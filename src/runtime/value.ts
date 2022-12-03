@@ -8,12 +8,13 @@ export interface ValueProps {
 }
 
 export class Value {
+  props: ValueProps;
   key?: string;
-  val: any;
   dom?: INode;
   cb?: (v: any) => void;
 
   constructor(scope: Scope, props: ValueProps) {
+    this.props = props;
     const key = props.key;
     if (key.startsWith(ATTR_VALUE_PREFIX)) {
       this.key = key.substring(ATTR_VALUE_PREFIX.length);
@@ -24,18 +25,17 @@ export class Value {
       this.dom = scope.texts ? scope.texts[i] : undefined;
       this.cb = Value.textCB;
     }
-    this.val = props.val;
   }
 
   static attrCB(v: Value) {
-    if (v.val != null) {
-      (v.dom as IElement).setAttribute(v.key as string, `${v.val}`);
+    if (v.props.val != null) {
+      (v.dom as IElement).setAttribute(v.key as string, `${v.props.val}`);
     } else {
       (v.dom as IElement).removeAttribute(v.key as string);
     }
   }
 
   static textCB(v: Value) {
-    (v.dom as INode).nodeValue = (v.val != null ? `${v}` : '');
+    (v.dom as INode).nodeValue = (v.props.val != null ? `${v.props.val}` : '');
   }
 }

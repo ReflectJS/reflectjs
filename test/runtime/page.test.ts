@@ -12,12 +12,12 @@ describe('page', () => {
     assert.equal(page.root.dom, page.doc.documentElement);
     assert.equal(page.root.children[0].dom, page.doc.head);
     assert.equal(page.root.children[1].dom, page.doc.body);
-    assert.equal(page.root.values[ROOT_SCOPE_NAME].val, page.root.obj);
-    assert.equal(page.root.values[HEAD_SCOPE_NAME].val, page.root.children[0].obj);
-    assert.equal(page.root.values[BODY_SCOPE_NAME].val, page.root.children[1].obj);
+    assert.equal(page.root.values[ROOT_SCOPE_NAME].props.val, page.root.obj);
+    assert.equal(page.root.values[HEAD_SCOPE_NAME].props.val, page.root.children[0].obj);
+    assert.equal(page.root.values[BODY_SCOPE_NAME].props.val, page.root.children[1].obj);
     assert.equal(
       page.markup,
-      `<html data-rsj="0">` +
+      `<!DOCTYPE html><html data-rsj="0">` +
       `<head data-rsj="1"></head>` +
       `<body data-rsj="2"></body>` +
       `</html>`
@@ -39,7 +39,7 @@ describe('page', () => {
     assert.equal(page.root.children[1].children[0].dom.tagName, 'SPAN');
     assert.equal(
       page.markup,
-      `<html data-rsj="0">` +
+      `<!DOCTYPE html><html data-rsj="0">` +
       `<head data-rsj="1"></head>` +
       `<body data-rsj="2"><span data-rsj="3">hi</span></body>` +
       `</html>`
@@ -73,18 +73,16 @@ export function baseApp(cb?: (props: PageProps) => void): Page {
       children: [{
         id: 1,
         name: HEAD_SCOPE_NAME,
-        query: 'head',
-        children: []
+        query: 'head'
       }, {
         id: 2,
         name: BODY_SCOPE_NAME,
-        query: 'body',
-        children: []
+        query: 'body'
       }]
     }
   }
   cb ? cb(props) : null;
-  return new Page(doc.documentElement, props);
+  return new Page(win, doc.documentElement, props);
 }
 
 export function addScope(props: PageProps, pos: number[], scope: ScopeProps) {

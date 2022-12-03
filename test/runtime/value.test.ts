@@ -16,7 +16,7 @@ describe('value', () => {
     });
     const v = page.root.children[1]?.values['v'];
     assert.isUndefined(v.key);
-    assert.equal(v.val, 1);
+    assert.equal(v.props.val, 1);
     assert.isUndefined(v.dom);
     assert.isUndefined(v.cb);
   });
@@ -31,7 +31,7 @@ describe('value', () => {
     });
     const v = page.root.children[1]?.values['attr_class'];
     assert.equal(v.key, 'class');
-    assert.equal(v.val, 'base');
+    assert.equal(v.props.val, 'base');
     assert.equal(v.dom, page.root.children[1]?.dom);
     assert.equal(v.cb, Value.attrCB);
   });
@@ -51,7 +51,7 @@ describe('value', () => {
     const span = body.children[0];
     const v = span.values[TEXT_VALUE_PREFIX + '0'];
     assert.isUndefined(v.key);
-    assert.equal(v.val, 'a text');
+    assert.equal(v.props.val, 'a text');
     assert.equal(v.dom, itemAt(0, span.texts));
     assert.equal(v.cb, Value.textCB);
   });
