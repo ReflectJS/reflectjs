@@ -1,24 +1,37 @@
 import { assert } from "chai";
-import { ScopeProps } from "../../src/runtime/scope";
+import { TEXT_NODE, TEXT_VALUE_PREFIX } from "../../src/runtime/page";
 import { addScope, baseApp } from "./page.test";
 
 describe('scope', () => {
 
-  it('should create an attribute value', () => {
+  it('should collect a DOM text', () => {
     const page = baseApp(props => {
-      const body = props.root.children?.at(1) as ScopeProps;
-      body.values = [{
-        key: 'attr_class',
-        val: 'base'
-      }];
+      addScope(props, [1], {
+        id: 3,
+        markup: `<span>Hello <!---t0-->x<!----->!</span>`
+      });
     });
-    // assert.equal(
-    //   page.markup,
-    //   `<html data-rsj="0">` +
-    //   `<head data-rsj="1"></head>` +
-    //   `<body data-rsj="2" class="base"></body>` +
-    //   `</html>`
-    // );
+    const body = page.root.children[1];
+    const span = body.children[0];
+    assert.equal(span.texts?.length, 1);
+    const text = span.texts?.at(0);
+    assert.equal(text?.nodeType, TEXT_NODE);
+    assert.equal(text?.nodeValue, 'x');
+  });
+
+  it('should collect an empty DOM text', () => {
+    const page = baseApp(props => {
+      addScope(props, [1], {
+        id: 3,
+        markup: `<span>Hello <!---t0--><!----->!</span>`
+      });
+    });
+    const body = page.root.children[1];
+    const span = body.children[0];
+    assert.equal(span.texts?.length, 1);
+    const text = span.texts?.at(0);
+    assert.equal(text?.nodeType, TEXT_NODE);
+    assert.equal(text?.nodeValue, '');
   });
 
 });

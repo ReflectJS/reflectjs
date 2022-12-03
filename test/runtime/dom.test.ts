@@ -1,9 +1,9 @@
 import { assert } from "chai";
 import { Window } from 'happy-dom';
 
-describe('happy-dom', function () {
+describe('dom', function () {
 
-  it("should execute example", () => {
+  it("should execute happy-dom example", () => {
     const window = new Window();
     const document = window.document;
     document.body.innerHTML = '<div class="container"></div>';

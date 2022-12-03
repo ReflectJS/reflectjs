@@ -1,8 +1,6 @@
-import { IElement } from "happy-dom";
-import { Page } from "./page";
+import { IElement, INode } from "happy-dom";
+import { COMMENT_NODE, DOM_ID_ATTR, ELEMENT_NODE, Page, TEXT_MARKER_PREFIX, TEXT_NODE } from "./page";
 import { Value, ValueProps } from "./value";
-
-const DOM_ID_ATTR = 'data-rsj';
 
 export interface ScopeProps {
   id: number;
@@ -20,6 +18,7 @@ export class Scope {
   children: Scope[];
   obj: any;
   dom: IElement;
+  texts?: INode[];
   values: { [key: string]: Value };
 
   constructor(page: Page, parent: Scope | null, props: ScopeProps) {
@@ -31,13 +30,14 @@ export class Scope {
     if (parent) {
       parent.children.push(this);
       if (props.name) {
-        parent.values[props.name] = new Value({
+        parent.values[props.name] = new Value(parent, {
           key: props.name,
           val: this.obj
         });
       }
     }
     this.dom = this.initDom();
+    this.texts = this.collectTexts();
     this.values = this.initValues();
   }
 
@@ -64,8 +64,35 @@ export class Scope {
     return this.page.doc.querySelector(query);
   }
 
+  collectTexts() {
+    const ret: INode[] = [];
+    const f = (p: IElement) => {
+      p.childNodes.forEach(n => {
+        if (
+          n.nodeType === COMMENT_NODE &&
+          n.nodeValue.startsWith(TEXT_MARKER_PREFIX)
+        ) {
+          const s = n.nodeValue.substring(TEXT_MARKER_PREFIX.length);
+          const i = parseInt(s);
+          let t = n.nextSibling;
+          if (t.nodeType !== TEXT_NODE) {
+            t = p.insertBefore(this.page.doc.createTextNode(''), t);
+          }
+          ret[i] = t;
+        } else if (n.nodeType === ELEMENT_NODE) {
+          f(n as IElement);
+        }
+      });
+    }
+    f(this.dom);
+    return ret.length > 0 ? ret : undefined;
+  }
+
   initValues() {
-    const ret = {};
+    const ret: { [key: string]: Value } = {};
+    this.props.values?.forEach(props => {
+      ret[props.key] = new Value(this, props);
+    });
     return ret;
   }
 }
