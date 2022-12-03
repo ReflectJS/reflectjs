@@ -98,6 +98,46 @@ tsconfig.json:
   ...
 ```
 
+### GitHub actions
+
+* Node.js CI
+* CodeQL
+
+### Coverage badge for GitHub
+
+[GitHub Action -- Create Coverage Badges](https://github.com/marketplace/actions/create-coverage-badges)
+
+```bash
+npm i -D coverage-badges-cli
+```
+
+.nycrc:
+
+```json
+{
+  "reporter": [
+    "json-summary",
+    "html",
+    "text"
+  ]
+}
+```
+
+README.md:
+
+```markdown
+...
+[![Coverage](coverage/badges.svg)](coverage/index.html)
+...
+```
+
+package.json/scripts:
+
+```json
+    "test": "nyc npm run test-base && coverage-badges",
+    "test-base": "mocha --exit -r ts-node/register test/**/*.test.ts"
+```
+
 ### Server-side DOM
 
 ```bash
