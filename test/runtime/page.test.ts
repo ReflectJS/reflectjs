@@ -12,9 +12,9 @@ describe('page', () => {
     assert.equal(page.root.dom, page.doc.documentElement);
     assert.equal(page.root.children[0].dom, page.doc.head);
     assert.equal(page.root.children[1].dom, page.doc.body);
-    assert.equal(page.root.values[ROOT_SCOPE_NAME].props.val, page.root.obj);
-    assert.equal(page.root.values[HEAD_SCOPE_NAME].props.val, page.root.children[0].obj);
-    assert.equal(page.root.values[BODY_SCOPE_NAME].props.val, page.root.children[1].obj);
+    assert.equal(page.root.values[ROOT_SCOPE_NAME].props.val, page.root.proxy);
+    assert.equal(page.root.values[HEAD_SCOPE_NAME].props.val, page.root.children[0].proxy);
+    assert.equal(page.root.values[BODY_SCOPE_NAME].props.val, page.root.children[1].proxy);
     assert.equal(
       page.markup,
       `<!DOCTYPE html><html data-rsj="0">` +

@@ -43,7 +43,7 @@ describe('value', () => {
         markup: `<span>Hello <!---t0--><!---/-->!</span>`,
         values: [{
           key: TEXT_VALUE_PREFIX + '0',
-          val: 'a text'
+          val: 'there'
         }]
       });
     });
@@ -51,9 +51,58 @@ describe('value', () => {
     const span = body.children[0];
     const v = span.values[TEXT_VALUE_PREFIX + '0'];
     assert.isUndefined(v.key);
-    assert.equal(v.props.val, 'a text');
+    assert.equal(v.props.val, 'there');
     assert.equal(v.dom, itemAt(0, span.texts));
     assert.equal(v.cb, Value.textCB);
+    assert.equal(
+      page.markup,
+      `<!DOCTYPE html><html data-rsj=\"0\">` +
+      `<head data-rsj=\"1\"></head><body data-rsj=\"2\">` +
+      `<span data-rsj=\"3\">Hello <!---t0--><!---/-->!</span>` +
+      `</body></html>`
+    );
+    page.refresh();
+    assert.equal(
+      page.markup,
+      `<!DOCTYPE html><html data-rsj=\"0\">` +
+      `<head data-rsj=\"1\"></head><body data-rsj=\"2\">` +
+      `<span data-rsj=\"3\">Hello <!---t0-->there<!---/-->!</span>` +
+      `</body></html>`
+    );
+  });
+
+  it('should update dependent value', () => {
+    const page = baseApp(props => {
+      const body = itemAt(1, props.root.children) as ScopeProps;
+      body.values = [{
+        key: 'v1', val: 1
+      }, {
+        key: 'v2', val: undefined,
+        fn: function() { return this.v1 + 1; },
+        refs: ['v1']
+      }];
+    });
+    const body = page.root.children[1];
+    const v1 = body.values['v1'];
+    const v2 = body.values['v2'];
+    assert.equal(v1.props.val, 1);
+    assert.isUndefined(v1.src);
+    assert.isUndefined(v1.dst);
+    assert.isUndefined(v2.props.val);
+    assert.isUndefined(v2.src);
+    assert.isUndefined(v2.dst);
+    page.refresh();
+    assert.equal(v1.props.val, 1);
+    assert.equal(v2.props.val, 2);
+    body.proxy['v1'] = 5;
+    assert.equal(v1.props.val, 5);
+    assert.equal(v2.props.val, 6);
+    body.proxy['v2'] = 100;
+    assert.equal(v1.props.val, 5);
+    assert.equal(v2.props.val, 100);
+    body.proxy['v1'] = 10;
+    assert.equal(v1.props.val, 10);
+    assert.equal(v2.props.val, 100);
   });
 
 });
