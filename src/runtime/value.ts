@@ -1,4 +1,3 @@
-import { IElement, INode } from "happy-dom";
 import { ATTR_VALUE_PREFIX, TEXT_VALUE_PREFIX } from "./page";
 import { Scope } from "./scope";
 
@@ -19,7 +18,7 @@ export class Value {
   props: ValueProps;
   scope?: Scope;
   key?: string;
-  dom?: INode;
+  dom?: Node;
   cb?: (v: any) => void;
   fn?: () => any;
   src?: Set<Value>;
@@ -43,13 +42,13 @@ export class Value {
 
   static attrCB(v: Value) {
     if (v.props.val != null) {
-      (v.dom as IElement).setAttribute(v.key as string, `${v.props.val}`);
+      (v.dom as Element).setAttribute(v.key as string, `${v.props.val}`);
     } else {
-      (v.dom as IElement).removeAttribute(v.key as string);
+      (v.dom as Element).removeAttribute(v.key as string);
     }
   }
 
   static textCB(v: Value) {
-    (v.dom as INode).nodeValue = (v.props.val != null ? `${v.props.val}` : '');
+    (v.dom as Node).nodeValue = (v.props.val != null ? `${v.props.val}` : '');
   }
 }

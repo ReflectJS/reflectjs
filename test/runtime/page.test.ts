@@ -82,7 +82,7 @@ export function baseApp(cb?: (props: PageProps) => void): Page {
     }
   }
   cb ? cb(props) : null;
-  return new Page(win, doc.documentElement, props);
+  return new Page(win, doc.documentElement as unknown as Element, props);
 }
 
 export function addScope(props: PageProps, pos: number[], scope: ScopeProps) {

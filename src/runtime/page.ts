@@ -1,4 +1,4 @@
-import { IDocument, IHTMLElement, Window } from "happy-dom";
+import { Window } from "happy-dom";
 import { Scope, ScopeProps } from "./scope";
 import { Value } from "./value";
 
@@ -29,15 +29,15 @@ export interface PageProps {
  */
  export class Page {
   win: Window;
-  doc: IDocument;
-  dom: IHTMLElement;
+  doc: Document;
+  dom: Element;
   props: PageProps;
   root: Scope;
   pushLevel?: number;
 
-  constructor(win: Window, dom: IHTMLElement, props: PageProps) {
+  constructor(win: Window, dom: Element, props: PageProps) {
     this.win = win;
-    this.doc = dom.ownerDocument;
+    this.doc = dom.ownerDocument as unknown as Document;
     this.dom = dom;
     this.props = props;
     this.root = this.load(null, props.root);
@@ -73,6 +73,6 @@ export interface PageProps {
   }
 
   getMarkup() {
-    return new this.win.XMLSerializer().serializeToString(this.doc);
+    return '<!DOCTYPE html>' + this.doc.documentElement.outerHTML;
   }
 }

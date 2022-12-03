@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import { TEXT_NODE, TEXT_VALUE_PREFIX } from "../../src/runtime/page";
+import { TEXT_NODE } from "../../src/runtime/page";
 import { addScope, baseApp, itemAt } from "./page.test";
 
 describe('scope', () => {

@@ -1,4 +1,3 @@
-import { IElement, INode } from "happy-dom";
 import { COMMENT_NODE, DOM_ID_ATTR, ELEMENT_NODE, OUTER_PROPERTY, Page, RESERVED_PREFIX, TEXT_MARKER_PREFIX, TEXT_NODE } from "./page";
 import { Value, ValueProps } from "./value";
 
@@ -19,8 +18,8 @@ export class Scope {
   parent: Scope | null;
   props: ScopeProps;
   children: Scope[];
-  dom: IElement;
-  texts?: INode[];
+  dom: Element;
+  texts?: Node[];
   values: { [key: string]: Value };
   proxy: any;
 
@@ -57,39 +56,39 @@ export class Scope {
     return ret;
   }
 
-  initDomFromMarkup(markup: string): IElement {
+  initDomFromMarkup(markup: string): Element {
     const p = (this.parent as Scope);
     const doc = p.dom.ownerDocument;
     const div = doc.createElement('div');
     div.innerHTML = markup;
-    const ret = div.firstElementChild;
+    const ret = div.firstElementChild as Element;
     div.removeChild(ret);
     p.dom.appendChild(ret);
     return ret;
   }
 
-  initDomFromDomQuery(query: string) {
-    return this.page.doc.querySelector(query);
+  initDomFromDomQuery(query: string): Element {
+    return this.page.doc.querySelector(query) as Element;
   }
 
   collectTextNodes() {
-    const ret: INode[] = [];
-    const f = (p: IElement) => {
+    const ret: Node[] = [];
+    const f = (p: Element) => {
       p.childNodes.forEach(n => {
         if (
           n.nodeType === COMMENT_NODE &&
-          n.nodeValue.startsWith(TEXT_MARKER_PREFIX)
+          n.nodeValue?.startsWith(TEXT_MARKER_PREFIX)
         ) {
           const s = n.nodeValue.substring(TEXT_MARKER_PREFIX.length);
           const i = parseInt(s);
           let t = n.nextSibling;
-          if (t.nodeType !== TEXT_NODE) {
+          if (t && t.nodeType !== TEXT_NODE) {
             t = p.insertBefore(this.page.doc.createTextNode(''), t);
           }
-          ret[i] = t;
+          ret[i] = t as Node;
         } else if (n.nodeType === ELEMENT_NODE) {
-          if (!(n as IElement).hasAttribute(DOM_ID_ATTR)) {
-            f(n as IElement);
+          if (!(n as Element).hasAttribute(DOM_ID_ATTR)) {
+            f(n as Element);
           }
         }
       });
