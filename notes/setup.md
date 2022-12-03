@@ -100,8 +100,10 @@ tsconfig.json:
 
 ### GitHub actions
 
-* Node.js CI
+* [Node.js CI](https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs)
 * CodeQL
+
+see [Starter Workflows](https://github.com/actions/starter-workflows)
 
 ### Coverage badge for GitHub
 
@@ -127,15 +129,15 @@ README.md:
 
 ```markdown
 ...
-[![Coverage](coverage/badges.svg)](coverage/index.html)
+![Coverage](res/coverage-badge.svg)
 ...
 ```
 
 package.json/scripts:
 
 ```json
-    "test": "nyc npm run test-base && coverage-badges",
-    "test-base": "mocha --exit -r ts-node/register test/**/*.test.ts"
+    "test": "mocha --exit -r ts-node/register test/**/*.test.ts",
+    "coverage": "nyc npm run test && coverage-badges --output res/coverage-badge.svg"
 ```
 
 ### Server-side DOM

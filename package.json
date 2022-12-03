@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "nyc npm run test-base && coverage-badges",
-    "test-base": "mocha --exit -r ts-node/register test/**/*.test.ts"
+    "test": "mocha --exit -r ts-node/register test/**/*.test.ts",
+    "coverage": "nyc npm run test && coverage-badges --output res/coverage-badge.svg"
   },
   "keywords": [],
   "author": "Fabrizio Capolini",
