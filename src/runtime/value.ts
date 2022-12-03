@@ -21,7 +21,7 @@ export class Value {
       this.cb = Value.attrCB;
     } else if (key.startsWith(TEXT_VALUE_PREFIX)) {
       const i = parseInt(key.substring(TEXT_VALUE_PREFIX.length));
-      this.dom = scope.texts?.at(i);
+      this.dom = scope.texts ? scope.texts[i] : undefined;
       this.cb = Value.textCB;
     }
     this.val = props.val;
