@@ -279,6 +279,22 @@ describe("preprocessor", () => {
     assert.equal(sourcePos?.column2, 7);
   });
 
+  // =========================================================================
+  // output
+  // =========================================================================
+
+  it("should output [[]]-quoted attributes as standard ones", async () => {
+    var prepro = new Preprocessor(preprocessor.rootPath, [{
+      fname: 'dummy.html',
+      content: '<html><body :v=[[x < 1 && y === "a"]]>Dummy</body></html>'
+    }]);
+    const doc = await prepro.read('dummy.html');
+    assert.isFalse(adjacentTextNodes(doc));
+    assert.equal(normalizeText(doc?.toString()), normalizeText(
+      `<html><head></head><body :v="[[x &lt; 1 && y === &quot;a&quot;]]">Dummy</body></html>`
+    ));
+  });
+
 });
 
 // =============================================================================

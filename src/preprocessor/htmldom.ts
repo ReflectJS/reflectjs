@@ -578,7 +578,9 @@ export class HtmlAttribute {
       } else {
         var q = this.quote === "'" ? "'" : '"';
         sb.add('='); sb.add(q);
+        this.quote === "[" && sb.add('[[');
         sb.add(HtmlElement.escape(outputValue, "<>\r\n" + q));
+        this.quote === "[" && sb.add(']]');
         sb.add(q);
       }
     }
