@@ -90,10 +90,14 @@ export function baseApp(cb?: (props: PageProps) => void): Page {
 export function addScope(props: PageProps, pos: number[], scope: ScopeProps) {
   let parent: ScopeProps | undefined = props.root;
   for (const i of pos) {
-    parent = parent?.children?.at(i);
+    parent = itemAt(i, parent?.children);
   }
   if (parent) {
     parent.children ? null : parent.children = [];
     parent.children.push(scope);
   }
+}
+
+export function itemAt(i: number, a?: any[]): any {
+  return (a && a.length > i ? a[i] : null);
 }

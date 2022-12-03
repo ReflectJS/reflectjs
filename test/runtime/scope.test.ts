@@ -1,6 +1,6 @@
 import { assert } from "chai";
 import { TEXT_NODE, TEXT_VALUE_PREFIX } from "../../src/runtime/page";
-import { addScope, baseApp } from "./page.test";
+import { addScope, baseApp, itemAt } from "./page.test";
 
 describe('scope', () => {
 
@@ -14,7 +14,7 @@ describe('scope', () => {
     const body = page.root.children[1];
     const span = body.children[0];
     assert.equal(span.texts?.length, 1);
-    const text = span.texts?.at(0);
+    const text = itemAt(0, span.texts);
     assert.equal(text?.nodeType, TEXT_NODE);
     assert.equal(text?.nodeValue, 'x');
   });
@@ -29,7 +29,7 @@ describe('scope', () => {
     const body = page.root.children[1];
     const span = body.children[0];
     assert.equal(span.texts?.length, 1);
-    const text = span.texts?.at(0);
+    const text = itemAt(0, span.texts);
     assert.equal(text?.nodeType, TEXT_NODE);
     assert.equal(text?.nodeValue, '');
   });
