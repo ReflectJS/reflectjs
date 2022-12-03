@@ -172,3 +172,10 @@ describe('happy-dom', function () {
 
 });
 ```
+
+### Esprima/ESCodeGen
+
+```
+npm i escodegen esprima estraverse
+npm i -D @types/escodegen @types/esprima @types/estraverse
+```

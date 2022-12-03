@@ -19,6 +19,8 @@ export const TEXT_VALUE_PREFIX = RESERVED_PREFIX + 't';
 
 export const TEXT_MARKER_PREFIX = '-t';
 
+export const NOTNULL_FN = RESERVED_PREFIX + 'nn';
+
 export interface PageProps {
   root: ScopeProps;
   cycle?: number;

@@ -95,7 +95,7 @@ describe("htmlparser", () => {
 
   it("should parse <html title=[[a[0]]]></html>", () => {
     var doc = HtmlParser.parse('<html title=[[a[0]]]></html>');
-    assert.equal(doc.toString(), '<html title="a[0]"></html>');
+    assert.equal(doc.toString(), '<html title="[[a[0]]]"></html>');
   });
 
   it("should complain about <html></div>", () => {
