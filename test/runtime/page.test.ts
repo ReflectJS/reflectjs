@@ -16,7 +16,7 @@ describe('page', () => {
     assert.equal(page.root.values[HEAD_SCOPE_NAME].props.val, page.root.children[0].proxy);
     assert.equal(page.root.values[BODY_SCOPE_NAME].props.val, page.root.children[1].proxy);
     assert.equal(
-      page.markup,
+      page.getMarkup(),
       `<!DOCTYPE html><html data-rsj="0">` +
       `<head data-rsj="1"></head>` +
       `<body data-rsj="2"></body>` +
@@ -38,7 +38,7 @@ describe('page', () => {
     assert.equal(page.root.children[1].dom, page.doc.body);
     assert.equal(page.root.children[1].children[0].dom.tagName, 'SPAN');
     assert.equal(
-      page.markup,
+      page.getMarkup(),
       `<!DOCTYPE html><html data-rsj="0">` +
       `<head data-rsj="1"></head>` +
       `<body data-rsj="2"><span data-rsj="3">hi</span></body>` +

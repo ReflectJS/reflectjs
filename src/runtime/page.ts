@@ -24,7 +24,10 @@ export interface PageProps {
   cycle?: number;
 }
 
-export class Page {
+/**
+ * Page
+ */
+ export class Page {
   win: Window;
   doc: IDocument;
   dom: IHTMLElement;
@@ -53,7 +56,9 @@ export class Page {
   }
 
   refresh(scope?: Scope, noincrement?: boolean) {
-    this.props.cycle ? (noincrement ? null : this.props.cycle++) : this.props.cycle = 1;
+    this.props.cycle
+      ? (noincrement ? null : this.props.cycle++)
+      : this.props.cycle = 1;
     delete this.pushLevel;
     scope || (scope = this.root);
     scope.unlinkValues();
@@ -63,11 +68,11 @@ export class Page {
     return this;
   }
 
-  globalLookup(key: string): Value | undefined {
+  lookupGlobal(key: string): Value | undefined {
     return undefined;
   }
 
-  get markup() {
+  getMarkup() {
     return new this.win.XMLSerializer().serializeToString(this.doc);
   }
 }

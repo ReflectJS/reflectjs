@@ -55,7 +55,7 @@ describe('value', () => {
     assert.equal(v.dom, itemAt(0, span.texts));
     assert.equal(v.cb, Value.textCB);
     assert.equal(
-      page.markup,
+      page.getMarkup(),
       `<!DOCTYPE html><html data-rsj=\"0\">` +
       `<head data-rsj=\"1\"></head><body data-rsj=\"2\">` +
       `<span data-rsj=\"3\">Hello <!---t0--><!---/-->!</span>` +
@@ -63,7 +63,7 @@ describe('value', () => {
     );
     page.refresh();
     assert.equal(
-      page.markup,
+      page.getMarkup(),
       `<!DOCTYPE html><html data-rsj=\"0\">` +
       `<head data-rsj=\"1\"></head><body data-rsj=\"2\">` +
       `<span data-rsj=\"3\">Hello <!---t0-->there<!---/-->!</span>` +
@@ -84,22 +84,27 @@ describe('value', () => {
     });
     const body = page.root.children[1];
     const v1 = body.values['v1'];
-    const v2 = body.values['v2'];
     assert.equal(v1.props.val, 1);
     assert.isUndefined(v1.src);
     assert.isUndefined(v1.dst);
+    const v2 = body.values['v2'];
     assert.isUndefined(v2.props.val);
     assert.isUndefined(v2.src);
     assert.isUndefined(v2.dst);
+    // by refreshing, the dependent value is updated
     page.refresh();
     assert.equal(v1.props.val, 1);
     assert.equal(v2.props.val, 2);
+    // and it gets linked to the upstream value
+    // so when that one changes, it changes too
     body.proxy['v1'] = 5;
     assert.equal(v1.props.val, 5);
     assert.equal(v2.props.val, 6);
+    // if it's set explicitly
     body.proxy['v2'] = 100;
     assert.equal(v1.props.val, 5);
     assert.equal(v2.props.val, 100);
+    // it then becomes independent
     body.proxy['v1'] = 10;
     assert.equal(v1.props.val, 10);
     assert.equal(v2.props.val, 100);

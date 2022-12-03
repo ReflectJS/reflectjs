@@ -12,13 +12,15 @@ export interface ValueProps {
   refs?: string[];
 }
 
+/**
+ * Value
+ */
 export class Value {
   props: ValueProps;
   scope?: Scope;
   key?: string;
   dom?: INode;
   cb?: (v: any) => void;
-
   fn?: () => any;
   src?: Set<Value>;
   dst?: Set<Value>;

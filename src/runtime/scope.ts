@@ -11,6 +11,9 @@ export interface ScopeProps {
   children?: ScopeProps[];
 }
 
+/**
+ * Scope
+ */
 export class Scope {
   page: Page;
   parent: Scope | null;
@@ -41,6 +44,10 @@ export class Scope {
       }
     }
   }
+
+  // ---------------------------------------------------------------------------
+  // dom
+  // ---------------------------------------------------------------------------
 
   initDom() {
     const ret = this.props.markup
@@ -81,13 +88,19 @@ export class Scope {
           }
           ret[i] = t;
         } else if (n.nodeType === ELEMENT_NODE) {
-          f(n as IElement);
+          if (!(n as IElement).hasAttribute(DOM_ID_ATTR)) {
+            f(n as IElement);
+          }
         }
       });
     }
     f(this.dom);
     return ret.length > 0 ? ret : undefined;
   }
+
+  // ---------------------------------------------------------------------------
+  // reactivity
+  // ---------------------------------------------------------------------------
 
   initValues() {
     const ret: { [key: string]: Value } = {};
@@ -106,7 +119,7 @@ export class Scope {
       scope = scope.parent;
     }
     if (!ret) {
-      ret = this.page.globalLookup(prop);
+      ret = this.page.lookupGlobal(prop);
     }
     return ret;
   }
@@ -141,6 +154,9 @@ export class Scope {
   }
 }
 
+/**
+ * ScopeProxyHandler
+ */
 class ScopeProxyHandler implements ProxyHandler<any> {
   page: Page;
   scope: Scope;
@@ -164,7 +180,6 @@ class ScopeProxyHandler implements ProxyHandler<any> {
       return false;
     }
     const value = this.scope.lookupValue(prop);
-
     if (value && !value.props.passive) {
       const old = value.props.val;
       value.props.val = val;
@@ -174,7 +189,6 @@ class ScopeProxyHandler implements ProxyHandler<any> {
         this.propagate(value);
       }
     }
-
     return !!value;
   }
 
@@ -183,14 +197,12 @@ class ScopeProxyHandler implements ProxyHandler<any> {
       if (!value.props.cycle || value.props.cycle < (this.page.props.cycle ?? 0)) {
         value.props.cycle = this.page.props.cycle ?? 0;
         const old = value.props.val;
-
         try {
           value.props.val = value.fn.apply((value.scope as Scope).proxy);
         } catch (ex: any) {
           //TODO (+ use ValueProps.pos if available)
           console.log(ex);
         }
-
         if (old == null ? value.props.val != null : old !== value.props.val) {
           value.cb && value.cb(value);
           value.dst && this.propagate(value);
