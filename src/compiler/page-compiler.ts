@@ -1,9 +1,9 @@
 import { generate } from "escodegen";
 import * as es from "estree";
 import { HtmlDocument } from "../preprocessor/htmldom";
-import * as page from "../runtime/page";
-import * as scope from "../runtime/scope";
-import * as value from "../runtime/value";
+import { PageProps } from "../runtime/page";
+import { ScopeProps } from "../runtime/scope";
+import { ValueProps } from "../runtime/value";
 import { loadPage } from "./page-preprocessor";
 
 export interface PageError {
@@ -18,9 +18,9 @@ export function compileDoc(doc: HtmlDocument) {
 }
 
 /**
- * @see page.PageProps
+ * @see PageProps
  */
-function compilePage(page: page.PageProps, errors: PageError[]) {
+function compilePage(page: PageProps, errors: PageError[]) {
   const props: es.Property[] = [];
   props.push(makeProperty('root', compileScope(page.root, errors)));
   return {
@@ -30,9 +30,9 @@ function compilePage(page: page.PageProps, errors: PageError[]) {
 }
 
 /**
- * @see scope.ScopeProps
+ * @see ScopeProps
  */
-function compileScope(src: scope.ScopeProps, errors: PageError[]) {
+function compileScope(src: ScopeProps, errors: PageError[]) {
   const dst: es.Property[] = [];
   dst.push(makeProperty('id', { type: 'Literal', value: src.id }));
   src.name && dst.push(makeProperty('name', { type: 'Literal', value: src.name }));
@@ -46,7 +46,7 @@ function compileScope(src: scope.ScopeProps, errors: PageError[]) {
   } as es.ObjectExpression;
 }
 
-function compileScopes(scopes: scope.ScopeProps[], errors: PageError[]) {
+function compileScopes(scopes: ScopeProps[], errors: PageError[]) {
   const dst: es.ObjectExpression[] = [];
   scopes.forEach(scope => {
     dst.push(compileScope(scope, errors));
@@ -57,7 +57,7 @@ function compileScopes(scopes: scope.ScopeProps[], errors: PageError[]) {
   } as es.ArrayExpression;
 }
 
-function compileValues(values: value.ValueProps[], errors: PageError[]) {
+function compileValues(values: ValueProps[], errors: PageError[]) {
   const dst: es.Property[] = [];
   values.forEach(valueProps => {
     dst.push(makeProperty(valueProps.key, compileValue(valueProps, errors)));
@@ -69,9 +69,9 @@ function compileValues(values: value.ValueProps[], errors: PageError[]) {
 }
 
 /**
- * @see value.ValueProps
+ * @see ValueProps
  */
-function compileValue(value: value.ValueProps, errors: PageError[]) {
+function compileValue(value: ValueProps, errors: PageError[]) {
   const dst: es.Property[] = [];
   //TODO
   return {
