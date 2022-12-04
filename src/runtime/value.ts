@@ -6,7 +6,7 @@ export interface ValueProps {
   val: any;
 
   passive?: boolean;
-  fn?: () => any;
+  fn?: () => any | string;
   cycle?: number;
   refs?: string[];
 }

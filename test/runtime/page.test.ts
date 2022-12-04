@@ -1,6 +1,6 @@
 import { assert } from "chai";
 import { Window } from "happy-dom";
-import { BODY_SCOPE_NAME, HEAD_SCOPE_NAME, Page, PageProps, ROOT_SCOPE_NAME } from "../../src/runtime/page";
+import { BODY_SCOPE_NAME, DOM_ID_ATTR, HEAD_SCOPE_NAME, Page, PageProps, ROOT_SCOPE_NAME } from "../../src/runtime/page";
 import { Scope, ScopeProps } from "../../src/runtime/scope";
 
 describe('page', () => {
@@ -17,9 +17,9 @@ describe('page', () => {
     assert.equal(page.root.values[BODY_SCOPE_NAME].props.val, page.root.children[1].proxy);
     assert.equal(
       page.getMarkup(),
-      `<!DOCTYPE html><html data-rsj="0">` +
-      `<head data-rsj="1"></head>` +
-      `<body data-rsj="2"></body>` +
+      `<!DOCTYPE html><html ${DOM_ID_ATTR}="0">` +
+      `<head ${DOM_ID_ATTR}="1"></head>` +
+      `<body ${DOM_ID_ATTR}="2"></body>` +
       `</html>`
     );
   });
@@ -39,9 +39,9 @@ describe('page', () => {
     assert.equal(page.root.children[1].children[0].dom.tagName, 'SPAN');
     assert.equal(
       page.getMarkup(),
-      `<!DOCTYPE html><html data-rsj="0">` +
-      `<head data-rsj="1"></head>` +
-      `<body data-rsj="2"><span data-rsj="3">hi</span></body>` +
+      `<!DOCTYPE html><html ${DOM_ID_ATTR}="0">` +
+      `<head ${DOM_ID_ATTR}="1"></head>` +
+      `<body ${DOM_ID_ATTR}="2"><span ${DOM_ID_ATTR}="3">hi</span></body>` +
       `</html>`
     );
   });

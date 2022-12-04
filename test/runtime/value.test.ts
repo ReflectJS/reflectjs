@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import { TEXT_VALUE_PREFIX } from "../../src/runtime/page";
+import { DOM_ID_ATTR, TEXT_VALUE_PREFIX } from "../../src/runtime/page";
 import { ScopeProps } from "../../src/runtime/scope";
 import { Value } from "../../src/runtime/value";
 import { addScope, baseApp, itemAt } from "./page.test";
@@ -56,17 +56,17 @@ describe('value', () => {
     assert.equal(v.cb, Value.textCB);
     assert.equal(
       page.getMarkup(),
-      `<!DOCTYPE html><html data-rsj=\"0\">` +
-      `<head data-rsj=\"1\"></head><body data-rsj=\"2\">` +
-      `<span data-rsj=\"3\">Hello <!---t0--><!---/-->!</span>` +
+      `<!DOCTYPE html><html ${DOM_ID_ATTR}=\"0\">` +
+      `<head ${DOM_ID_ATTR}=\"1\"></head><body ${DOM_ID_ATTR}=\"2\">` +
+      `<span ${DOM_ID_ATTR}=\"3\">Hello <!---t0--><!---/-->!</span>` +
       `</body></html>`
     );
     page.refresh();
     assert.equal(
       page.getMarkup(),
-      `<!DOCTYPE html><html data-rsj=\"0\">` +
-      `<head data-rsj=\"1\"></head><body data-rsj=\"2\">` +
-      `<span data-rsj=\"3\">Hello <!---t0-->there<!---/-->!</span>` +
+      `<!DOCTYPE html><html ${DOM_ID_ATTR}=\"0\">` +
+      `<head ${DOM_ID_ATTR}=\"1\"></head><body ${DOM_ID_ATTR}=\"2\">` +
+      `<span ${DOM_ID_ATTR}=\"3\">Hello <!---t0-->there<!---/-->!</span>` +
       `</body></html>`
     );
   });

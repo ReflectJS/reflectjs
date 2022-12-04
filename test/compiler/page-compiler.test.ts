@@ -1,0 +1,71 @@
+import { assert } from "chai";
+import { compileDoc } from "../../src/compiler/page-compiler";
+import { HtmlDocument } from "../../src/preprocessor/htmldom";
+import Preprocessor from "../../src/preprocessor/preprocessor";
+import { normalizeSpace } from "../../src/preprocessor/util";
+import { DOM_ID_ATTR } from "../../src/runtime/page";
+
+const preprocessor = new Preprocessor(process.cwd() + '/test/compiler/page-compiler');
+
+describe("page-compiler", () => {
+
+  it(`empty page`, async () => {
+    const doc = await getDoc(`<html></html>`);
+    const { page, js, errors } = compileDoc(doc);
+    assert.equal(errors.length, 0);
+    assert.equal(
+      page.getMarkup(),
+      `<!DOCTYPE html><html ${DOM_ID_ATTR}="0">` +
+      `<head ${DOM_ID_ATTR}="1"></head>` +
+      `<body ${DOM_ID_ATTR}="2"></body>` +
+      `</html>`
+    );
+    assert.equal(
+      normalizeSpace(js),
+      normalizeSpace(`{ root: {
+        id: 0, name: 'page', query: 'html',
+        children: [
+          { id: 1, name: 'head', query: 'head' },
+          { id: 2, name: 'body', query: 'body' }
+        ]
+      } }`)
+    );
+  });
+
+  // it(`basic page`, async () => {
+  //   const doc = await getDoc(`<html :attr_lang=[[l]] :l="en"></html>`);
+  //   const { page, js, errors } = compileDoc(doc);
+  //   assert.equal(errors.length, 0);
+  //   assert.equal(
+  //     page.getMarkup(),
+  //     `<!DOCTYPE html><html ${DOM_ID_ATTR}="0">` +
+  //     `<head ${DOM_ID_ATTR}="1"></head>` +
+  //     `<body ${DOM_ID_ATTR}="2"></body>` +
+  //     `</html>`
+  //   );
+  //   assert.equal(
+  //     normalizeSpace(js),
+  //     normalizeSpace(`{ root: {
+  //       id: 0, name: 'page', query: 'html',
+  //       children: [
+  //         { id: 1, name: 'head', query: 'head' },
+  //         { id: 2, name: 'body', query: 'body' }
+  //       ]
+  //     } }`)
+  //   );
+  // });
+
+});
+
+// =============================================================================
+// util
+// =============================================================================
+
+async function getDoc(content: string): Promise<HtmlDocument> {
+  var prepro = new Preprocessor(preprocessor.rootPath, [{
+    fname: 'index.html',
+    content: content
+  }]);
+  const ret = await prepro.read('index.html');
+  return ret as HtmlDocument;
+}
