@@ -6,7 +6,10 @@ export const ELEMENT_NODE = 1; //TODO
 export const TEXT_NODE = 3; //TODO
 export const COMMENT_NODE = 8; //TODO
 
-export const DOM_ID_ATTR = 'data-rsj';
+export const LOGIC_ATTR_PREFIX = ':';
+export const AKA_ATTR = LOGIC_ATTR_PREFIX + 'aka';
+
+export const DOM_ID_ATTR = 'data-reflectjs';
 
 export const ROOT_SCOPE_NAME = 'page';
 export const HEAD_SCOPE_NAME = 'head';

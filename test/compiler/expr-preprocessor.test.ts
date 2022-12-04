@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import { preprocess } from "../../src/compiler/expr-preprocesor";
+import { preprocess } from "../../src/compiler/expr-preprocessor";
 import { NOTNULL_FN } from "../../src/runtime/page";
 
 describe("expr-preprocessor", () => {
