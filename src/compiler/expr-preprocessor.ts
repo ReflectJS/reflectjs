@@ -1,8 +1,8 @@
 import { StringBuf } from "../preprocessor/util";
 import { NOTNULL_FN } from "../runtime/page";
 
-const EXPR_MARKER1 = '[[';
-const EXPR_MARKER2 = ']]';
+export const EXPR_MARKER1 = '[[';
+export const EXPR_MARKER2 = ']]';
 
 export interface Expr {
 	src: string,

@@ -1,4 +1,4 @@
-import { COMMENT_NODE, DOM_ID_ATTR, ELEMENT_NODE, OUTER_PROPERTY, Page, RESERVED_PREFIX, TEXT_MARKER_PREFIX, TEXT_NODE } from "./page";
+import { COMMENT_NODE, DOM_ID_ATTR, ELEMENT_NODE, OUTER_PROPERTY, Page, RESERVED_PREFIX, TEXT_MARKER1_PREFIX, TEXT_NODE } from "./page";
 import { Value, ValueProps } from "./value";
 
 export interface ScopeProps {
@@ -77,9 +77,9 @@ export class Scope {
       p.childNodes.forEach(n => {
         if (
           n.nodeType === COMMENT_NODE &&
-          n.nodeValue?.startsWith(TEXT_MARKER_PREFIX)
+          n.nodeValue?.startsWith(TEXT_MARKER1_PREFIX)
         ) {
-          const s = n.nodeValue.substring(TEXT_MARKER_PREFIX.length);
+          const s = n.nodeValue.substring(TEXT_MARKER1_PREFIX.length);
           const i = parseInt(s);
           let t = n.nextSibling;
           if (t && t.nodeType !== TEXT_NODE) {

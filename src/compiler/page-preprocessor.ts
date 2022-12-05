@@ -3,7 +3,7 @@ import { HtmlAttribute, HtmlDocument, HtmlElement, HtmlText } from "../preproces
 import * as page from "../runtime/page";
 import { ScopeProps } from "../runtime/scope";
 import { ValueProps } from "../runtime/value";
-import { isDynamic } from "./expr-preprocessor";
+import { EXPR_MARKER1, EXPR_MARKER2, isDynamic } from "./expr-preprocessor";
 import { PageError } from "./page-compiler";
 
 export function loadPage(doc: HtmlDocument) {
@@ -70,6 +70,7 @@ function loadScope(e: HtmlElement, errors: PageError[]): ScopeProps {
   e.getAttribute(page.AKA_ATTR) && (ret.name = e.getAttribute(page.AKA_ATTR));
   loadValues(e, ret.values as ValueProps[], errors);
 
+  const textValueProps: ValueProps[] = [];
   function scan(p: HtmlElement) {
     p.childNodes.forEach(n => {
       if (n.nodeType === ELEMENT_NODE) {
@@ -80,12 +81,13 @@ function loadScope(e: HtmlElement, errors: PageError[]): ScopeProps {
         }
       } else if (n.nodeType === TEXT_NODE) {
         if (isDynamic((n as HtmlText).nodeValue)) {
-          ret.values?.push(loadText(n as HtmlText, errors));
+          loadTexts(n as HtmlText, textValueProps, errors);
         }
       }
     });
   }
   scan(e);
+  ret.values?.push(...textValueProps);
 
   (ret.values && ret.values.length < 1) && (delete ret.values);
   (ret.children && ret.children.length < 1) && (delete ret.children);
@@ -113,7 +115,36 @@ function loadValue(
   });
 }
 
-function loadText(t: HtmlText, errors: PageError[]): ValueProps {
-  //TODO
-  return { key: '', val: '' };
+function loadTexts(t: HtmlText, ret: ValueProps[], errors: PageError[]) {
+  const d = t.ownerDocument as HtmlDocument;
+  const p = t.parentElement as HtmlElement;
+  const s = t.nodeValue;
+
+  let i1a, i1b, i2a, i2b = 0, id;
+  while ((i1a = s.indexOf(EXPR_MARKER1, i2a)) >= i2b) {
+    id = ret.length;
+    i1b = i1a + EXPR_MARKER1.length;
+    if ((i2a = s.indexOf(EXPR_MARKER2, i1b)) < 0) {
+      break;
+    }
+    // so e.g. in '[[v[0]]]' the end marker is correct
+    while (s.indexOf(EXPR_MARKER2, i2a + 1) === i2a + 1) {
+      i2a++;
+    }
+    
+    if (i1a > i2b) {
+      p.insertBefore(d.createTextNode(s.substring(i2b, i1a)), t);
+    }
+    p.insertBefore(d.createComment(page.TEXT_MARKER1_PREFIX + id), t);
+    p.insertBefore(d.createComment(page.TEXT_MARKER2), t);
+
+    i2b = i2a + EXPR_MARKER2.length;
+
+    ret.push({
+      key: page.TEXT_VALUE_PREFIX + id,
+      val: s.substring(i1a, i2b)
+    });
+  }
+  
+  t.nodeValue = (i2b < s.length ? s.substring(i2b) : '');
 }
