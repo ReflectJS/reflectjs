@@ -210,6 +210,28 @@ describe("page-preprocessor", () => {
         </body>
       </html>`)
     );
+    const expected: PageProps = {
+      root: {
+        id: 0, name: 'page', query: 'html',
+        children: [
+          { id: 1, name: 'head', query: 'head' },
+          { id: 2, name: 'body', query: 'body', children: [
+            { id: 3, query: `[${DOM_ID_ATTR}="3"]`, values: [
+              { key: 'v', val: 'x' }
+            ] }, { id: 4, query: `[${DOM_ID_ATTR}="4"]`, values: [
+              { key: 'v', val: '[[x]]' }
+            ] }, { id: 5, query: `[${DOM_ID_ATTR}="5"]`, values: [
+              { key: 'v', val: '[[x]]' }
+            ] }, { id: 6, query: `[${DOM_ID_ATTR}="6"]`, values: [
+              { key: 'attr_v', val: '[[x]]' }
+            ] }, { id: 7, query: `[${DOM_ID_ATTR}="7"]`, values: [
+              { key: 'attr_v', val: '[[x]]' }
+            ] }
+          ] }
+        ]
+      }
+    }
+    assert.deepEqual(props, expected);
   });
 
   it(`should collect and mark dynamic texts`, async () => {
@@ -243,19 +265,48 @@ describe("page-preprocessor", () => {
     assert.deepEqual(props, expected);
   });
 
-  // it(`dynamic texts should use closest outer scope`, async () => {
-  //   const doc = await getDoc(pre, `<html :v="there">
-  //     <body>
-  //       <span>
-  //         <b>hello [[v]]!</b>
-  //       </span>
-  //       <div :aka="theDiv">
-  //         <i>hi [[v]]!</b>
-  //       </div>
-  //       <pre :aka="thePre">
-  //         ciao [[v]]!
-  //       </pre>
-  //     </body>
-  //   </html>`);
-  // });
+  it(`dynamic texts should use closest outer scope`, async () => {
+    const doc = await getDoc(pre, `<html>
+      <body>
+        <span><b>hello [[name]]!</b></span>
+        <div :aka="theDiv"><i>[[greeting]] [[name]]</i></div>
+        <pre :aka="thePre">ciao [[name]]!</pre>
+      </body>
+    </html>`);
+    const { props, errors } = loadPage(doc);
+    assert.equal(errors.length, 0);
+    assert.equal(
+      normalizeText(doc.toString()),
+      normalizeText(`<html ${DOM_ID_ATTR}="0">
+        <head ${DOM_ID_ATTR}="1"></head><body ${DOM_ID_ATTR}="2">
+          <span><b>hello <!---t0--><!---/-->!</b></span>
+          <div ${DOM_ID_ATTR}="3"><i><!---t0--><!---/--> <!---t1--><!---/--></i></div>
+          <pre ${DOM_ID_ATTR}="4">ciao <!---t0--><!---/-->!</pre>
+        </body>
+      </html>`)
+    );
+    const expected: PageProps = {
+      root: {
+        id: 0, name: 'page', query: 'html',
+        children: [{
+          id: 1, name: 'head', query: 'head'
+        }, {
+          id: 2, name: 'body', query: 'body', values: [{
+            key: '__t0', val: '[[name]]'
+          }], children: [{
+            id: 3, name: 'theDiv', query: `[${DOM_ID_ATTR}="3"]`, values: [{
+              key: '__t0', val: '[[greeting]]'
+            }, {
+              key: '__t1', val: '[[name]]'
+            }]
+          }, {
+            id: 4, name: 'thePre', query: `[${DOM_ID_ATTR}="4"]`, values: [{
+              key: '__t0', val: '[[name]]'
+            }]
+          }]
+        }]
+      }
+    }
+    assert.deepEqual(props, expected);
+  });
 });

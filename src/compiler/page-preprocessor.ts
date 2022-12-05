@@ -68,6 +68,7 @@ function loadScope(e: HtmlElement, errors: PageError[]): ScopeProps {
       ret.query = `[${page.DOM_ID_ATTR}="${ret.id}"]`;
   }
   e.getAttribute(page.AKA_ATTR) && (ret.name = e.getAttribute(page.AKA_ATTR));
+  e.removeAttribute(page.AKA_ATTR);
   loadValues(e, ret.values as ValueProps[], errors);
 
   const textValueProps: ValueProps[] = [];
