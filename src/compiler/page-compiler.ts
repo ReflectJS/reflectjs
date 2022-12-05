@@ -57,10 +57,11 @@ function compileScopes(scopes: ScopeProps[], errors: PageError[]) {
   } as es.ArrayExpression;
 }
 
-function compileValues(values: ValueProps[], errors: PageError[]) {
+function compileValues(values: { [key: string]: ValueProps }, errors: PageError[]) {
   const dst: es.Property[] = [];
-  values.forEach(valueProps => {
-    dst.push(makeProperty(valueProps.key, compileValue(valueProps, errors)));
+  Reflect.ownKeys(values).forEach(key => {
+    const props: ValueProps = values[key as string];
+    dst.push(makeProperty(key as string, compileValue(props, errors)));
   });
   return {
     type: 'ObjectExpression',

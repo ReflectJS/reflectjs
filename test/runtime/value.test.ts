@@ -9,10 +9,9 @@ describe('value', () => {
   it('should create a logic value', () => {
     const page = baseApp(props => {
       const body = itemAt(1, props.root.children) as ScopeProps;
-      body.values = [{
-        key: 'v',
-        val: 1
-      }];
+      body.values = {
+        v: { val: 1 }
+      };
     });
     const v = page.root.children[1]?.values['v'];
     assert.isUndefined(v.key);
@@ -24,10 +23,9 @@ describe('value', () => {
   it('should create a DOM attribute value', () => {
     const page = baseApp(props => {
       const body = itemAt(1, props.root.children) as ScopeProps;
-      body.values = [{
-        key: 'attr_class',
-        val: 'base'
-      }];
+      body.values = {
+        attr_class: { val: 'base' }
+      };
     });
     const v = page.root.children[1]?.values['attr_class'];
     assert.equal(v.key, 'class');
@@ -41,10 +39,9 @@ describe('value', () => {
       addScope(props, [1], {
         id: 3,
         markup: `<span>Hello <!---t0--><!---/-->!</span>`,
-        values: [{
-          key: TEXT_VALUE_PREFIX + '0',
-          val: 'there'
-        }]
+        values: {
+          __t0: { val: 'there' }
+        }
       });
     });
     const body = page.root.children[1];
@@ -74,13 +71,14 @@ describe('value', () => {
   it('should update dependent value', () => {
     const page = baseApp(props => {
       const body = itemAt(1, props.root.children) as ScopeProps;
-      body.values = [{
-        key: 'v1', val: 1
-      }, {
-        key: 'v2', val: undefined,
-        fn: function() { return this.v1 + 1; },
-        refs: ['v1']
-      }];
+      body.values = {
+        v1: { val: 1 },
+        v2: {
+          val: undefined,
+          fn: function() { return this.v1 + 1; },
+          refs: ['v1']
+        }
+      };
     });
     const body = page.root.children[1];
     const v1 = body.values['v1'];

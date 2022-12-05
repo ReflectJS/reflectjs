@@ -2,7 +2,7 @@ import { ATTR_VALUE_PREFIX, TEXT_VALUE_PREFIX } from "./page";
 import { Scope } from "./scope";
 
 export interface ValueProps {
-  key: string;
+  // key: string;
   val: any;
 
   passive?: boolean;
@@ -24,10 +24,9 @@ export class Value {
   src?: Set<Value>;
   dst?: Set<Value>;
 
-  constructor(props: ValueProps, scope?: Scope) {
+  constructor(key: string, props: ValueProps, scope?: Scope) {
     this.props = props;
     this.scope = scope;
-    const key = props.key;
     if (key.startsWith(ATTR_VALUE_PREFIX)) {
       this.key = key.substring(ATTR_VALUE_PREFIX.length);
       this.dom = scope?.dom;

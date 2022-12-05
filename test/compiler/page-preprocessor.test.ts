@@ -45,9 +45,9 @@ describe("page-preprocessor", () => {
     const expected: PageProps = {
       root: {
         id: 0, name: 'page', query: 'html',
-        values: [
-          { key: 'v', val: 'x' }
-        ],
+        values: {
+          v: { val: 'x' }
+        },
         children: [
           { id: 1, name: 'head', query: 'head' },
           { id: 2, name: 'body', query: 'body' }
@@ -71,9 +71,9 @@ describe("page-preprocessor", () => {
     const expected: PageProps = {
       root: {
         id: 0, name: 'page', query: 'html',
-        values: [
-          { key: 'v', val: '[[x]]' }
-        ],
+        values: {
+          v: { val: '[[x]]' }
+        },
         children: [
           { id: 1, name: 'head', query: 'head' },
           { id: 2, name: 'body', query: 'body' }
@@ -97,9 +97,9 @@ describe("page-preprocessor", () => {
     const expected: PageProps = {
       root: {
         id: 0, name: 'page', query: 'html',
-        values: [
-          { key: 'v', val: '[[x]]' }
-        ],
+        values: {
+          v: { val: '[[x]]' }
+        },
         children: [
           { id: 1, name: 'head', query: 'head' },
           { id: 2, name: 'body', query: 'body' }
@@ -123,9 +123,9 @@ describe("page-preprocessor", () => {
     const expected: PageProps = {
       root: {
         id: 0, name: 'page', query: 'html',
-        values: [
-          { key: 'attr_v', val: '[[x]]' }
-        ],
+        values: {
+          attr_v: { val: '[[x]]' }
+        },
         children: [
           { id: 1, name: 'head', query: 'head' },
           { id: 2, name: 'body', query: 'body' }
@@ -149,9 +149,9 @@ describe("page-preprocessor", () => {
     const expected: PageProps = {
       root: {
         id: 0, name: 'page', query: 'html',
-        values: [
-          { key: 'attr_v', val: '[[x]]' }
-        ],
+        values: {
+          attr_v: { val: '[[x]]' }
+        },
         children: [
           { id: 1, name: 'head', query: 'head' },
           { id: 2, name: 'body', query: 'body' }
@@ -216,17 +216,17 @@ describe("page-preprocessor", () => {
         children: [
           { id: 1, name: 'head', query: 'head' },
           { id: 2, name: 'body', query: 'body', children: [
-            { id: 3, query: `[${DOM_ID_ATTR}="3"]`, values: [
-              { key: 'v', val: 'x' }
-            ] }, { id: 4, query: `[${DOM_ID_ATTR}="4"]`, values: [
-              { key: 'v', val: '[[x]]' }
-            ] }, { id: 5, query: `[${DOM_ID_ATTR}="5"]`, values: [
-              { key: 'v', val: '[[x]]' }
-            ] }, { id: 6, query: `[${DOM_ID_ATTR}="6"]`, values: [
-              { key: 'attr_v', val: '[[x]]' }
-            ] }, { id: 7, query: `[${DOM_ID_ATTR}="7"]`, values: [
-              { key: 'attr_v', val: '[[x]]' }
-            ] }
+            { id: 3, query: `[${DOM_ID_ATTR}="3"]`, values: {
+              v: { val: 'x' }
+            } }, { id: 4, query: `[${DOM_ID_ATTR}="4"]`, values: {
+              v: { val: '[[x]]' }
+            } }, { id: 5, query: `[${DOM_ID_ATTR}="5"]`, values: {
+              v: { val: '[[x]]' }
+            } }, { id: 6, query: `[${DOM_ID_ATTR}="6"]`, values: {
+              attr_v: { val: '[[x]]' }
+            } }, { id: 7, query: `[${DOM_ID_ATTR}="7"]`, values: {
+              attr_v: { val: '[[x]]' }
+            } }
           ] }
         ]
       }
@@ -255,10 +255,10 @@ describe("page-preprocessor", () => {
         id: 0, name: 'page', query: 'html',
         children: [
           { id: 1, name: 'head', query: 'head' },
-          { id: 2, name: 'body', query: 'body', values: [
-            { key: '__t0', val: '[[v[0]]]' },
-            { key: '__t1', val: '[[name]]' }
-          ] }
+          { id: 2, name: 'body', query: 'body', values: {
+            __t0: { val: '[[v[0]]]' },
+            __t1: { val: '[[name]]' }
+          } }
         ]
       }
     }
@@ -291,18 +291,17 @@ describe("page-preprocessor", () => {
         children: [{
           id: 1, name: 'head', query: 'head'
         }, {
-          id: 2, name: 'body', query: 'body', values: [{
-            key: '__t0', val: '[[name]]'
-          }], children: [{
-            id: 3, name: 'theDiv', query: `[${DOM_ID_ATTR}="3"]`, values: [{
-              key: '__t0', val: '[[greeting]]'
-            }, {
-              key: '__t1', val: '[[name]]'
-            }]
+          id: 2, name: 'body', query: 'body', values: {
+            __t0: { val: '[[name]]' }
+          }, children: [{
+            id: 3, name: 'theDiv', query: `[${DOM_ID_ATTR}="3"]`, values: {
+              __t0: { val: '[[greeting]]' },
+              __t1: { val: '[[name]]' }
+            }
           }, {
-            id: 4, name: 'thePre', query: `[${DOM_ID_ATTR}="4"]`, values: [{
-              key: '__t0', val: '[[name]]'
-            }]
+            id: 4, name: 'thePre', query: `[${DOM_ID_ATTR}="4"]`, values: {
+              __t0: { val: '[[name]]' }
+            }
           }]
         }]
       }

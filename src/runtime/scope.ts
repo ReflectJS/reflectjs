@@ -6,7 +6,7 @@ export interface ScopeProps {
   name?: string;
   query?: string;
   markup?: string;
-  values?: ValueProps[];
+  values?: { [key: string]: ValueProps };
   children?: ScopeProps[];
 }
 
@@ -35,8 +35,7 @@ export class Scope {
     if (parent) {
       parent.children.push(this);
       if (props.name) {
-        parent.values[props.name] = new Value({
-          key: props.name,
+        parent.values[props.name] = new Value(props.name, {
           val: this.proxy,
           passive: true
         }, parent);
@@ -103,9 +102,13 @@ export class Scope {
 
   initValues() {
     const ret: { [key: string]: Value } = {};
-    this.props.values?.forEach(props => {
-      ret[props.key] = new Value(props, this);
+    Reflect.ownKeys(this.props.values ?? {}).forEach(key => {
+      const props = (this.props.values as any)[key];
+      ret[key as string] = new Value(key as string, props, this);
     });
+    // this.props.values?.forEach(props => {
+    //   ret[props.key] = new Value(props, this);
+    // });
     return ret;
   }
 

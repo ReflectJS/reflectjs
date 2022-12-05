@@ -47,8 +47,7 @@ export interface PageProps {
     this.dom = dom;
     this.props = props;
     this.root = this.load(null, props.root);
-    this.root.values[ROOT_SCOPE_NAME] = new Value({
-      key: ROOT_SCOPE_NAME,
+    this.root.values[ROOT_SCOPE_NAME] = new Value(ROOT_SCOPE_NAME, {
       val: this.root.proxy
     }, this.root);
   }

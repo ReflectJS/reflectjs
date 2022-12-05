@@ -33,7 +33,7 @@ describe("page-compiler", () => {
   });
 
   // it(`basic page`, async () => {
-  //   const doc = await getDoc(`<html :attr_lang=[[l]] :l="en"></html>`);
+  //   const doc = await getDoc(pre, `<html :attr_lang=[[l]] :l="en"></html>`);
   //   const { js, errors } = compileDoc(doc);
   //   assert.equal(errors.length, 0);
   //   assert.equal(
