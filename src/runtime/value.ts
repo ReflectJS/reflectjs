@@ -2,11 +2,9 @@ import { ATTR_VALUE_PREFIX, TEXT_VALUE_PREFIX } from "./page";
 import { Scope } from "./scope";
 
 export interface ValueProps {
-  // key: string;
   val: any;
-
   passive?: boolean;
-  fn?: () => any | string;
+  fn?: (() => any) | string;
   cycle?: number;
   refs?: string[];
 }
@@ -36,7 +34,7 @@ export class Value {
       this.dom = scope?.texts ? scope.texts[i] : undefined;
       this.cb = Value.textCB;
     }
-    this.fn = props.fn;
+    this.fn = props.fn as (() => any) | undefined;
   }
 
   static attrCB(v: Value) {

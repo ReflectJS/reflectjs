@@ -4,7 +4,9 @@ import { OUTER_PROPERTY } from "../runtime/page";
 
 //TODO: event handler functions
 
-export function makeValueFunction(key: string | null, script: es.Program, references: Set<string>): es.FunctionExpression {
+export function makeValueFunction(
+  key: string | null, script: es.Program, references: Set<string>
+): es.FunctionExpression {
   return {
     type: 'FunctionExpression',
     params: [],
@@ -12,7 +14,9 @@ export function makeValueFunction(key: string | null, script: es.Program, refere
   }
 }
 
-function makeFunctionBody(key: string | null, statements: es.Statement[], references: Set<string>): es.BlockStatement {
+function makeFunctionBody(
+  key: string | null, statements: es.Statement[], references: Set<string>
+): es.BlockStatement {
   const len = statements.length;
   for (let i = 0; i < len; i++) {
     const node: any = statements[i];
@@ -34,7 +38,9 @@ function makeFunctionBody(key: string | null, statements: es.Statement[], refere
   return ret;
 }
 
-function qualifyIdentifiers(key: string | null, body: es.BlockStatement, references: Set<string>) {
+function qualifyIdentifiers(
+  key: string | null, body: es.BlockStatement, references: Set<string>
+) {
   const scopes: Array<{ isFunction: boolean, ids: Set<string> }> = [];
 
   function enterScope(isFunction: boolean) {

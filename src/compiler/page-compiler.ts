@@ -1,9 +1,12 @@
 import { generate } from "escodegen";
+import { parseScript } from "esprima";
 import * as es from "estree";
 import { HtmlDocument } from "../preprocessor/htmldom";
 import { PageProps } from "../runtime/page";
 import { ScopeProps } from "../runtime/scope";
 import { ValueProps } from "../runtime/value";
+import { makeValueFunction } from "./expr-compiler";
+import { isDynamic, preprocess } from "./expr-preprocessor";
 import { loadPage } from "./page-preprocessor";
 
 export interface PageError {
@@ -74,11 +77,37 @@ function compileValues(values: { [key: string]: ValueProps }, errors: PageError[
  */
 function compileValue(value: ValueProps, errors: PageError[]) {
   const dst: es.Property[] = [];
-  //TODO
+  if (isDynamic(value.val)) {
+    const refs = new Set<string>();
+    const fn = compileExpr(value.val, refs, errors);
+    fn && (dst.push(makeProperty('fn', fn)));
+    if (refs.size > 0) {
+      const ee: es.Literal[] = [];
+      refs.forEach(ref => ee.push({ type: "Literal", value: ref }));
+      dst.push(makeProperty("refs", { type: "ArrayExpression", elements: ee }));
+    }
+    value.val = null;
+  }
+  dst.push(makeProperty("val", { type: "Literal", value: value.val }));
   return {
     type: 'ObjectExpression',
     properties: dst
   } as es.ObjectExpression;
+}
+
+//TODO: source position
+function compileExpr(
+  src: string, refs: Set<string>, errors: PageError[]
+): es.FunctionExpression | undefined {
+  const expr = preprocess(src);
+  let ast, ret = undefined;
+  try {
+    ast = parseScript(expr.src, { loc: true });
+    ret = makeValueFunction(null, ast, refs);
+  } catch (error: any) {
+    console.log(error); //TODO: add to errors[]
+  }
+  return ret;
 }
 
 // =============================================================================

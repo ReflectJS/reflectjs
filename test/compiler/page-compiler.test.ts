@@ -32,28 +32,40 @@ describe("page-compiler", () => {
     );
   });
 
-  // it(`basic page`, async () => {
-  //   const doc = await getDoc(pre, `<html :attr_lang=[[l]] :l="en"></html>`);
-  //   const { js, errors } = compileDoc(doc);
-  //   assert.equal(errors.length, 0);
-  //   assert.equal(
-  //     doc.toString(),
-  //     `<html ${DOM_ID_ATTR}="0">` +
-  //     `<head ${DOM_ID_ATTR}="1"></head>` +
-  //     `<body ${DOM_ID_ATTR}="2"></body>` +
-  //     `</html>`
-  //   );
-  //   assert.equal(
-  //     normalizeSpace(js),
-  //     normalizeSpace(`{ root: {
-  //       id: 0, name: 'page', query: 'html',
-  //       children: [
-  //         { id: 1, name: 'head', query: 'head' },
-  //         { id: 2, name: 'body', query: 'body' }
-  //       ]
-  //     } }`)
-  //   );
-  // });
+  it(`basic page`, async () => {
+    const doc = await getDoc(pre, `<html lang=[[l]] :l="en"></html>`);
+    const { js, errors } = compileDoc(doc);
+    assert.equal(errors.length, 0);
+    assert.equal(
+      doc.toString(),
+      `<html ${DOM_ID_ATTR}="0">` +
+      `<head ${DOM_ID_ATTR}="1"></head>` +
+      `<body ${DOM_ID_ATTR}="2"></body>` +
+      `</html>`
+    );
+    assert.equal(
+      normalizeSpace(js),
+      normalizeSpace(`{ root: {
+        id: 0, name: 'page', query: 'html',
+        values: {
+          attr_lang: {
+            fn: function () {
+              return this.l;
+            },
+            refs: ['l'],
+            val: null
+          },
+          l: {
+            val: 'en'
+          }
+        },
+        children: [
+          { id: 1, name: 'head', query: 'head' },
+          { id: 2, name: 'body', query: 'body' }
+        ]
+      } }`)
+    );
+  });
 
 });
 
