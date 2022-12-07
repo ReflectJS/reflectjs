@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import { loadPage } from "../../src/compiler/page-preprocessor";
+import { hyphenToCamel, loadPage } from "../../src/compiler/page-preprocessor";
 import Preprocessor from "../../src/preprocessor/preprocessor";
 import { normalizeText } from "../../src/preprocessor/util";
 import { DOM_ID_ATTR, PageProps } from "../../src/runtime/page";
@@ -307,5 +307,11 @@ describe("page-preprocessor", () => {
       }
     }
     assert.deepEqual(props, expected);
+  });
+
+  it(`hyphenToCamel()`, () => {
+    assert.equal(hyphenToCamel('data-dummy'), 'dataDummy');
+    assert.equal(hyphenToCamel('attr_data-dummy'), 'attr_dataDummy');
+    assert.equal(hyphenToCamel('attr_data-dummy-data'), 'attr_dataDummyData');
   });
 });

@@ -1,5 +1,6 @@
 import { ELEMENT_NODE, TEXT_NODE } from "../preprocessor/dom";
 import { HtmlAttribute, HtmlDocument, HtmlElement, HtmlText } from "../preprocessor/htmldom";
+import { regexMap } from "../preprocessor/util";
 import * as page from "../runtime/page";
 import { ScopeProps } from "../runtime/scope";
 import { ValueProps } from "../runtime/value";
@@ -108,7 +109,7 @@ function loadValues(e: HtmlElement, ret: Map<string, ValueProps>, errors: PageEr
 function loadValue(
   key: string, attr: HtmlAttribute, ret: Map<string, ValueProps>, errors: PageError[]
 ) {
-  ret.set(key, {
+  ret.set(hyphenToCamel(key), {
     val: attr.quote === '[' ? `[[${attr.value}]]` : attr.value
   });
 }
@@ -144,4 +145,10 @@ function loadTexts(t: HtmlText, ret: Map<string, ValueProps>, errors: PageError[
   }
   
   t.nodeValue = (i2b < s.length ? s.substring(i2b) : '');
+}
+
+export function hyphenToCamel(s: string) {
+  return regexMap(/(-.)/, s, match => {
+    return s.substring(match.index + 1, match.index + 2).toUpperCase();
+  });
 }

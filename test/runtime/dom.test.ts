@@ -4,6 +4,7 @@ import { Window } from 'happy-dom';
 describe('dom', function () {
 
   it("should execute happy-dom example", () => {
+    // https://github.com/capricorn86/happy-dom/tree/master/packages/happy-dom
     const window = new Window();
     const document = window.document;
     document.body.innerHTML = '<div class="container"></div>';

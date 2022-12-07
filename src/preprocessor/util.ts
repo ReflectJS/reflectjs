@@ -37,3 +37,16 @@ export function normalizeSpace(s?: string): string | undefined {
 //     return n.substr(p, 1).toLowerCase() + '-' + n.substr(p + 1, 1).toLowerCase();
 //   });
 // }
+
+export function regexMap(
+  re: RegExp, s: string, cb: (match: RegExpExecArray) => string
+): string {
+  const _re = new RegExp(re, (re.flags.indexOf('g') < 0 ? 'g' : '') + re.flags);
+  let sb = new StringBuf(), i = 0;
+  for (let match; !!(match = _re.exec(s)); i = match.index + match.length) {
+    match.index > i && sb.add(s.substring(i, match.index));
+    sb.add(cb(match));
+  }
+  s.length > i && sb.add(s.substring(i));
+  return sb.toString();
+}

@@ -1,3 +1,4 @@
+import { regexMap } from "../preprocessor/util";
 import { ATTR_VALUE_PREFIX, TEXT_VALUE_PREFIX } from "./page";
 import { Scope } from "./scope";
 
@@ -26,7 +27,7 @@ export class Value {
     this.props = props;
     this.scope = scope;
     if (key.startsWith(ATTR_VALUE_PREFIX)) {
-      this.key = key.substring(ATTR_VALUE_PREFIX.length);
+      this.key = camelToHyphen(key.substring(ATTR_VALUE_PREFIX.length));
       this.dom = scope?.dom;
       this.cb = Value.attrCB;
     } else if (key.startsWith(TEXT_VALUE_PREFIX)) {
@@ -48,4 +49,11 @@ export class Value {
   static textCB(v: Value) {
     (v.dom as Node).nodeValue = (v.props.val != null ? `${v.props.val}` : '');
   }
+}
+
+export function camelToHyphen(s: string) {
+  return regexMap(/([0-9a-z][A-Z])/, s, match => {
+    const ret = s.charAt(match.index) + '-' + s.charAt(match.index + 1).toLowerCase();
+    return ret;
+  });
 }

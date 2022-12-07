@@ -1,7 +1,7 @@
 import { assert } from "chai";
 import { DOM_ID_ATTR, TEXT_VALUE_PREFIX } from "../../src/runtime/page";
 import { ScopeProps } from "../../src/runtime/scope";
-import { Value } from "../../src/runtime/value";
+import { camelToHyphen, Value } from "../../src/runtime/value";
 import { addScope, baseApp, itemAt } from "./page.test";
 
 describe('value', () => {
@@ -108,4 +108,9 @@ describe('value', () => {
     assert.equal(v2.props.val, 100);
   });
 
+  it(`camelToHyphen()`, () => {
+    assert.equal(camelToHyphen('dataDummy'), 'data-dummy');
+    assert.equal(camelToHyphen('attr_dataDummy'), 'attr_data-dummy');
+    assert.equal(camelToHyphen('attr_dataDummyData'), 'attr_data-dummy-data');
+  });
 });
