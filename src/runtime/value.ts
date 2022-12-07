@@ -52,7 +52,7 @@ export class Value {
 }
 
 export function camelToHyphen(s: string) {
-  return regexMap(/([0-9a-z][A-Z])/, s, match => {
+  return regexMap(/([0-9a-z][A-Z])/g, s, match => {
     const ret = s.charAt(match.index) + '-' + s.charAt(match.index + 1).toLowerCase();
     return ret;
   });

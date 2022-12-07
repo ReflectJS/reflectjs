@@ -4,6 +4,27 @@ import { OUTER_PROPERTY } from "../runtime/page";
 
 //TODO: event handler functions
 
+export function checkFunctionType(script: es.Program): string | null {
+  if (script.body.length === 1 && script.body[0].type === 'ExpressionStatement') {
+    const type = script.body[0].expression.type;
+    if (type === 'FunctionExpression' || type === 'ArrowFunctionExpression') {
+      return type;
+    }
+  }
+  return null;
+}
+
+// use only if checkFunctionType() !== null
+export function makeFunction(
+  script: es.Program, references: Set<string>
+): es.FunctionExpression | es.ArrowFunctionExpression {
+  const ret = (script.body[0] as any).expression as
+    es.FunctionExpression | es.ArrowFunctionExpression;
+  qualifyIdentifiers(null, script, references)
+  return ret;
+}
+
+// use only if checkFunctionType() === null
 export function makeValueFunction(
   key: string | null, script: es.Program, references: Set<string>
 ): es.FunctionExpression {
@@ -39,7 +60,7 @@ function makeFunctionBody(
 }
 
 function qualifyIdentifiers(
-  key: string | null, body: es.BlockStatement, references: Set<string>
+  key: string | null, body: es.Node, references: Set<string>
 ) {
   const scopes: Array<{ isFunction: boolean, ids: Set<string> }> = [];
 
@@ -129,10 +150,14 @@ function qualifyIdentifiers(
       ) {
         enterScope(false);
       } else if (
-        node.type === 'FunctionDeclaration'
+        node.type === 'FunctionDeclaration' ||
+        node.type === 'FunctionExpression' ||
+        node.type === 'ArrowFunctionExpression'
       ) {
-        if (node.id && node.id.type === 'Identifier') {
-          addLocalId(node.id.name, true);
+        if (node.type !== 'ArrowFunctionExpression') {
+          if (node.id && node.id.type === 'Identifier') {
+            addLocalId(node.id.name, true);
+          }
         }
         enterScope(true);
         node.params.forEach(p => {

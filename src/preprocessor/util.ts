@@ -41,7 +41,7 @@ export function normalizeSpace(s?: string): string | undefined {
 export function regexMap(
   re: RegExp, s: string, cb: (match: RegExpExecArray) => string
 ): string {
-  const _re = new RegExp(re, (re.flags.indexOf('g') < 0 ? 'g' : '') + re.flags);
+  const _re = re.flags.indexOf('g') >= 0 ? re : new RegExp(re, 'g' + re.flags);
   let sb = new StringBuf(), i = 0;
   for (let match; !!(match = _re.exec(s)); i = match.index + match.length) {
     match.index > i && sb.add(s.substring(i, match.index));

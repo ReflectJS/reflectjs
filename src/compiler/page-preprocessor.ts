@@ -148,7 +148,7 @@ function loadTexts(t: HtmlText, ret: Map<string, ValueProps>, errors: PageError[
 }
 
 export function hyphenToCamel(s: string) {
-  return regexMap(/(-.)/, s, match => {
+  return regexMap(/(-.)/g, s, match => {
     return s.substring(match.index + 1, match.index + 2).toUpperCase();
   });
 }

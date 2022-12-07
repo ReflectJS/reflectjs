@@ -31,7 +31,8 @@ function preprocessIt(s: string): string {
   var sep = '';
   var exprStart, exprEnd;
   if (s.startsWith(EXPR_MARKER1) && s.endsWith(EXPR_MARKER2)) {
-    exprStart = exprEnd = '';
+    exprStart = '(';
+    exprEnd = ')';
   } else {
     exprStart = NOTNULL_FN + '(';
     exprEnd = ')';
@@ -44,9 +45,12 @@ function preprocessIt(s: string): string {
     if (i1 > i) {
       sb.add("'" + escape(s.substring(i, i1)) + "'+");
     }
-    sb.add(exprStart);
-    sb.add(s.substring(i1 + EXPR_MARKER1.length, i2));
-    sb.add(exprEnd);
+    let e = s.substring(i1 + EXPR_MARKER1.length, i2);
+    if (e.trim().length > 0) {
+      sb.add(exprStart);
+      sb.add(e);
+      sb.add(exprEnd);
+    }
     i = i2 + EXPR_MARKER2.length;
   }
   if (i < s.length || sep === '') {
