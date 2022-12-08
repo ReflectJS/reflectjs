@@ -27,6 +27,11 @@ export class Value {
   constructor(key: string, props: ValueProps, scope?: Scope) {
     this.props = props;
     if ((this.scope = scope)) {
+      if (props.passive && typeof props.val === 'function') {
+        const proxy = new Proxy(props.val, scope.proxyHandler);
+        props._origVal = props.val;
+        props.val = (...args: any[]) => proxy(...args);
+      }
       if (key.startsWith(ATTR_VALUE_PREFIX)) {
         this.key = camelToHyphen(key.substring(ATTR_VALUE_PREFIX.length));
         this.dom = scope.dom;
@@ -34,16 +39,11 @@ export class Value {
       } else if (key.startsWith(EVENT_VALUE_PREFIX)) {
         this.key = key.substring(EVENT_VALUE_PREFIX.length);
         this.dom = scope.dom;
-        const proxy = new Proxy(props.val, scope.proxyHandler);
-        this.dom.addEventListener(this.key, (...ev: any[]) => proxy(...ev));
+        this.dom.addEventListener(this.key, props.val);
       } else if (key.startsWith(TEXT_VALUE_PREFIX)) {
         const i = parseInt(key.substring(TEXT_VALUE_PREFIX.length));
         this.dom = scope.texts ? scope.texts[i] : undefined;
         this.cb = Value.textCB;
-      } else if (props.passive && typeof props.val === 'function') {
-        const proxy = new Proxy(props.val, scope.proxyHandler);
-        props._origVal = props.val;
-        props.val = (...args: any[]) => proxy(...args);
       }
     }
     this.fn = props.fn as (() => any) | undefined;

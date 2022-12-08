@@ -100,7 +100,7 @@ describe(`page samples`, () => {
     const res = await load('sample1.html', html);
     assert.equal(res.errors?.length, 1);
     assert.equal(
-      res.errors?.at(0)?.msg,
+      res.errors ? res.errors[0].msg : '',
       'arrow functions cannot access other values: x, y'
     );
   });
