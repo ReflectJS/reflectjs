@@ -18,6 +18,7 @@ export const BODY_SCOPE_NAME = 'body';
 export const RESERVED_PREFIX = '__';
 export const OUTER_PROPERTY = RESERVED_PREFIX + 'outer';
 export const ATTR_VALUE_PREFIX = 'attr_';
+export const EVENT_VALUE_PREFIX = 'on_';
 export const TEXT_VALUE_PREFIX = RESERVED_PREFIX + 't';
 
 export const TEXT_MARKER1_PREFIX = '-t';

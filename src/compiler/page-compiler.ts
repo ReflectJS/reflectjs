@@ -5,12 +5,14 @@ import { HtmlDocument } from "../preprocessor/htmldom";
 import { PageProps } from "../runtime/page";
 import { ScopeProps } from "../runtime/scope";
 import { ValueProps } from "../runtime/value";
-import { checkFunctionType, makeFunction, makeValueFunction } from "./expr-compiler";
+import { checkFunctionKind, makeFunction, makeValueFunction } from "./expr-compiler";
 import { isDynamic, preprocess } from "./expr-preprocessor";
 import { loadPage } from "./page-preprocessor";
 
 export interface PageError {
   type: 'err' | 'warn';
+  msg: string;
+  //TODO: pos
 }
 
 export function compileDoc(doc: HtmlDocument) {
@@ -110,9 +112,17 @@ function compileExpr(
   let ast, fn = undefined, kind: 'exp' | 'fun' | undefined = undefined;
   try {
     ast = parseScript(expr.src, { loc: true });
-    if (checkFunctionType(ast)) {
+    const functionKind = checkFunctionKind(ast);
+    if (functionKind) {
       fn = makeFunction(ast, refs);
       kind = 'fun';
+      if (functionKind === 'ArrowFunctionExpression' && refs.size > 0) {
+        errors.push({
+          type: 'err',
+          msg: `arrow functions cannot access other values: ` +
+              `${Array.from(refs).sort().join(', ')}`
+        });
+      }
     } else {
       fn = makeValueFunction(null, ast, refs);
       kind = 'exp';

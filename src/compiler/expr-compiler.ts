@@ -4,7 +4,7 @@ import { OUTER_PROPERTY } from "../runtime/page";
 
 //TODO: event handler functions
 
-export function checkFunctionType(script: es.Program): string | null {
+export function checkFunctionKind(script: es.Program): string | null {
   if (script.body.length === 1 && script.body[0].type === 'ExpressionStatement') {
     const type = script.body[0].expression.type;
     if (type === 'FunctionExpression' || type === 'ArrowFunctionExpression') {
@@ -14,7 +14,7 @@ export function checkFunctionType(script: es.Program): string | null {
   return null;
 }
 
-// use only if checkFunctionType() !== null
+// use only if checkFunctionKind() !== null
 export function makeFunction(
   script: es.Program, references: Set<string>
 ): es.FunctionExpression | es.ArrowFunctionExpression {
@@ -24,7 +24,7 @@ export function makeFunction(
   return ret;
 }
 
-// use only if checkFunctionType() === null
+// use only if checkFunctionKind() === null
 export function makeValueFunction(
   key: string | null, script: es.Program, references: Set<string>
 ): es.FunctionExpression {

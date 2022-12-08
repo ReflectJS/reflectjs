@@ -1,5 +1,5 @@
 import { regexMap } from "../preprocessor/util";
-import { ATTR_VALUE_PREFIX, TEXT_VALUE_PREFIX } from "./page";
+import { ATTR_VALUE_PREFIX, EVENT_VALUE_PREFIX, TEXT_VALUE_PREFIX } from "./page";
 import { Scope } from "./scope";
 
 export interface ValueProps {
@@ -22,18 +22,26 @@ export class Value {
   fn?: () => any;
   src?: Set<Value>;
   dst?: Set<Value>;
+  // originalFnVal?: any;
+  fnproxy?: any;
 
   constructor(key: string, props: ValueProps, scope?: Scope) {
     this.props = props;
-    this.scope = scope;
-    if (key.startsWith(ATTR_VALUE_PREFIX)) {
-      this.key = camelToHyphen(key.substring(ATTR_VALUE_PREFIX.length));
-      this.dom = scope?.dom;
-      this.cb = Value.attrCB;
-    } else if (key.startsWith(TEXT_VALUE_PREFIX)) {
-      const i = parseInt(key.substring(TEXT_VALUE_PREFIX.length));
-      this.dom = scope?.texts ? scope.texts[i] : undefined;
-      this.cb = Value.textCB;
+    if ((this.scope = scope)) {
+      if (key.startsWith(ATTR_VALUE_PREFIX)) {
+        this.key = camelToHyphen(key.substring(ATTR_VALUE_PREFIX.length));
+        this.dom = scope.dom;
+        this.cb = Value.attrCB;
+      } else if (key.startsWith(EVENT_VALUE_PREFIX)) {
+        this.key = key.substring(EVENT_VALUE_PREFIX.length);
+        this.dom = scope.dom;
+        this.fnproxy = new Proxy(props.val, scope.proxyHandler);
+        this.dom.addEventListener(this.key, (...ev: any[]) => this.fnproxy(...ev));
+      } else if (key.startsWith(TEXT_VALUE_PREFIX)) {
+        const i = parseInt(key.substring(TEXT_VALUE_PREFIX.length));
+        this.dom = scope.texts ? scope.texts[i] : undefined;
+        this.cb = Value.textCB;
+      }
     }
     this.fn = props.fn as (() => any) | undefined;
   }

@@ -20,6 +20,7 @@ export class Scope {
   children: Scope[];
   dom: Element;
   texts?: Node[];
+  proxyHandler: ScopeProxyHandler;
   values: { [key: string]: Value };
   proxy: any;
 
@@ -30,8 +31,9 @@ export class Scope {
     this.children = [];
     this.dom = this.initDom();
     this.texts = this.collectTextNodes();
+    this.proxyHandler = new ScopeProxyHandler(page, this);
     this.values = this.initValues();
-    this.proxy = new Proxy<any>(this.values, new ScopeProxyHandler(page, this));
+    this.proxy = new Proxy<any>(this.values, this.proxyHandler);
     if (parent) {
       parent.children.push(this);
       if (props.name) {
@@ -173,6 +175,9 @@ class ScopeProxyHandler implements ProxyHandler<any> {
       return this.scope.parent?.proxy;
     }
     const value = this.scope.lookupValue(prop);
+    // if (value?.fnproxy) {
+    //   return value?.fnproxy;
+    // }
     value && !value.props.passive && this.update(value);
     return value?.props.val;
   }
@@ -192,6 +197,10 @@ class ScopeProxyHandler implements ProxyHandler<any> {
       }
     }
     return !!value;
+  }
+
+  apply(target: any, thisArg: any, argumentsList: any[]) {
+    target.apply(this.scope.proxy, argumentsList);
   }
 
   private update(value: Value) {

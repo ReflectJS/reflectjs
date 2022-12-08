@@ -1,7 +1,7 @@
 import { assert } from "chai";
 import { generate } from "escodegen";
 import { parseScript } from "esprima";
-import { checkFunctionType, makeFunction, makeValueFunction } from "../../src/compiler/expr-compiler";
+import { checkFunctionKind, makeFunction, makeValueFunction } from "../../src/compiler/expr-compiler";
 import { preprocess } from "../../src/compiler/expr-preprocessor";
 import { normalizeSpace } from "../../src/preprocessor/util";
 
@@ -10,7 +10,7 @@ describe("expr-compiler", () => {
   it(`empty script`, () => {
     const ids = new Set<string>();
     const pre = parseScript(``);
-    assert.notExists(checkFunctionType(pre));
+    assert.notExists(checkFunctionKind(pre));
     const ast = makeValueFunction(null, pre, ids);
     assert.equal(ids.size, 0);
     const src = generate(ast);
@@ -21,7 +21,7 @@ describe("expr-compiler", () => {
   it(`empty statement`, () => {
     const ids = new Set<string>();
     const pre = parseScript(`;`);
-    assert.notExists(checkFunctionType(pre));
+    assert.notExists(checkFunctionKind(pre));
     const ast = makeValueFunction(null, pre, ids);
     assert.equal(ids.size, 0);
     const src = generate(ast);
@@ -33,7 +33,7 @@ describe("expr-compiler", () => {
   it(`value reference`, () => {
     const ids = new Set<string>();
     const pre = parseScript(`x + 1`);
-    assert.notExists(checkFunctionType(pre));
+    assert.notExists(checkFunctionKind(pre));
     const ast = makeValueFunction(null, pre, ids);
     assert.isTrue(ids.has('x'));
     const src = generate(ast);
@@ -45,7 +45,7 @@ describe("expr-compiler", () => {
   it(`local var reference 1`, () => {
     const ids = new Set<string>();
     const pre = parseScript(`var x; x + 1`);
-    assert.notExists(checkFunctionType(pre));
+    assert.notExists(checkFunctionKind(pre));
     const ast = makeValueFunction(null, pre, ids);
     assert.isFalse(ids.has('x'));
     const src = generate(ast);
@@ -57,7 +57,7 @@ describe("expr-compiler", () => {
   it(`local var reference 2`, () => {
     const ids = new Set<string>();
     const pre = parseScript(`var x = 0; x + 1`);
-    assert.notExists(checkFunctionType(pre));
+    assert.notExists(checkFunctionKind(pre));
     const ast = makeValueFunction(null, pre, ids);
     assert.isFalse(ids.has('x'));
     const src = generate(ast);
@@ -69,7 +69,7 @@ describe("expr-compiler", () => {
   it(`local var reference 3`, () => {
     const ids = new Set<string>();
     const pre = parseScript(`var x = 0, y; x + y + 1`);
-    assert.notExists(checkFunctionType(pre));
+    assert.notExists(checkFunctionKind(pre));
     const ast = makeValueFunction(null, pre, ids);
     assert.isFalse(ids.has('x'));
     assert.isFalse(ids.has('y'));
@@ -86,7 +86,7 @@ describe("expr-compiler", () => {
       { var z; }
       x + y + z + 1;
     `);
-    assert.notExists(checkFunctionType(pre));
+    assert.notExists(checkFunctionKind(pre));
     const ast = makeValueFunction(null, pre, ids);
     assert.isFalse(ids.has('x'));
     assert.isFalse(ids.has('y'));
@@ -100,7 +100,7 @@ describe("expr-compiler", () => {
   it(`local let/const reference 1`, () => {
     const ids = new Set<string>();
     const pre = parseScript(`let x; x + 1`);
-    assert.notExists(checkFunctionType(pre));
+    assert.notExists(checkFunctionKind(pre));
     const ast = makeValueFunction(null, pre, ids);
     assert.isFalse(ids.has('x'));
     const src = generate(ast);
@@ -112,7 +112,7 @@ describe("expr-compiler", () => {
   it(`local let/const reference 2`, () => {
     const ids = new Set<string>();
     const pre = parseScript(`let x = 0; x + 1`);
-    assert.notExists(checkFunctionType(pre));
+    assert.notExists(checkFunctionKind(pre));
     const ast = makeValueFunction(null, pre, ids);
     assert.isFalse(ids.has('x'));
     const src = generate(ast);
@@ -124,7 +124,7 @@ describe("expr-compiler", () => {
   it(`local let/const reference 3`, () => {
     const ids = new Set<string>();
     const pre = parseScript(`let x = 0, y; x + y + 1`);
-    assert.notExists(checkFunctionType(pre));
+    assert.notExists(checkFunctionKind(pre));
     const ast = makeValueFunction(null, pre, ids);
     assert.isFalse(ids.has('x'));
     assert.isFalse(ids.has('y'));
@@ -141,7 +141,7 @@ describe("expr-compiler", () => {
       { let z; }
       x + y + z + 1;
     `);
-    assert.notExists(checkFunctionType(pre));
+    assert.notExists(checkFunctionKind(pre));
     const ast = makeValueFunction(null, pre, ids);
     assert.isFalse(ids.has('x'));
     assert.isFalse(ids.has('y'));
@@ -159,7 +159,7 @@ describe("expr-compiler", () => {
     if (true) { let z = 1; }
     x + y + z + 1;
   `);
-    assert.notExists(checkFunctionType(pre));
+    assert.notExists(checkFunctionKind(pre));
     const ast = makeValueFunction(null, pre, ids);
     assert.isFalse(ids.has('x'));
     assert.isFalse(ids.has('y'));
@@ -177,7 +177,7 @@ describe("expr-compiler", () => {
       for (let z = 0; z < 10; z++) console.log(z);
       x + y + z + 1;
     `);
-    assert.notExists(checkFunctionType(pre));
+    assert.notExists(checkFunctionKind(pre));
     const ast = makeValueFunction(null, pre, ids);
     assert.isFalse(ids.has('x'));
     assert.isFalse(ids.has('y'));
@@ -199,7 +199,7 @@ describe("expr-compiler", () => {
       }
       f1(1) + f2() + x + y;
     `);
-    assert.notExists(checkFunctionType(pre));
+    assert.notExists(checkFunctionKind(pre));
     const ast = makeValueFunction(null, pre, ids);
     assert.isFalse(ids.has('x'));
     assert.isFalse(ids.has('f1'));
@@ -219,7 +219,7 @@ describe("expr-compiler", () => {
   it(`function value 1`, async () => {
     const src1 = preprocess('[[function (ev) { console.log(x); ev.cancel(); }]]').src;
     const ast1 = parseScript(src1);
-    assert.equal(checkFunctionType(ast1), 'FunctionExpression');
+    assert.equal(checkFunctionKind(ast1), 'FunctionExpression');
     const ast2 = makeFunction(ast1, new Set());
     const src2 = generate(ast2);
     assert.equal(normalizeSpace(src2), `function (ev) { this.console.log(this.x); ev.cancel(); }`);
@@ -228,7 +228,7 @@ describe("expr-compiler", () => {
   it(`function value 2`, async () => {
     const src1 = preprocess('[[(ev) => ev.cancel()]]').src;
     const ast1 = parseScript(src1);
-    assert.equal(checkFunctionType(ast1), 'ArrowFunctionExpression');
+    assert.equal(checkFunctionKind(ast1), 'ArrowFunctionExpression');
     const ast2 = makeFunction(ast1, new Set());
     const src2 = generate(ast2);
     assert.equal(normalizeSpace(src2), `ev => ev.cancel()`);

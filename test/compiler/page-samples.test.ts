@@ -76,7 +76,7 @@ describe(`page samples`, () => {
     );
   });
 
-  it(`function value`, async () => {
+  it(`function value 1`, async () => {
     const html = `<html lang=[[v()]] :v=[[() => 'en']]></html>`;
     const page = (await load('sample1.html', html)).page as Page;
 
@@ -95,30 +95,87 @@ describe(`page samples`, () => {
     );
   });
 
-  // it(`event value`, async () => {
-  //   const html = `<html>
-  //     <body :on_click=[[() => v = 'clicked']] :v="">[[v]]</body>
+  it(`function value 2`, async () => {
+    const html = `<html lang=[[v()]] :v=[[() => x + y]]></html>`;
+    const res = await load('sample1.html', html);
+    assert.equal(res.errors?.length, 1);
+    assert.equal(
+      res.errors?.at(0)?.msg,
+      'arrow functions cannot access other values: x, y'
+    );
+  });
+
+  it(`function value 3`, async () => {
+    const html = `<html lang=[[v()]] :v=[[function() { return x + y; }]] :x="e" :y="n"></html>`;
+    const res = await load('sample1.html', html);
+    assert.equal(res.errors?.length, 0);
+    res.page?.doc.head.remove();
+    res.page?.doc.body.remove();
+    res.page?.refresh();
+    assert.equal(
+      clean(res.page?.getMarkup()),
+      clean(`<html lang="en"></html>`)
+    );
+  });
+
+  it(`function value 4`, async () => {
+    const html = `<html :v=[[function() { return x + y; }]] :x="e" :y="n">
+      <body lang=[[v()]]/>
+    </html>`;
+    const res = await load('sample1.html', html);
+    assert.equal(res.errors?.length, 0);
+    res.page?.doc.head.remove();
+    res.page?.refresh();
+    assert.equal(
+      clean(res.page?.getMarkup()),
+      clean(`<html>
+        <body lang="en"></body>
+      </html>`)
+    );
+  });
+
+  // it(`function value 5`, async () => {
+  //   const html = `<html :v=[[function() { return x + y; }]] :x="e" :y="n">
+  //     <body lang=[[v()]] :y="s"/>
   //   </html>`;
-  //   const page = (await load('sample1.html', html)).page as Page;
-
-  //   assert.exists(page);
-  //   page.doc.head.remove();
-  //   page.refresh();
+  //   const res = await load('sample1.html', html);
+  //   assert.equal(res.errors?.length, 0);
+  //   res.page?.doc.head.remove();
+  //   res.page?.refresh();
+  //   // `v` must behave as a method of `html`, so it must take `html`'s `y`
+  //   // (and not `body`'s)
   //   assert.equal(
-  //     clean(page.getMarkup()),
+  //     clean(res.page?.getMarkup()),
   //     clean(`<html>
-  //       <body><!---t0--><!---/--></body>
-  //     </html>`)
-  //   );
-
-  //   page.doc.querySelector('body')?.click();
-  //   assert.equal(
-  //     clean(page.getMarkup()),
-  //     clean(`<html>
-  //       <body><!---t0-->clicked<!---/--></body>
+  //       <body lang="en"></body>
   //     </html>`)
   //   );
   // });
+
+  it(`event value`, async () => {
+    const html = `<html>
+      <body :on_click=[[function(ev) { v = ev.type }]] :v="">[[v]]</body>
+    </html>`;
+    const page = (await load('sample1.html', html)).page as Page;
+
+    assert.exists(page);
+    page.doc.head.remove();
+    page.refresh();
+    assert.equal(
+      clean(page.getMarkup()),
+      clean(`<html>
+        <body><!---t0--><!---/--></body>
+      </html>`)
+    );
+
+    page.doc.querySelector('body')?.click();
+    assert.equal(
+      clean(page.getMarkup()),
+      clean(`<html>
+        <body><!---t0-->click<!---/--></body>
+      </html>`)
+    );
+  });
 
   // it(`sample 1`, async () => {
   //   const page = (await load('sample1.html', `<html>
