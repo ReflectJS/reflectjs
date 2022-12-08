@@ -52,11 +52,40 @@ describe("page-compiler", () => {
             fn: function () {
               return this.l;
             },
-            refs: ['l'],
-            val: null
+            val: null,
+            refs: ['l']
           },
           l: {
             val: 'en'
+          }
+        },
+        children: [
+          { id: 1, name: 'head', query: 'head' },
+          { id: 2, name: 'body', query: 'body' }
+        ]
+      } }`)
+    );
+  });
+
+  it(`function value`, async () => {
+    const doc = await getDoc(pre, `<html :myfun=[[(s) => s.trim()]]></html>`);
+    const { js, errors } = compileDoc(doc);
+    assert.equal(errors.length, 0);
+    assert.equal(
+      doc.toString(),
+      `<html ${DOM_ID_ATTR}="0">` +
+      `<head ${DOM_ID_ATTR}="1"></head>` +
+      `<body ${DOM_ID_ATTR}="2"></body>` +
+      `</html>`
+    );
+    assert.equal(
+      normalizeSpace(js),
+      normalizeSpace(`{ root: {
+        id: 0, name: 'page', query: 'html',
+        values: {
+          myfun: {
+            val: s => s.trim(),
+            passive: true
           }
         },
         children: [

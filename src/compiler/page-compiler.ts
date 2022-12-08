@@ -5,7 +5,7 @@ import { HtmlDocument } from "../preprocessor/htmldom";
 import { PageProps } from "../runtime/page";
 import { ScopeProps } from "../runtime/scope";
 import { ValueProps } from "../runtime/value";
-import { makeValueFunction } from "./expr-compiler";
+import { checkFunctionType, makeFunction, makeValueFunction } from "./expr-compiler";
 import { isDynamic, preprocess } from "./expr-preprocessor";
 import { loadPage } from "./page-preprocessor";
 
@@ -79,16 +79,23 @@ function compileValue(value: ValueProps, errors: PageError[]) {
   const dst: es.Property[] = [];
   if (isDynamic(value.val)) {
     const refs = new Set<string>();
-    const fn = compileExpr(value.val, refs, errors);
-    fn && (dst.push(makeProperty('fn', fn)));
+    const { fn, kind } = compileExpr(value.val, refs, errors);
+    if (fn && kind === 'fun') {
+      dst.push(makeProperty('val', fn));
+      dst.push(makeProperty('passive', { type: "Literal", value: true }));
+    } else if (fn && kind === 'exp' ) {
+      dst.push(makeProperty('fn', fn));
+      dst.push(makeProperty("val", { type: "Literal", value: null }));
+    }
     if (refs.size > 0) {
       const ee: es.Literal[] = [];
       refs.forEach(ref => ee.push({ type: "Literal", value: ref }));
       dst.push(makeProperty("refs", { type: "ArrayExpression", elements: ee }));
     }
     value.val = null;
+  } else {
+    dst.push(makeProperty("val", { type: "Literal", value: value.val }));
   }
-  dst.push(makeProperty("val", { type: "Literal", value: value.val }));
   return {
     type: 'ObjectExpression',
     properties: dst
@@ -98,16 +105,22 @@ function compileValue(value: ValueProps, errors: PageError[]) {
 //TODO: source position
 function compileExpr(
   src: string, refs: Set<string>, errors: PageError[]
-): es.FunctionExpression | undefined {
+): { fn?: es.FunctionExpression | es.ArrowFunctionExpression, kind?: 'exp' | 'fun' } {
   const expr = preprocess(src);
-  let ast, ret = undefined;
+  let ast, fn = undefined, kind: 'exp' | 'fun' | undefined = undefined;
   try {
     ast = parseScript(expr.src, { loc: true });
-    ret = makeValueFunction(null, ast, refs);
+    if (checkFunctionType(ast)) {
+      fn = makeFunction(ast, refs);
+      kind = 'fun';
+    } else {
+      fn = makeValueFunction(null, ast, refs);
+      kind = 'exp';
+    }
   } catch (error: any) {
     console.log(error); //TODO: add to errors[]
   }
-  return ret;
+  return { fn, kind };
 }
 
 // =============================================================================
