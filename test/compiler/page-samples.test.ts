@@ -76,27 +76,81 @@ describe(`page samples`, () => {
     );
   });
 
-  it(`sample 1`, async () => {
-    const page = (await load('sample1.html', `<html>
-      <body :v=[[10]]>
-        <button :on_click=[[() => v--]]>-</button>
-        [[v]]
-        <button :on_click=[[() => v++]]>+</button>
-      </body>
-    </html>`)).page as Page;
+  it(`function value`, async () => {
+    const html = `<html lang=[[v()]] :v=[[() => 'en']]></html>`;
+    const page = (await load('sample1.html', html)).page as Page;
+
+    assert.exists(page);
+    page.doc.head.remove();
+    page.doc.body.remove();
+    assert.equal(
+      clean(page.getMarkup()),
+      clean(`<html></html>`)
+    );
+
     page.refresh();
     assert.equal(
       clean(page.getMarkup()),
-      clean(`<html>
-      <head></head><body>
-        <button>-</button>
-        <!---t0-->10<!---/-->
-        <button>+</button>
-      </body>
-      </html>`)
+      clean(`<html lang="en"></html>`)
     );
-    //FIXME: test events
   });
+
+  // it(`event value`, async () => {
+  //   const html = `<html>
+  //     <body :on_click=[[() => v = 'clicked']] :v="">[[v]]</body>
+  //   </html>`;
+  //   const page = (await load('sample1.html', html)).page as Page;
+
+  //   assert.exists(page);
+  //   page.doc.head.remove();
+  //   page.refresh();
+  //   assert.equal(
+  //     clean(page.getMarkup()),
+  //     clean(`<html>
+  //       <body><!---t0--><!---/--></body>
+  //     </html>`)
+  //   );
+
+  //   page.doc.querySelector('body')?.click();
+  //   assert.equal(
+  //     clean(page.getMarkup()),
+  //     clean(`<html>
+  //       <body><!---t0-->clicked<!---/--></body>
+  //     </html>`)
+  //   );
+  // });
+
+  // it(`sample 1`, async () => {
+  //   const page = (await load('sample1.html', `<html>
+  //     <body :v=[[10]]>
+  //       <button :on_click=[[() => v--]]>-</button>
+  //       [[v]]
+  //       <button :on_click=[[() => v++]]>+</button>
+  //     </body>
+  //   </html>`)).page as Page;
+  //   page.refresh();
+  //   assert.equal(
+  //     clean(page.getMarkup()),
+  //     clean(`<html>
+  //     <head></head><body>
+  //       <button>-</button>
+  //       <!---t0-->10<!---/-->
+  //       <button>+</button>
+  //     </body>
+  //     </html>`)
+  //   );
+  //   page.doc.querySelector('button')?.click();
+  //   assert.equal(
+  //     clean(page.getMarkup()),
+  //     clean(`<html>
+  //     <head></head><body>
+  //       <button>-</button>
+  //       <!---t0-->9<!---/-->
+  //       <button>+</button>
+  //     </body>
+  //     </html>`)
+  //   );
+  // });
 
 });
 

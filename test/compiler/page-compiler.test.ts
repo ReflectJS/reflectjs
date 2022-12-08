@@ -68,7 +68,7 @@ describe("page-compiler", () => {
   });
 
   it(`function value`, async () => {
-    const doc = await getDoc(pre, `<html :myfun=[[(s) => s.trim()]]></html>`);
+    const doc = await getDoc(pre, `<html :myfun=[[(s) => s.trim() + x]]></html>`);
     const { js, errors } = compileDoc(doc);
     assert.equal(errors.length, 0);
     assert.equal(
@@ -84,8 +84,9 @@ describe("page-compiler", () => {
         id: 0, name: 'page', query: 'html',
         values: {
           myfun: {
-            val: s => s.trim(),
-            passive: true
+            val: s => s.trim() + this.x,
+            passive: true,
+            refs: ['x']
           }
         },
         children: [
