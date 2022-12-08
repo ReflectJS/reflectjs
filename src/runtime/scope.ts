@@ -153,7 +153,10 @@ export class Scope {
   }
 
   updateValues() {
-    Object.keys(this.proxy).forEach(k => this.proxy[k]);
+    Object.keys(this.values).forEach(k => {
+      const v = this.values[k];
+      !v.props.passive && this.proxy[k];
+    });
     this.children.forEach(s => s.updateValues());
   }
 }
@@ -175,9 +178,6 @@ class ScopeProxyHandler implements ProxyHandler<any> {
       return this.scope.parent?.proxy;
     }
     const value = this.scope.lookupValue(prop);
-    // if (value?.fnproxy) {
-    //   return value?.fnproxy;
-    // }
     value && !value.props.passive && this.update(value);
     return value?.props.val;
   }
@@ -200,7 +200,7 @@ class ScopeProxyHandler implements ProxyHandler<any> {
   }
 
   apply(target: any, thisArg: any, argumentsList: any[]) {
-    target.apply(this.scope.proxy, argumentsList);
+    return target.apply(this.scope.proxy, argumentsList);
   }
 
   private update(value: Value) {

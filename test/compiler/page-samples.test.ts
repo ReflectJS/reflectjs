@@ -134,23 +134,55 @@ describe(`page samples`, () => {
     );
   });
 
-  // it(`function value 5`, async () => {
-  //   const html = `<html :v=[[function() { return x + y; }]] :x="e" :y="n">
-  //     <body lang=[[v()]] :y="s"/>
-  //   </html>`;
-  //   const res = await load('sample1.html', html);
-  //   assert.equal(res.errors?.length, 0);
-  //   res.page?.doc.head.remove();
-  //   res.page?.refresh();
-  //   // `v` must behave as a method of `html`, so it must take `html`'s `y`
-  //   // (and not `body`'s)
-  //   assert.equal(
-  //     clean(res.page?.getMarkup()),
-  //     clean(`<html>
-  //       <body lang="en"></body>
-  //     </html>`)
-  //   );
-  // });
+  it(`function value 5`, async () => {
+    const html = `<html :f=[[function() { return v; }]] :v="in html">
+      <body result=[[f()]] :v="in body"/>
+    </html>`;
+    const res = await load('sample1.html', html);
+    assert.equal(res.errors?.length, 0);
+    res.page?.doc.head.remove();
+    res.page?.refresh();
+    // `f` must behave as a method of `html`, so it must take `html`'s `v`
+    // (and not `body`'s)
+    assert.equal(
+      clean(res.page?.getMarkup()),
+      clean(`<html>
+        <body result="in html"></body>
+      </html>`)
+    );
+  });
+
+  it(`function value 6`, async () => {
+    const html = `<html :f=[[function(that) { return that.v; }]] :v="in html">
+      <body result=[[f(this)]] :v="in body"/>
+    </html>`;
+    const res = await load('sample1.html', html);
+    assert.equal(res.errors?.length, 0);
+    res.page?.doc.head.remove();
+    res.page?.refresh();
+    assert.equal(
+      clean(res.page?.getMarkup()),
+      clean(`<html>
+        <body result="in body"></body>
+      </html>`)
+    );
+  });
+
+  it(`function value 7`, async () => {
+    const html = `<html :f=[[(that) => that.v]] :v="in html">
+      <body result=[[f(this)]] :v="in body"/>
+    </html>`;
+    const res = await load('sample1.html', html);
+    assert.equal(res.errors?.length, 0);
+    res.page?.doc.head.remove();
+    res.page?.refresh();
+    assert.equal(
+      clean(res.page?.getMarkup()),
+      clean(`<html>
+        <body result="in body"></body>
+      </html>`)
+    );
+  });
 
   it(`event value`, async () => {
     const html = `<html>
@@ -177,37 +209,37 @@ describe(`page samples`, () => {
     );
   });
 
-  // it(`sample 1`, async () => {
-  //   const page = (await load('sample1.html', `<html>
-  //     <body :v=[[10]]>
-  //       <button :on_click=[[() => v--]]>-</button>
-  //       [[v]]
-  //       <button :on_click=[[() => v++]]>+</button>
-  //     </body>
-  //   </html>`)).page as Page;
-  //   page.refresh();
-  //   assert.equal(
-  //     clean(page.getMarkup()),
-  //     clean(`<html>
-  //     <head></head><body>
-  //       <button>-</button>
-  //       <!---t0-->10<!---/-->
-  //       <button>+</button>
-  //     </body>
-  //     </html>`)
-  //   );
-  //   page.doc.querySelector('button')?.click();
-  //   assert.equal(
-  //     clean(page.getMarkup()),
-  //     clean(`<html>
-  //     <head></head><body>
-  //       <button>-</button>
-  //       <!---t0-->9<!---/-->
-  //       <button>+</button>
-  //     </body>
-  //     </html>`)
-  //   );
-  // });
+  it(`sample 1`, async () => {
+    const page = (await load('sample1.html', `<html>
+      <body :v=[[10]]>
+        <button :on_click=[[function() { v--; }]]>-</button>
+        [[v]]
+        <button :on_click=[[function() { v++; }]]>+</button>
+      </body>
+    </html>`)).page as Page;
+    page.refresh();
+    assert.equal(
+      clean(page.getMarkup()),
+      clean(`<html>
+      <head></head><body>
+        <button>-</button>
+        <!---t0-->10<!---/-->
+        <button>+</button>
+      </body>
+      </html>`)
+    );
+    page.doc.querySelector('button')?.click();
+    assert.equal(
+      clean(page.getMarkup()),
+      clean(`<html>
+      <head></head><body>
+        <button>-</button>
+        <!---t0-->9<!---/-->
+        <button>+</button>
+      </body>
+      </html>`)
+    );
+  });
 
 });
 

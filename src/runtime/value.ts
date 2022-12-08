@@ -4,6 +4,7 @@ import { Scope } from "./scope";
 
 export interface ValueProps {
   val: any;
+  _origVal?: any;
   passive?: boolean;
   fn?: (() => any) | string;
   cycle?: number;
@@ -22,8 +23,6 @@ export class Value {
   fn?: () => any;
   src?: Set<Value>;
   dst?: Set<Value>;
-  // originalFnVal?: any;
-  fnproxy?: any;
 
   constructor(key: string, props: ValueProps, scope?: Scope) {
     this.props = props;
@@ -35,12 +34,16 @@ export class Value {
       } else if (key.startsWith(EVENT_VALUE_PREFIX)) {
         this.key = key.substring(EVENT_VALUE_PREFIX.length);
         this.dom = scope.dom;
-        this.fnproxy = new Proxy(props.val, scope.proxyHandler);
-        this.dom.addEventListener(this.key, (...ev: any[]) => this.fnproxy(...ev));
+        const proxy = new Proxy(props.val, scope.proxyHandler);
+        this.dom.addEventListener(this.key, (...ev: any[]) => proxy(...ev));
       } else if (key.startsWith(TEXT_VALUE_PREFIX)) {
         const i = parseInt(key.substring(TEXT_VALUE_PREFIX.length));
         this.dom = scope.texts ? scope.texts[i] : undefined;
         this.cb = Value.textCB;
+      } else if (props.passive && typeof props.val === 'function') {
+        const proxy = new Proxy(props.val, scope.proxyHandler);
+        props._origVal = props.val;
+        props.val = (...args: any[]) => proxy(...args);
       }
     }
     this.fn = props.fn as (() => any) | undefined;
