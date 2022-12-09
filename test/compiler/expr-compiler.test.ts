@@ -222,7 +222,7 @@ describe("expr-compiler", () => {
     assert.equal(checkFunctionKind(ast1), 'FunctionExpression');
     const ast2 = makeFunction(ast1, new Set());
     const src2 = generate(ast2);
-    assert.equal(normalizeSpace(src2), `function (ev) { this.console.log(this.x); ev.cancel(); }`);
+    assert.equal(normalizeSpace(src2), `function (ev) { this.console.log(this.x); return ev.cancel(); }`);
   });
 
   it(`function value 2`, async () => {
@@ -231,7 +231,7 @@ describe("expr-compiler", () => {
     assert.equal(checkFunctionKind(ast1), 'ArrowFunctionExpression');
     const ast2 = makeFunction(ast1, new Set());
     const src2 = generate(ast2);
-    assert.equal(normalizeSpace(src2), `ev => ev.cancel()`);
+    assert.equal(normalizeSpace(src2), `function (ev) { return ev.cancel(); }`);
   });
 
 });

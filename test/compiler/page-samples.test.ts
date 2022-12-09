@@ -96,12 +96,23 @@ describe(`page samples`, () => {
   });
 
   it(`function value 2`, async () => {
-    const html = `<html lang=[[v()]] :v=[[() => x + y]]></html>`;
+    const html = `<html lang=[[v()]] :v=[[() => x + y]] :x="e" :y="n"></html>`;
     const res = await load('sample1.html', html);
-    assert.equal(res.errors?.length, 1);
+    assert.equal(res.errors?.length, 0);
+    const page = res.page as Page;
+
+    assert.exists(page);
+    page.doc.head.remove();
+    page.doc.body.remove();
     assert.equal(
-      res.errors ? res.errors[0].msg : '',
-      'arrow functions cannot access other values: x, y'
+      clean(page.getMarkup()),
+      clean(`<html></html>`)
+    );
+
+    page.refresh();
+    assert.equal(
+      clean(page.getMarkup()),
+      clean(`<html lang="en"></html>`)
     );
   });
 

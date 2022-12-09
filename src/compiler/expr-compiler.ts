@@ -17,11 +17,33 @@ export function checkFunctionKind(script: es.Program): string | null {
 // use only if checkFunctionKind() !== null
 export function makeFunction(
   script: es.Program, references: Set<string>
-): es.FunctionExpression | es.ArrowFunctionExpression {
-  const ret = (script.body[0] as any).expression as
+): es.FunctionExpression {
+  const src = (script.body[0] as any).expression as
     es.FunctionExpression | es.ArrowFunctionExpression;
-  qualifyIdentifiers(null, script, references)
-  return ret;
+  
+  const locals = new Set<string>();
+  src.params.forEach(pattern => {
+    if (pattern.type === 'Identifier') {
+      locals.add(pattern.name);
+    }
+    //TODO: other possible function parameter types
+  });
+
+  let body: es.Statement[];
+  if (src.body.type === 'BlockStatement') {
+    body = src.body.body;
+  } else {
+    body = [{
+      type: 'ExpressionStatement',
+      expression: src.body
+    }];
+  }
+
+  return {
+    type: 'FunctionExpression',
+    params: src.params,
+    body: makeFunctionBody(null, body, references, locals)
+  }
 }
 
 // use only if checkFunctionKind() === null
@@ -36,7 +58,7 @@ export function makeValueFunction(
 }
 
 function makeFunctionBody(
-  key: string | null, statements: es.Statement[], references: Set<string>
+  key: string | null, statements: es.Statement[], references: Set<string>, locals?: Set<string>
 ): es.BlockStatement {
   const len = statements.length;
   for (let i = 0; i < len; i++) {
@@ -55,17 +77,17 @@ function makeFunctionBody(
     type: 'BlockStatement',
     body: statements
   }
-  qualifyIdentifiers(key, ret, references);
+  qualifyIdentifiers(key, ret, references, locals);
   return ret;
 }
 
 function qualifyIdentifiers(
-  key: string | null, body: es.Node, references: Set<string>
+  key: string | null, body: es.Node, references: Set<string>, locals?: Set<string>
 ) {
   const scopes: Array<{ isFunction: boolean, ids: Set<string> }> = [];
 
-  function enterScope(isFunction: boolean) {
-    scopes.push({ isFunction: isFunction, ids: new Set() });
+  function enterScope(isFunction: boolean, locals?: Set<string>) {
+    scopes.push({ isFunction: isFunction, ids: locals ?? new Set() });
   }
 
   function leaveScope() {
@@ -140,7 +162,11 @@ function qualifyIdentifiers(
           property: node
         }
       } else if (node.type === 'BlockStatement') {
-        enterScope(stack.length === 1);
+        if (stack.length == 1) {
+          enterScope(true, locals);
+        } else {
+          enterScope(false);
+        }
       } else if (
         node.type === 'WhileStatement' ||
         node.type === 'DoWhileStatement' ||

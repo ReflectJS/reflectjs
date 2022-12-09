@@ -116,13 +116,6 @@ function compileExpr(
     if (functionKind) {
       fn = makeFunction(ast, refs);
       kind = 'fun';
-      if (functionKind === 'ArrowFunctionExpression' && refs.size > 0) {
-        errors.push({
-          type: 'err',
-          msg: `arrow functions cannot access other values: ` +
-              `${Array.from(refs).sort().join(', ')}`
-        });
-      }
     } else {
       fn = makeValueFunction(null, ast, refs);
       kind = 'exp';

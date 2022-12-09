@@ -114,7 +114,7 @@ describe("page-compiler", () => {
         id: 0, name: 'page', query: 'html',
         values: {
           myfun: {
-            val: s => s.trim(),
+            val: function (s) { return s.trim(); },
             passive: true
           }
         },
