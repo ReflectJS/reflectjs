@@ -23,6 +23,10 @@ export function isDynamic(s: any) {
 
 export function preprocess(s: string, origin?: string, lineNr = 1): Expr {
   var src = preprocessIt(s);
+  if (/^\s*function\s*\(/gm.test(src)) {
+    // if it's an anonimous function, turn into a function expression
+    src = `(${src})`;
+  }
   return { src: src, origin: origin, lineNr: lineNr };
 }
 
@@ -31,8 +35,8 @@ function preprocessIt(s: string): string {
   var sep = '';
   var exprStart, exprEnd;
   if (s.startsWith(EXPR_MARKER1) && s.endsWith(EXPR_MARKER2)) {
-    exprStart = '(';
-    exprEnd = ')';
+    exprStart = '';
+    exprEnd = '';
   } else {
     exprStart = NOTNULL_FN + '(';
     exprEnd = ')';

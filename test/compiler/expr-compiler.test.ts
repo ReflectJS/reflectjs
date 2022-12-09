@@ -222,7 +222,27 @@ describe("expr-compiler", () => {
     assert.equal(checkFunctionKind(ast1), 'FunctionExpression');
     const ast2 = makeFunction(ast1, new Set());
     const src2 = generate(ast2);
-    assert.equal(normalizeSpace(src2), `function (ev) { this.console.log(this.x); return ev.cancel(); }`);
+    assert.equal(normalizeSpace(src2), `function (ev) { this.console.log(this.x); ev.cancel(); }`);
+  });
+
+  it(`function value 1b`, async () => {
+    const src1 = preprocess('[[function (ev) { console.log(x); ev.cancel(); return true; }]]').src;
+    const ast1 = parseScript(src1);
+    assert.equal(checkFunctionKind(ast1), 'FunctionExpression');
+    const ast2 = makeFunction(ast1, new Set());
+    const src2 = generate(ast2);
+    assert.equal(normalizeSpace(src2), `function (ev) { this.console.log(this.x); ev.cancel(); return true; }`);
+  });
+
+  it(`function value 1c`, async () => {
+    const src1 = preprocess(`[[
+      function (ev) { console.log(x); ev.cancel(); }
+    ]]`).src;
+    const ast1 = parseScript(src1);
+    assert.equal(checkFunctionKind(ast1), 'FunctionExpression');
+    const ast2 = makeFunction(ast1, new Set());
+    const src2 = generate(ast2);
+    assert.equal(normalizeSpace(src2), `function (ev) { this.console.log(this.x); ev.cancel(); }`);
   });
 
   it(`function value 2`, async () => {
@@ -234,4 +254,28 @@ describe("expr-compiler", () => {
     assert.equal(normalizeSpace(src2), `function (ev) { return ev.cancel(); }`);
   });
 
+  it(`function value 2b`, async () => {
+    const src1 = preprocess('[[(ev) => { ev.cancel(); console.log("done"); }]]').src;
+    const ast1 = parseScript(src1);
+    assert.equal(checkFunctionKind(ast1), 'ArrowFunctionExpression');
+    const ast2 = makeFunction(ast1, new Set());
+    const src2 = generate(ast2);
+    assert.equal(normalizeSpace(src2), `function (ev) { ev.cancel(); this.console.log('done'); }`);
+  });
+
+  it(`multi statement expression`, async () => {
+    const src1 = preprocess(`[[
+      attr_dataTest = true;
+      setTimeout(() => count++, 1000);
+    ]]`).src;
+    const ast1 = parseScript(src1);
+    assert.notExists(checkFunctionKind(ast1));
+    const ids = new Set<string>();
+    const ast2 = makeValueFunction(null, ast1, ids);
+    const src2 = generate(ast2);
+    assert.equal(normalizeSpace(src2), normalizeSpace(`function () {
+      this.attr_dataTest = true;
+      return this.setTimeout(() => this.count++, 1000);
+    }`));
+  });
 });

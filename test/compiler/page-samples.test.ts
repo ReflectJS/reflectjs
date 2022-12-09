@@ -290,6 +290,36 @@ describe(`page samples`, () => {
       </html>`)
     );
   });
+
+  it(`sample 3 - "Reactivity" from aremel.org`, async () => {
+    const page = (await load('sample2.html', `<html>
+      <body :count=[[0]] data-test=[[false]]
+            :handle_count=[[
+              !count && setTimeout(() => count++, 0);
+              attr_dataTest = true;
+            ]]>
+        Seconds: [[count]]
+      </body>
+    </html>`)).page as Page;
+    page.refresh();
+    assert.equal(
+      clean(page.getMarkup()),
+      clean(`<html>
+      <head></head><body data-test="true">
+        Seconds: <!---t0-->0<!---/-->
+      </body>
+      </html>`)
+    );
+    await new Promise(resolve => setTimeout(resolve, 0));
+    assert.equal(
+      clean(page.getMarkup()),
+      clean(`<html>
+      <head></head><body data-test="true">
+        Seconds: <!---t0-->1<!---/-->
+      </body>
+      </html>`)
+    );
+  });
 });
 
 // =============================================================================

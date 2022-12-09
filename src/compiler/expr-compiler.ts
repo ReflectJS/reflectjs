@@ -2,8 +2,6 @@ import estraverse from "estraverse";
 import * as es from "estree";
 import { OUTER_PROPERTY } from "../runtime/page";
 
-//TODO: event handler functions
-
 export function checkFunctionKind(script: es.Program): string | null {
   if (script.body.length === 1 && script.body[0].type === 'ExpressionStatement') {
     const type = script.body[0].expression.type;
@@ -39,10 +37,15 @@ export function makeFunction(
     }];
   }
 
+  const noImplicitReturn = (
+    src.type !== 'ArrowFunctionExpression' ||
+    src.body.type === 'BlockStatement'
+  );
+  
   return {
     type: 'FunctionExpression',
     params: src.params,
-    body: makeFunctionBody(null, body, references, locals)
+    body: makeFunctionBody(null, body, references, locals, noImplicitReturn)
   }
 }
 
@@ -58,7 +61,8 @@ export function makeValueFunction(
 }
 
 function makeFunctionBody(
-  key: string | null, statements: es.Statement[], references: Set<string>, locals?: Set<string>
+  key: string | null, statements: es.Statement[], references: Set<string>,
+  locals?: Set<string>, noImplicitReturn?: boolean
 ): es.BlockStatement {
   const len = statements.length;
   for (let i = 0; i < len; i++) {
@@ -66,7 +70,7 @@ function makeFunctionBody(
     if (node.type === 'ExpressionStatement' && node.directive) {
       delete node.directive;
     }
-    if (i === (len - 1) && node.type === 'ExpressionStatement') {
+    if (i === (len - 1) && node.type === 'ExpressionStatement' && !noImplicitReturn) {
       statements[i] = {
         type: 'ReturnStatement',
         argument: node.expression
