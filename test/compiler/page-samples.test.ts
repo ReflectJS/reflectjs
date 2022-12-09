@@ -220,7 +220,7 @@ describe(`page samples`, () => {
     );
   });
 
-  it(`sample 1`, async () => {
+  it(`sample 1 - "Augmented HTML" from aremel.org`, async () => {
     const page = (await load('sample1.html', `<html>
       <body :v=[[10]]>
         <button :on_click=[[function() { v--; }]]>-</button>
@@ -252,6 +252,44 @@ describe(`page samples`, () => {
     );
   });
 
+  it(`sample 2 - "Reusability" from aremel.org`, async () => {
+    const page = (await load('sample2.html', `<html>
+      <body>
+        <:define tag="app-product" :name :price>
+          <b>Product: [[name]]</b>
+          <div>Price: [[price]]</div>
+          <p/>
+        </:define>
+    
+        <app-product :name="Thingy" :price="1$"/>
+        <app-product :name="Widget" :price="2$"/>
+        <app-product :name="Gadget" :price="3$"/>
+      </body>
+    </html>`)).page as Page;
+    page.refresh();
+    assert.equal(
+      clean(page.getMarkup()),
+      clean(`<html>
+      <head></head><body>
+        <div>
+          <b>Product: <!---t0-->Thingy<!---/--></b>
+          <div>Price: <!---t1-->1$<!---/--></div>
+          <p></p>
+        </div>
+        <div>
+          <b>Product: <!---t0-->Widget<!---/--></b>
+          <div>Price: <!---t1-->2$<!---/--></div>
+          <p></p>
+        </div>
+        <div>
+          <b>Product: <!---t0-->Gadget<!---/--></b>
+          <div>Price: <!---t1-->3$<!---/--></div>
+          <p></p>
+        </div>
+      </body>
+      </html>`)
+    );
+  });
 });
 
 // =============================================================================
