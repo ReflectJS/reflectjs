@@ -39,6 +39,10 @@ export class Value {
       } else if (key.startsWith(EVENT_VALUE_PREFIX)) {
         this.key = key.substring(EVENT_VALUE_PREFIX.length);
         this.dom = scope.dom;
+        //TODO:
+        // 1) value keys are passed through hyphenToCamel()
+        // 2) events may use both hypenized and camelized names
+        // 3) we need to add ValueProps.key w/ uncamelized name
         this.dom.addEventListener(this.key, props.val);
       } else if (key.startsWith(TEXT_VALUE_PREFIX)) {
         const i = parseInt(key.substring(TEXT_VALUE_PREFIX.length));

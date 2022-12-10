@@ -108,9 +108,6 @@ export class Scope {
       const props = (this.props.values as any)[key];
       ret[key as string] = new Value(key as string, props, this);
     });
-    // this.props.values?.forEach(props => {
-    //   ret[props.key] = new Value(props, this);
-    // });
     return ret;
   }
 
