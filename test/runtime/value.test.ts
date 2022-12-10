@@ -1,7 +1,7 @@
 import { assert } from "chai";
 import { DOM_ID_ATTR, TEXT_VALUE_PREFIX } from "../../src/runtime/page";
 import { ScopeProps } from "../../src/runtime/scope";
-import { camelToHyphen, Value } from "../../src/runtime/value";
+import { attrCB, camelToHyphen, textCB, Value } from "../../src/runtime/value";
 import { addScope, baseApp, itemAt } from "./page.test";
 
 describe('value', () => {
@@ -31,7 +31,7 @@ describe('value', () => {
     assert.equal(v.key, 'class');
     assert.equal(v.props.val, 'base');
     assert.equal(v.dom, page.root.children[1]?.dom);
-    assert.equal(v.cb, Value.attrCB);
+    assert.equal(v.cb, attrCB);
   });
 
   it('should create a DOM text value', () => {
@@ -50,7 +50,7 @@ describe('value', () => {
     assert.isUndefined(v.key);
     assert.equal(v.props.val, 'there');
     assert.equal(v.dom, itemAt(0, span.texts));
-    assert.equal(v.cb, Value.textCB);
+    assert.equal(v.cb, textCB);
     assert.equal(
       page.getMarkup(),
       `<!DOCTYPE html><html ${DOM_ID_ATTR}=\"0\">` +

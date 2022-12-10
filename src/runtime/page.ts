@@ -20,6 +20,7 @@ export const OUTER_PROPERTY = RESERVED_PREFIX + 'outer';
 export const ATTR_VALUE_PREFIX = 'attr_';
 export const EVENT_VALUE_PREFIX = 'on_';
 export const HANDLER_VALUE_PREFIX = 'handle_';
+export const DATA_VALUE = 'data';
 export const TEXT_VALUE_PREFIX = RESERVED_PREFIX + 't';
 
 export const TEXT_MARKER1_PREFIX = '-t';

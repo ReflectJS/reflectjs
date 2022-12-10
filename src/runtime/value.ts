@@ -1,5 +1,5 @@
 import { regexMap } from "../preprocessor/util";
-import { ATTR_VALUE_PREFIX, EVENT_VALUE_PREFIX, TEXT_VALUE_PREFIX } from "./page";
+import { ATTR_VALUE_PREFIX, DATA_VALUE, EVENT_VALUE_PREFIX, TEXT_VALUE_PREFIX } from "./page";
 import { Scope } from "./scope";
 
 export interface ValueProps {
@@ -35,7 +35,7 @@ export class Value {
       if (key.startsWith(ATTR_VALUE_PREFIX)) {
         this.key = camelToHyphen(key.substring(ATTR_VALUE_PREFIX.length));
         this.dom = scope.dom;
-        this.cb = Value.attrCB;
+        this.cb = attrCB;
       } else if (key.startsWith(EVENT_VALUE_PREFIX)) {
         this.key = key.substring(EVENT_VALUE_PREFIX.length);
         this.dom = scope.dom;
@@ -47,28 +47,37 @@ export class Value {
       } else if (key.startsWith(TEXT_VALUE_PREFIX)) {
         const i = parseInt(key.substring(TEXT_VALUE_PREFIX.length));
         this.dom = scope.texts ? scope.texts[i] : undefined;
-        this.cb = Value.textCB;
+        this.cb = textCB;
+      } else if (key === DATA_VALUE) {
+        this.cb = dataCB;
       }
     }
     this.fn = props.fn as (() => any) | undefined;
   }
-
-  static attrCB(v: Value) {
-    if (v.props.val != null) {
-      (v.dom as Element).setAttribute(v.key as string, `${v.props.val}`);
-    } else {
-      (v.dom as Element).removeAttribute(v.key as string);
-    }
-  }
-
-  static textCB(v: Value) {
-    (v.dom as Node).nodeValue = (v.props.val != null ? `${v.props.val}` : '');
-  }
 }
 
 export function camelToHyphen(s: string) {
-  return regexMap(/([0-9a-z][A-Z])/g, s, match => {
-    const ret = s.charAt(match.index) + '-' + s.charAt(match.index + 1).toLowerCase();
-    return ret;
-  });
+  return regexMap(/([0-9a-z][A-Z])/g, s, match => 
+    s.charAt(match.index) + '-' + s.charAt(match.index + 1).toLowerCase()
+  );
+}
+
+export function attrCB(v: Value) {
+  if (v.props.val != null) {
+    (v.dom as Element).setAttribute(v.key as string, `${v.props.val}`);
+  } else {
+    (v.dom as Element).removeAttribute(v.key as string);
+  }
+}
+
+export function textCB(v: Value) {
+  (v.dom as Node).nodeValue = (v.props.val != null ? `${v.props.val}` : '');
+}
+
+export function dataCB(v: Value) {
+  if (!v.props.val || !Array.isArray(v.props.val)) {
+    return;
+  }
+  console.log('dataCB', v.props.val);
+  v.props.val = v.props.val.length > 0 ? v.props.val[0] : null;
 }

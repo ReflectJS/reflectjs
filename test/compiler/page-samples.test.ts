@@ -291,7 +291,7 @@ describe(`page samples`, () => {
     );
   });
 
-  it(`sample 3/5 - "Reactivity/Isomorphism" from aremel.org`, async () => {
+  it(`sample 3/4 - "Reactivity/Isomorphism" from aremel.org`, async () => {
     const page = (await load('sample.html', `<html>
       <body :count=[[0]] data-test=[[false]]
             :handle_count=[[
@@ -406,6 +406,36 @@ describe(`page samples`, () => {
       </html>`)
     );
   });
+
+  // it(`data binding 3 - replication`, async () => {
+  //   const page = (await load('sample.html', `<html>
+  //     <body :data=[[{ list: [1, 2, 3] }]]>
+  //       <ul>
+  //         <li :data=[[data.list]]>[[data]]</li>
+  //       </ul>
+  //     </body>
+  //   </html>`)).page as Page;
+  //   page.refresh();
+  //   assert.equal(
+  //     clean(page.getMarkup()),
+  //     clean(`<html>
+  //     <head></head><body>
+  //       <ul>
+  //         <li><!---t0-->1<!---/--></li><li><!---t0-->2<!---/--></li><li><!---t0-->3<!---/--></li>
+  //       </ul>
+  //     </body>
+  //     </html>`)
+  //   );
+  //   // page.root.proxy['body'].data = { id: 2, name: 'Bob' };
+  //   // assert.equal(
+  //   //   clean(page.getMarkup()),
+  //   //   clean(`<html>
+  //   //   <head></head><body>
+  //   //     id: <!---t0-->2<!---/-->, name: <!---t1-->Bob<!---/-->
+  //   //   </body>
+  //   //   </html>`)
+  //   // );
+  // });
 
 });
 
