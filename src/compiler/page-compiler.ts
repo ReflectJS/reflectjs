@@ -81,7 +81,7 @@ function compileValue(key: string, value: ValueProps, errors: PageError[]) {
   const dst: es.Property[] = [];
   if (isDynamic(value.val)) {
     const refs = new Set<string>();
-    const { fn, kind } = compileExpr(value.val, refs, errors);
+    const { fn, kind } = compileExpr(key, value.val, refs, errors);
     if (fn && kind === 'fun') {
       dst.push(makeProperty('val', fn));
       dst.push(makeProperty('passive', { type: "Literal", value: true }));
@@ -109,7 +109,7 @@ function compileValue(key: string, value: ValueProps, errors: PageError[]) {
 
 //TODO: source position
 function compileExpr(
-  src: string, refs: Set<string>, errors: PageError[]
+  key: string, src: string, refs: Set<string>, errors: PageError[]
 ): { fn?: es.FunctionExpression | es.ArrowFunctionExpression, kind?: 'exp' | 'fun' } {
   const expr = preprocess(src);
   let ast, fn = undefined, kind: 'exp' | 'fun' | undefined = undefined;
@@ -120,7 +120,7 @@ function compileExpr(
       fn = makeFunction(ast, refs);
       kind = 'fun';
     } else {
-      fn = makeValueFunction(null, ast, refs);
+      fn = makeValueFunction(key, ast, refs);
       kind = 'exp';
     }
   } catch (error: any) {

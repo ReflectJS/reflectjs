@@ -37,7 +37,11 @@ describe("expr-preprocessor", () => {
     } else {
       trace('ko');
     }`);
-    assert.equal(preprocess("[[function(x) {return x * 2}]]").src, '(function(x) {return x * 2})');
+    assert.equal(preprocess(`[[
+      function(x) {return x * 2}
+    ]]`).src, `(
+      function(x) {return x * 2}
+    )`);
     assert.equal(preprocess("[[function\n(x) {return x * 2}]]").src, '(function\n(x) {return x * 2})');
     assert.equal(preprocess("[[(x) => {return x * 2}]]").src, '(x) => {return x * 2}');
     assert.equal(preprocess("[[\n(x) => {return x * 2}]]").src, '\n(x) => {return x * 2}');

@@ -4,7 +4,7 @@ import { compileDoc, PageError } from "../../src/compiler/page-compiler";
 import { HtmlDocument } from "../../src/preprocessor/htmldom";
 import Preprocessor from "../../src/preprocessor/preprocessor";
 import { normalizeSpace, normalizeText } from "../../src/preprocessor/util";
-import { DOM_ID_ATTR, Page } from "../../src/runtime/page";
+import { OUTER_PROPERTY, Page } from "../../src/runtime/page";
 
 describe(`page samples`, () => {
 
@@ -221,7 +221,7 @@ describe(`page samples`, () => {
   });
 
   it(`sample 1 - "Augmented HTML" from aremel.org`, async () => {
-    const page = (await load('sample1.html', `<html>
+    const page = (await load('sample.html', `<html>
       <body :v=[[10]]>
         <button :on_click=[[function() { v--; }]]>-</button>
         [[v]]
@@ -253,7 +253,7 @@ describe(`page samples`, () => {
   });
 
   it(`sample 2 - "Reusability" from aremel.org`, async () => {
-    const page = (await load('sample2.html', `<html>
+    const page = (await load('sample.html', `<html>
       <body>
         <:define tag="app-product" :name :price>
           <b>Product: [[name]]</b>
@@ -292,7 +292,7 @@ describe(`page samples`, () => {
   });
 
   it(`sample 3/5 - "Reactivity/Isomorphism" from aremel.org`, async () => {
-    const page = (await load('sample2.html', `<html>
+    const page = (await load('sample.html', `<html>
       <body :count=[[0]] data-test=[[false]]
             :handle_count=[[
               !count && setTimeout(() => count++, 0);
@@ -320,6 +320,93 @@ describe(`page samples`, () => {
       </html>`)
     );
   });
+
+  it(`data binding 1 - data reference`, async () => {
+    const page = (await load('sample.html', `<html>
+      <body :data=[[{ id: 1, name: 'Alice' }]]>
+        id: [[data.id]], name: [[data.name]]
+      </body>
+    </html>`)).page as Page;
+    page.refresh();
+    assert.equal(
+      clean(page.getMarkup()),
+      clean(`<html>
+      <head></head><body>
+        id: <!---t0-->1<!---/-->, name: <!---t1-->Alice<!---/-->
+      </body>
+      </html>`)
+    );
+    page.root.proxy['body'].data = { id: 2, name: 'Bob' };
+    assert.equal(
+      clean(page.getMarkup()),
+      clean(`<html>
+      <head></head><body>
+        id: <!---t0-->2<!---/-->, name: <!---t1-->Bob<!---/-->
+      </body>
+      </html>`)
+    );
+  });
+
+  it(`data binding 2 - data refinement`, async () => {
+    const res = (await load('sample.html', `<html>
+      <body :data=[[{ id: 1, name: 'Alice' }]]>
+        <span :data=[[data.name]]>[[data]]</span>
+      </body>
+    </html>`));
+    const js = res.js;
+    assert.equal(normalizeSpace(js), normalizeSpace(`{
+      root: {
+        id: 0,
+        name: 'page',
+        query: 'html',
+        children: [
+          { id: 1, name: 'head', query: 'head' },
+          { id: 2, name: 'body', query: 'body',
+            values: {
+              data: {
+                fn: function () { return { id: 1, name: 'Alice' }; },
+                val: null
+              }
+            },
+            children: [{ id: 3, query: '[data-reflectjs="3"]',
+              values: {
+                __t0: {
+                  fn: function () { return this.data; },
+                  val: null,
+                  refs: ['data']
+                },
+                data: {
+                  fn: function () { return this.${OUTER_PROPERTY}.data.name; },
+                  val: null,
+                  refs: ['data']
+                }
+              }
+            }]
+          }
+        ]
+      }
+    }`));
+    const page = res.page as Page;
+    page.refresh();
+    assert.equal(
+      clean(page.getMarkup()),
+      clean(`<html>
+      <head></head><body>
+        <span><!---t0-->Alice<!---/--></span>
+      </body>
+      </html>`)
+    );
+    page.root.proxy['body'].data = { id: 2, name: 'Bob' };
+    assert.equal(
+      clean(page.getMarkup()),
+      clean(`<html>
+      <head></head><body>
+        <span><!---t0-->Bob<!---/--></span>
+      </body>
+      </html>`)
+    );
+  });
+
 });
 
 // =============================================================================

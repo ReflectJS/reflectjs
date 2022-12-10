@@ -23,8 +23,8 @@ export function isDynamic(s: any) {
 
 export function preprocess(s: string, origin?: string, lineNr = 1): Expr {
   var src = preprocessIt(s);
-  if (/^\s*function\s*\(/gm.test(src)) {
-    // if it's an anonimous function, turn into a function expression
+  if (/^\s*function\s*\(/g.test(src) || /^\s*\{/g.test(src)) {
+    // if it's an anonimous function or an object literal, turn into expression
     src = `(${src})`;
   }
   return { src: src, origin: origin, lineNr: lineNr };
