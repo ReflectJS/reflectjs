@@ -22,10 +22,10 @@ describe("page-preprocessor", () => {
     );
     assert.deepEqual(props, {
       root: {
-        id: 0, name: 'page', query: 'html',
+        id: '0', name: 'page', query: 'html',
         children: [
-          { id: 1, name: 'head', query: 'head' },
-          { id: 2, name: 'body', query: 'body' }
+          { id: '1', name: 'head', query: 'head' },
+          { id: '2', name: 'body', query: 'body' }
         ]
       }
     });
@@ -44,13 +44,13 @@ describe("page-preprocessor", () => {
     );
     const expected: PageProps = {
       root: {
-        id: 0, name: 'page', query: 'html',
+        id: '0', name: 'page', query: 'html',
         values: {
           v: { val: 'x' }
         },
         children: [
-          { id: 1, name: 'head', query: 'head' },
-          { id: 2, name: 'body', query: 'body' }
+          { id: '1', name: 'head', query: 'head' },
+          { id: '2', name: 'body', query: 'body' }
         ]
       }
     }
@@ -70,13 +70,13 @@ describe("page-preprocessor", () => {
     );
     const expected: PageProps = {
       root: {
-        id: 0, name: 'page', query: 'html',
+        id: '0', name: 'page', query: 'html',
         values: {
           v: { val: '[[x]]' }
         },
         children: [
-          { id: 1, name: 'head', query: 'head' },
-          { id: 2, name: 'body', query: 'body' }
+          { id: '1', name: 'head', query: 'head' },
+          { id: '2', name: 'body', query: 'body' }
         ]
       }
     }
@@ -96,13 +96,13 @@ describe("page-preprocessor", () => {
     );
     const expected: PageProps = {
       root: {
-        id: 0, name: 'page', query: 'html',
+        id: '0', name: 'page', query: 'html',
         values: {
           v: { val: '[[x]]' }
         },
         children: [
-          { id: 1, name: 'head', query: 'head' },
-          { id: 2, name: 'body', query: 'body' }
+          { id: '1', name: 'head', query: 'head' },
+          { id: '2', name: 'body', query: 'body' }
         ]
       }
     }
@@ -122,13 +122,13 @@ describe("page-preprocessor", () => {
     );
     const expected: PageProps = {
       root: {
-        id: 0, name: 'page', query: 'html',
+        id: '0', name: 'page', query: 'html',
         values: {
           attr_v: { val: '[[x]]' }
         },
         children: [
-          { id: 1, name: 'head', query: 'head' },
-          { id: 2, name: 'body', query: 'body' }
+          { id: '1', name: 'head', query: 'head' },
+          { id: '2', name: 'body', query: 'body' }
         ]
       }
     }
@@ -148,13 +148,13 @@ describe("page-preprocessor", () => {
     );
     const expected: PageProps = {
       root: {
-        id: 0, name: 'page', query: 'html',
+        id: '0', name: 'page', query: 'html',
         values: {
           attr_v: { val: '[[x]]' }
         },
         children: [
-          { id: 1, name: 'head', query: 'head' },
-          { id: 2, name: 'body', query: 'body' }
+          { id: '1', name: 'head', query: 'head' },
+          { id: '2', name: 'body', query: 'body' }
         ]
       }
     }
@@ -174,10 +174,10 @@ describe("page-preprocessor", () => {
     );
     const expected: PageProps = {
       root: {
-        id: 0, name: 'page', query: 'html',
+        id: '0', name: 'page', query: 'html',
         children: [
-          { id: 1, name: 'head', query: 'head' },
-          { id: 2, name: 'body', query: 'body' }
+          { id: '1', name: 'head', query: 'head' },
+          { id: '2', name: 'body', query: 'body' }
         ]
       }
     }
@@ -212,19 +212,19 @@ describe("page-preprocessor", () => {
     );
     const expected: PageProps = {
       root: {
-        id: 0, name: 'page', query: 'html',
+        id: '0', name: 'page', query: 'html',
         children: [
-          { id: 1, name: 'head', query: 'head' },
-          { id: 2, name: 'body', query: 'body', children: [
-            { id: 3, query: `[${DOM_ID_ATTR}="3"]`, values: {
+          { id: '1', name: 'head', query: 'head' },
+          { id: '2', name: 'body', query: 'body', children: [
+            { id: '3', query: `[${DOM_ID_ATTR}="3"]`, values: {
               v: { val: 'x' }
-            } }, { id: 4, query: `[${DOM_ID_ATTR}="4"]`, values: {
+            } }, { id: '4', query: `[${DOM_ID_ATTR}="4"]`, values: {
               v: { val: '[[x]]' }
-            } }, { id: 5, query: `[${DOM_ID_ATTR}="5"]`, values: {
+            } }, { id: '5', query: `[${DOM_ID_ATTR}="5"]`, values: {
               v: { val: '[[x]]' }
-            } }, { id: 6, query: `[${DOM_ID_ATTR}="6"]`, values: {
+            } }, { id: '6', query: `[${DOM_ID_ATTR}="6"]`, values: {
               attr_v: { val: '[[x]]' }
-            } }, { id: 7, query: `[${DOM_ID_ATTR}="7"]`, values: {
+            } }, { id: '7', query: `[${DOM_ID_ATTR}="7"]`, values: {
               attr_v: { val: '[[x]]' }
             } }
           ] }
@@ -252,10 +252,10 @@ describe("page-preprocessor", () => {
     );
     const expected: PageProps = {
       root: {
-        id: 0, name: 'page', query: 'html',
+        id: '0', name: 'page', query: 'html',
         children: [
-          { id: 1, name: 'head', query: 'head' },
-          { id: 2, name: 'body', query: 'body', values: {
+          { id: '1', name: 'head', query: 'head' },
+          { id: '2', name: 'body', query: 'body', values: {
             __t0: { val: '[[v[0]]]' },
             __t1: { val: '[[name]]' }
           } }
@@ -287,19 +287,19 @@ describe("page-preprocessor", () => {
     );
     const expected: PageProps = {
       root: {
-        id: 0, name: 'page', query: 'html',
+        id: '0', name: 'page', query: 'html',
         children: [{
-          id: 1, name: 'head', query: 'head'
+          id: '1', name: 'head', query: 'head'
         }, {
-          id: 2, name: 'body', query: 'body', values: {
+          id: '2', name: 'body', query: 'body', values: {
             __t0: { val: '[[name]]' }
           }, children: [{
-            id: 3, name: 'theDiv', query: `[${DOM_ID_ATTR}="3"]`, values: {
+            id: '3', name: 'theDiv', query: `[${DOM_ID_ATTR}="3"]`, values: {
               __t0: { val: '[[greeting]]' },
               __t1: { val: '[[name]]' }
             }
           }, {
-            id: 4, name: 'thePre', query: `[${DOM_ID_ATTR}="4"]`, values: {
+            id: '4', name: 'thePre', query: `[${DOM_ID_ATTR}="4"]`, values: {
               __t0: { val: '[[name]]' }
             }
           }]

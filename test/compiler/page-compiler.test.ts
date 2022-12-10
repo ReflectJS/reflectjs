@@ -23,10 +23,10 @@ describe("page-compiler", () => {
     assert.equal(
       normalizeSpace(js),
       normalizeSpace(`{ root: {
-        id: 0, name: 'page', query: 'html',
+        id: '0', name: 'page', query: 'html',
         children: [
-          { id: 1, name: 'head', query: 'head' },
-          { id: 2, name: 'body', query: 'body' }
+          { id: '1', name: 'head', query: 'head' },
+          { id: '2', name: 'body', query: 'body' }
         ]
       } }`)
     );
@@ -46,7 +46,7 @@ describe("page-compiler", () => {
     assert.equal(
       normalizeSpace(js),
       normalizeSpace(`{ root: {
-        id: 0, name: 'page', query: 'html',
+        id: '0', name: 'page', query: 'html',
         values: {
           attr_lang: {
             fn: function () {
@@ -60,8 +60,8 @@ describe("page-compiler", () => {
           }
         },
         children: [
-          { id: 1, name: 'head', query: 'head' },
-          { id: 2, name: 'body', query: 'body' }
+          { id: '1', name: 'head', query: 'head' },
+          { id: '2', name: 'body', query: 'body' }
         ]
       } }`)
     );
@@ -81,7 +81,7 @@ describe("page-compiler", () => {
     assert.equal(
       normalizeSpace(js),
       normalizeSpace(`{ root: {
-        id: 0, name: 'page', query: 'html',
+        id: '0', name: 'page', query: 'html',
         values: {
           myfun: {
             val: function (s) { return s.trim() + this.x; },
@@ -90,8 +90,8 @@ describe("page-compiler", () => {
           }
         },
         children: [
-          { id: 1, name: 'head', query: 'head' },
-          { id: 2, name: 'body', query: 'body' }
+          { id: '1', name: 'head', query: 'head' },
+          { id: '2', name: 'body', query: 'body' }
         ]
       } }`)
     );
@@ -111,7 +111,7 @@ describe("page-compiler", () => {
     assert.equal(
       normalizeSpace(js),
       normalizeSpace(`{ root: {
-        id: 0, name: 'page', query: 'html',
+        id: '0', name: 'page', query: 'html',
         values: {
           myfun: {
             val: function (s) { return s.trim(); },
@@ -119,8 +119,8 @@ describe("page-compiler", () => {
           }
         },
         children: [
-          { id: 1, name: 'head', query: 'head' },
-          { id: 2, name: 'body', query: 'body' }
+          { id: '1', name: 'head', query: 'head' },
+          { id: '2', name: 'body', query: 'body' }
         ]
       } }`)
     );

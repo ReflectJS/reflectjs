@@ -47,7 +47,7 @@ export function loadPage(doc: HtmlDocument) {
 
 function loadScope(e: HtmlElement, errors: PageError[]): ScopeProps {
   const ret: ScopeProps = {
-    id: parseInt(e.getAttribute(page.DOM_ID_ATTR) as string)
+    id: e.getAttribute(page.DOM_ID_ATTR) as string
   };
   const values = new Map<string, ValueProps>();
   const children = new Array<ScopeProps>();

@@ -16,7 +16,7 @@ describe(`page samples`, () => {
     assert.equal(
       normalizeSpace(loaded.js),
       normalizeSpace(`{ root: {
-        id: 0, name: 'page', query: 'html',
+        id: '0', name: 'page', query: 'html',
         values: {
           attr_dataDummy: {
             fn: function () { return ''; },
@@ -24,8 +24,8 @@ describe(`page samples`, () => {
           }
         },
         children: [
-          { id: 1, name: 'head', query: 'head' },
-          { id: 2, name: 'body', query: 'body' }
+          { id: '1', name: 'head', query: 'head' },
+          { id: '2', name: 'body', query: 'body' }
         ]
       } }`)
     );
@@ -356,19 +356,19 @@ describe(`page samples`, () => {
     const js = res.js;
     assert.equal(normalizeSpace(js), normalizeSpace(`{
       root: {
-        id: 0,
+        id: '0',
         name: 'page',
         query: 'html',
         children: [
-          { id: 1, name: 'head', query: 'head' },
-          { id: 2, name: 'body', query: 'body',
+          { id: '1', name: 'head', query: 'head' },
+          { id: '2', name: 'body', query: 'body',
             values: {
               data: {
                 fn: function () { return { id: 1, name: 'Alice' }; },
                 val: null
               }
             },
-            children: [{ id: 3, query: '[data-reflectjs="3"]',
+            children: [{ id: '3', query: '[data-reflectjs="3"]',
               values: {
                 __t0: {
                   fn: function () { return this.data; },

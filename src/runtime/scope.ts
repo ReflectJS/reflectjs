@@ -2,7 +2,7 @@ import { COMMENT_NODE, DOM_ID_ATTR, ELEMENT_NODE, OUTER_PROPERTY, Page, RESERVED
 import { Value, ValueProps } from "./value";
 
 export interface ScopeProps {
-  id: number;
+  id: string;
   name?: string;
   query?: string;
   markup?: string;
@@ -45,6 +45,11 @@ export class Scope {
     }
   }
 
+  // clone(nr: number, ref?: Scope): Scope {
+  //   const dom = this.dom.cloneNode(true);
+  //   dom.get
+  // }
+
   // ---------------------------------------------------------------------------
   // dom
   // ---------------------------------------------------------------------------
@@ -53,7 +58,7 @@ export class Scope {
     const ret = this.props.markup
       ? this.initDomFromMarkup(this.props.markup)
       : this.initDomFromDomQuery(this.props.query as string);
-    ret.setAttribute(DOM_ID_ATTR, `${this.props.id}`);
+    ret.setAttribute(DOM_ID_ATTR, this.props.id);
     return ret;
   }
 
