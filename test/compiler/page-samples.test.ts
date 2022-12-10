@@ -291,7 +291,7 @@ describe(`page samples`, () => {
     );
   });
 
-  it(`sample 3 - "Reactivity" from aremel.org`, async () => {
+  it(`sample 3/5 - "Reactivity/Isomorphism" from aremel.org`, async () => {
     const page = (await load('sample2.html', `<html>
       <body :count=[[0]] data-test=[[false]]
             :handle_count=[[

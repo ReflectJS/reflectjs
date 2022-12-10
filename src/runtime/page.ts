@@ -49,7 +49,7 @@ export interface PageProps {
     this.doc = dom.ownerDocument as unknown as Document;
     this.dom = dom;
     this.props = props;
-    this.globals = this.initGlobals();
+    this.globals = new Map<string, Value>();
     this.root = this.load(null, props.root);
     this.root.values[ROOT_SCOPE_NAME] = new Value(ROOT_SCOPE_NAME, {
       val: this.root.proxy
@@ -77,18 +77,13 @@ export interface PageProps {
     return this;
   }
 
-  initGlobals(): Map<string, Value> {
-    const ret = new Map<string, Value>();
-    ret.set('window', new Value('', { passive: true, val: this.win }));
-    ret.set('document', new Value('', { passive: true, val: this.doc }));
-    ret.set('console', new Value('', { passive: true, val: this.win.console }));
-    ret.set('setTimeout', new Value('', { passive: true, val: this.win.setTimeout }));
-    ret.set('setInterval', new Value('', { passive: true, val: this.win.setInterval }));
-    return ret;
-  }
-
   lookupGlobal(key: string): Value | undefined {
-    return this.globals.get(key);
+    let ret = this.globals.get(key);
+    if (!ret && Reflect.has(this.win, key)) {
+      ret = new Value(key, { passive: true, val: Reflect.get(this.win, key) });
+      this.globals.set(key, ret);
+    }
+    return ret;
   }
 
   getMarkup() {
