@@ -620,7 +620,7 @@ class HtmlClassAttribute extends HtmlAttribute {
   override getOutputValue(sort: boolean, plain: boolean): string {
     var sb = new StringBuf();
     sb.add(this.value);
-    if (!plain && this.classes) {
+    if (this.classes) {
       this.classes.forEach(c => {
         sb.add(' ');
         sb.add(c);
@@ -664,7 +664,7 @@ class HtmlStyleAttribute extends HtmlAttribute {
       sb.add(s);
       !s.endsWith(';') ? sb.add(';') : null;
     }
-    if (!plain && this.styles) {
+    if (this.styles) {
       this.styles.forEach((v, k) => {
         sb.add(k); sb.add(':');
         sb.add(v); sb.add(';');
