@@ -49,7 +49,7 @@ export class Value {
         this.dom = scope.texts ? scope.texts[i] : undefined;
         this.cb = textCB;
       } else if (key === DATA_VALUE) {
-        this.cb = dataCB;
+        this.cb = Scope.dataCB;
       }
     }
     this.fn = props.fn as (() => any) | undefined;

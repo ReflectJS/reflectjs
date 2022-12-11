@@ -6,9 +6,11 @@ export interface ScopeProps {
   name?: string;
   query?: string;
   markup?: string;
-  values?: { [key: string]: ValueProps };
+  values?: ScopeValuesProps;
   children?: ScopeProps[];
 }
+
+export type ScopeValuesProps = { [key: string]: ValueProps };
 
 /**
  * Scope
@@ -18,17 +20,20 @@ export class Scope {
   parent: Scope | null;
   props: ScopeProps;
   children: Scope[];
+  cloneOf?: Scope;
   dom: Element;
   texts?: Node[];
   proxyHandler: ScopeProxyHandler;
   values: { [key: string]: Value };
   proxy: any;
+  clones?: Scope[];
 
-  constructor(page: Page, parent: Scope | null, props: ScopeProps) {
+  constructor(page: Page, parent: Scope | null, props: ScopeProps, cloneOf?: Scope) {
     this.page = page;
     this.parent = parent;
     this.props = props;
     this.children = [];
+    this.cloneOf = cloneOf;
     this.dom = this.initDom();
     this.texts = this.collectTextNodes();
     this.proxyHandler = new ScopeProxyHandler(page, this);
@@ -36,7 +41,7 @@ export class Scope {
     this.proxy = new Proxy<any>(this.values, this.proxyHandler);
     if (parent) {
       parent.children.push(this);
-      if (props.name) {
+      if (props.name && !cloneOf) {
         parent.values[props.name] = new Value(props.name, {
           val: this.proxy,
           passive: true
@@ -45,10 +50,37 @@ export class Scope {
     }
   }
 
-  // clone(nr: number, ref?: Scope): Scope {
-  //   const dom = this.dom.cloneNode(true);
-  //   dom.get
-  // }
+  dispose() {
+    this.dom.remove();
+    this.unlinkValues();
+    if (this.parent) {
+      const i = this.parent.children.indexOf(this);
+      i >= 0 && this.parent.children.splice(i, 1);
+      if (!this.cloneOf && this.props.name) {
+        this.unlinkValue(this.parent.values[this.props.name]);
+        delete this.parent.values[this.props.name];
+      }
+    }
+    if (this.cloneOf) {
+      const clones = this.cloneOf.clones ?? [];
+      const i = clones.indexOf(this);
+      i >= 0 && clones.splice(i, 1);
+    }
+  }
+
+  clone(nr: number): Scope {
+    const props = this.cloneProps(nr);
+    const dom = this.cloneDom(props.id);
+    const dst = this.page.load(this.parent, props, this);
+    !this.clones && (this.clones = []);
+    this.clones.push(dst);
+    this.page.refresh(dst);
+    return dst;
+  }
+
+  get(key: string): any {
+    return this.proxy[key];
+  }
 
   // ---------------------------------------------------------------------------
   // dom
@@ -74,7 +106,12 @@ export class Scope {
   }
 
   initDomFromDomQuery(query: string): Element {
-    return this.page.doc.querySelector(query) as Element;
+    if (this.cloneOf) {
+      return this.cloneOf?.dom?.previousElementSibling as Element;
+    }
+    const e = this.parent?.dom ?? this.page.doc;
+    const ret = e.querySelector(query) as Element;
+    return ret;
   }
 
   collectTextNodes() {
@@ -132,12 +169,16 @@ export class Scope {
 
   unlinkValues() {
     for (const [key, value] of Object.entries(this.values)) {
-      if (value.src) {
-        value.src.forEach(o => o?.dst?.delete(value));
-        delete value.src;
-      }
+      this.unlinkValue(value);
     }
     this.children.forEach(s => s.unlinkValues());
+  }
+
+  unlinkValue(value: Value) {
+    if (value.src) {
+      value.src.forEach(o => o?.dst?.delete(value));
+      delete value.src;
+    }
   }
 
   relinkValues() {
@@ -161,6 +202,76 @@ export class Scope {
     });
     this.children.forEach(s => s.updateValues());
   }
+
+  // ---------------------------------------------------------------------------
+  // cloning
+  // ---------------------------------------------------------------------------
+
+  cloneDom(id: string): Element {
+    const src = this.dom as Element;
+    const dst = src.cloneNode(true) as Element;
+    dst.setAttribute(DOM_ID_ATTR, id);
+    src.parentElement?.insertBefore(dst, src);
+    return dst;
+  }
+
+  cloneProps(nr: number): ScopeProps {
+    const dst: ScopeProps = {
+      id: `${this.props.id}.${nr}`,
+      name: this.props.name,
+      query: `[${DOM_ID_ATTR}="${this.props.id}.${nr}"]`,
+      values: this.cloneValues()
+    };
+    return dst;
+  }
+
+  cloneValues(): ScopeValuesProps | undefined {
+    if (!this.props.values) {
+      return undefined;
+    }
+    const dst: ScopeValuesProps = {};
+    for (const key of Reflect.ownKeys(this.props.values)) {
+      if (typeof key === 'string') {
+        dst[key] = this.cloneValue(key);
+      }
+    }
+    return dst;
+  }
+
+  cloneValue(key: string): ValueProps {
+    const src = (this.props.values as ScopeValuesProps)[key];
+    const dst: ValueProps = {
+      val: src._origVal ?? src.val,
+      passive: src.passive,
+      fn: src.fn,
+      cycle: src.cycle,
+      refs: src.refs
+    };
+    return dst;
+  }
+
+  // ---------------------------------------------------------------------------
+  // replication
+  // ---------------------------------------------------------------------------
+
+  static dataCB(v: Value) {
+    const that = v.scope as Scope;
+    if (!v.props.val || !Array.isArray(v.props.val)) {
+      if (that.clones && that.clones.length > 0) {
+        that.removeExcessClones(0);
+      }
+    }
+    
+  }
+
+  removeExcessClones(maxCount: number) {
+    if (this.clones) {
+      while (this.clones.length > (maxCount + 1)) {
+        this.clones.pop()?.dispose();
+      }
+    }
+  }
+
 }
 
 /**

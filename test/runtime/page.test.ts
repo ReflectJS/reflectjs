@@ -6,7 +6,7 @@ import { Scope, ScopeProps } from "../../src/runtime/scope";
 describe('page', () => {
 
   it('should create an empty page', () => {
-    const page = baseApp();
+    const page = baseApp(null);
     assert.exists(page.dom);
     assert.equal(scopeCount(page), 3);
     assert.equal(page.root.dom, page.doc.documentElement);
@@ -25,9 +25,9 @@ describe('page', () => {
   });
 
   it('should create a simple page', () => {
-    const page = baseApp(props => {
+    const page = baseApp(null, props => {
       addScope(props, [1], {
-        id: 3,
+        id: '3',
         markup: `<span>hi</span>`
       });
     });
@@ -62,20 +62,21 @@ function scopeCount(page: Page): number {
   return ret;
 }
 
-export function baseApp(cb?: (props: PageProps) => void): Page {
+export function baseApp(markup: string | null, cb?: (props: PageProps) => void): Page {
   const win = new Window();
   const doc = win.document;
-  const props = {
+  markup && win.document.write(markup);
+  const props: PageProps = {
     root: {
-      id: 0,
+      id: '0',
       name: ROOT_SCOPE_NAME,
       query: 'html',
       children: [{
-        id: 1,
+        id: '1',
         name: HEAD_SCOPE_NAME,
         query: 'head'
       }, {
-        id: 2,
+        id: '2',
         name: BODY_SCOPE_NAME,
         query: 'body'
       }]

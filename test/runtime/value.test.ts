@@ -7,7 +7,7 @@ import { addScope, baseApp, itemAt } from "./page.test";
 describe('value', () => {
 
   it('should create a logic value', () => {
-    const page = baseApp(props => {
+    const page = baseApp(null, props => {
       const body = itemAt(1, props.root.children) as ScopeProps;
       body.values = {
         v: { val: 1 }
@@ -21,7 +21,7 @@ describe('value', () => {
   });
 
   it('should create a DOM attribute value', () => {
-    const page = baseApp(props => {
+    const page = baseApp(null, props => {
       const body = itemAt(1, props.root.children) as ScopeProps;
       body.values = {
         attr_class: { val: 'base' }
@@ -35,9 +35,9 @@ describe('value', () => {
   });
 
   it('should create a DOM text value', () => {
-    const page = baseApp(props => {
+    const page = baseApp(null, props => {
       addScope(props, [1], {
-        id: 3,
+        id: '3',
         markup: `<span>Hello <!---t0--><!---/-->!</span>`,
         values: {
           __t0: { val: 'there' }
@@ -69,7 +69,7 @@ describe('value', () => {
   });
 
   it('should update dependent value', () => {
-    const page = baseApp(props => {
+    const page = baseApp(null, props => {
       const body = itemAt(1, props.root.children) as ScopeProps;
       body.values = {
         v1: { val: 1 },

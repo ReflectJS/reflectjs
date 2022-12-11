@@ -57,8 +57,8 @@ export interface PageProps {
     }, this.root);
   }
 
-  load(parent: Scope | null, props: ScopeProps) {
-    const ret = new Scope(this, parent, props);
+  load(parent: Scope | null, props: ScopeProps, cloneOf?: Scope) {
+    const ret = new Scope(this, parent, props, cloneOf);
     props.children?.forEach(props => {
       this.load(ret, props);
     });
