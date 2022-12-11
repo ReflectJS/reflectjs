@@ -407,35 +407,96 @@ describe(`page samples`, () => {
     );
   });
 
-  // it(`data binding 3 - replication`, async () => {
-  //   const page = (await load('sample.html', `<html>
-  //     <body :data=[[{ list: [1, 2, 3] }]]>
-  //       <ul>
-  //         <li :data=[[data.list]]>[[data]]</li>
-  //       </ul>
-  //     </body>
-  //   </html>`)).page as Page;
-  //   page.refresh();
-  //   assert.equal(
-  //     clean(page.getMarkup()),
-  //     clean(`<html>
-  //     <head></head><body>
-  //       <ul>
-  //         <li><!---t0-->1<!---/--></li><li><!---t0-->2<!---/--></li><li><!---t0-->3<!---/--></li>
-  //       </ul>
-  //     </body>
-  //     </html>`)
-  //   );
-  //   // page.root.proxy['body'].data = { id: 2, name: 'Bob' };
-  //   // assert.equal(
-  //   //   clean(page.getMarkup()),
-  //   //   clean(`<html>
-  //   //   <head></head><body>
-  //   //     id: <!---t0-->2<!---/-->, name: <!---t1-->Bob<!---/-->
-  //   //   </body>
-  //   //   </html>`)
-  //   // );
-  // });
+  it(`data binding 3 - replication`, async () => {
+    const res = (await load('sample.html', `<html>
+      <body :data=[[{ list: [1, 2, 3] }]]>
+        <ul>
+          <li :data=[[data.list]]>[[data]]</li>
+        </ul>
+      </body>
+    </html>`));
+    assert.equal(
+      normalizeSpace(res.js),
+      normalizeSpace(`{
+        root: {
+          id: '0',
+          name: 'page',
+          query: 'html',
+          children: [
+            {
+              id: '1',
+              name: 'head',
+              query: 'head'
+            },
+            {
+              id: '2',
+              name: 'body',
+              query: 'body',
+              values: {
+                data: {
+                  fn: function () { return { list: [ 1, 2, 3 ] }; },
+                  val: null
+                }
+              },
+              children: [{
+                id: '3',
+                query: '[data-reflectjs="3"]',
+                values: {
+                  __t0: {
+                    fn: function () { return this.data; },
+                    val: null,
+                    refs: ['data']
+                  },
+                  data: {
+                    fn: function () { return this.__outer.data.list; },
+                    val: null,
+                    refs: ['data']
+                  }
+                }
+              }]
+            }
+          ]
+        }
+      }`)
+    );
+
+    const page = res.page as Page;
+    page.refresh();
+    assert.equal(
+      clean(page.getMarkup()),
+      clean(`<html>
+      <head></head><body>
+        <ul>
+          <li><!---t0-->1<!---/--></li><li><!---t0-->2<!---/--></li><li><!---t0-->3<!---/--></li>
+        </ul>
+      </body>
+      </html>`)
+    );
+
+    page.root.proxy['body'].data = { list: ['a', 'b'] };
+    assert.equal(
+      clean(page.getMarkup()),
+      clean(`<html>
+      <head></head><body>
+        <ul>
+          <li><!---t0-->a<!---/--></li><li><!---t0-->b<!---/--></li>
+        </ul>
+      </body>
+      </html>`)
+    );
+
+    page.root.proxy['body'].data = {};
+    assert.equal(
+      clean(page.getMarkup()),
+      clean(`<html>
+      <head></head><body>
+        <ul>
+          <li><!---t0--><!---/--></li>
+        </ul>
+      </body>
+      </html>`)
+    );
+  });
 
 });
 
@@ -480,6 +541,6 @@ function clean(s?: string) {
     return undefined;
   }
   s = s.replace('<!DOCTYPE html>', '');
-  s = s.replace(/(\s+data-reflectjs="\d+")/g, '');
+  s = s.replace(/(\s+data-reflectjs=".*?")/g, '');
   return normalizeText(s);
 }

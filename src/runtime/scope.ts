@@ -268,6 +268,11 @@ export class Scope {
       return;
     }
     // value is an array
+    if (that.cloneOf) {
+      // clones ignore array data
+      v.props.val = null;
+      return;
+    }
     const vv: any[] = v.props.val;
     const offset = 0, length = vv.length;
     let ci = 0, di = offset;
