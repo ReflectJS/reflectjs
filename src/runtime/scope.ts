@@ -1,4 +1,4 @@
-import { COMMENT_NODE, DOM_ID_ATTR, ELEMENT_NODE, OUTER_PROPERTY, Page, RESERVED_PREFIX, TEXT_MARKER1_PREFIX, TEXT_NODE } from "./page";
+import { COMMENT_NODE, DATA_VALUE, DOM_ID_ATTR, ELEMENT_NODE, OUTER_PROPERTY, Page, RESERVED_PREFIX, TEXT_MARKER1_PREFIX, TEXT_NODE } from "./page";
 import { Value, ValueProps } from "./value";
 
 export interface ScopeProps {
@@ -71,6 +71,11 @@ export class Scope {
   clone(nr: number): Scope {
     const props = this.cloneProps(nr);
     const dom = this.cloneDom(props.id);
+    if (props.values && props.values[DATA_VALUE]) {
+      // clones are generated and updated based on original scope's data value;
+      // their own data value is updated by the original scope
+      delete props.values[DATA_VALUE].refs;
+    }
     const dst = this.page.load(this.parent, props, this);
     !this.clones && (this.clones = []);
     this.clones.push(dst);
@@ -260,13 +265,33 @@ export class Scope {
       if (that.clones && that.clones.length > 0) {
         that.removeExcessClones(0);
       }
+      return;
     }
-    
+    // value is an array
+    const vv: any[] = v.props.val;
+    const offset = 0, length = vv.length;
+    let ci = 0, di = offset;
+    !that.clones && (that.clones = []);
+    // create/update clones
+    for (; di < (offset + length - 1); ci++, di++) {
+      if (ci < that.clones.length) {
+        that.clones[ci].proxy[DATA_VALUE] = vv[di];
+      } else {
+        const clone = that.clone(ci);
+        clone.proxy[DATA_VALUE] = vv[di];
+      }
+    }
+    // remove excess clones
+    that.removeExcessClones(Math.max(0, length - 1));
+    // update original scope
+    if (di < (offset + length)) {
+      v.props.val = vv[di];
+    }
   }
 
   removeExcessClones(maxCount: number) {
     if (this.clones) {
-      while (this.clones.length > (maxCount + 1)) {
+      while (this.clones.length > maxCount) {
         this.clones.pop()?.dispose();
       }
     }

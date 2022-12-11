@@ -1,6 +1,6 @@
 import { assert } from "chai";
 import { normalizeText } from "../../src/preprocessor/util";
-import { DOM_ID_ATTR, TEXT_NODE } from "../../src/runtime/page";
+import { DATA_VALUE, DOM_ID_ATTR, TEXT_NODE } from "../../src/runtime/page";
 import { addScope, baseApp, itemAt } from "./page.test";
 
 describe('scope', () => {
@@ -128,6 +128,64 @@ describe('scope', () => {
       <head ${DOM_ID_ATTR}="1"></head>
       <body ${DOM_ID_ATTR}="2">
         <span ${DOM_ID_ATTR}="3"><!---t0-->OK<!---/--> <!---t1-->Alice<!---/--></span>
+      </body>
+      </html>`)
+    );
+  });
+
+  it('should replicate', () => {
+    const page = baseApp(`<html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>
+      <body ${DOM_ID_ATTR}="2">
+        <span ${DOM_ID_ATTR}="3"><!---t0--><!---/--> <!---t1--><!---/--></span>
+      </body>
+    </html>`, props => {
+      props.root.children && (props.root.children[1].values = {
+        greeting: { val: 'Hello' },
+        data: { val: { list: [ 'Alice', 'Bob', 'Charles' ] } }
+      });
+      addScope(props, [1], {
+        id: '3',
+        name: 'theSpan',
+        query: `[${DOM_ID_ATTR}="3"]`,
+        values: {
+          data: { val: null, fn: function() { return this.__outer.data.list; }, refs: ['data'] },
+          __t0: { val: null, fn: function() { return this.greeting; }, refs: ['greeting'] },
+          __t1: { val: null, fn: function() { return this.data; }, refs: ['data'] }
+        }
+      });
+    });
+
+    const body = page.root.children[1];
+    assert.equal(body.children.length, 1);
+    const span = body.children[0];
+    assert.notExists(span.clones);
+
+    page.refresh();
+    assert.equal(body.children.length, 3);
+    assert.equal(span.clones?.length, 2);
+    assert.equal(
+      normalizeText(page.getMarkup()),
+      normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>
+      <body ${DOM_ID_ATTR}="2">
+        <span ${DOM_ID_ATTR}="3.0"><!---t0-->Hello<!---/--> <!---t1-->Alice<!---/--></span>` +
+        `<span ${DOM_ID_ATTR}="3.1"><!---t0-->Hello<!---/--> <!---t1-->Bob<!---/--></span>` +
+        `<span ${DOM_ID_ATTR}="3"><!---t0-->Hello<!---/--> <!---t1-->Charles<!---/--></span>
+      </body>
+      </html>`)
+    );
+
+    body.proxy[DATA_VALUE] = { list: [ 'Alice', 'Bob' ] };
+    assert.equal(body.children.length, 2);
+    assert.equal(span.clones?.length, 1);
+    assert.equal(
+      normalizeText(page.getMarkup()),
+      normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>
+      <body ${DOM_ID_ATTR}="2">
+        <span ${DOM_ID_ATTR}="3.0"><!---t0-->Hello<!---/--> <!---t1-->Alice<!---/--></span>` +
+        `<span ${DOM_ID_ATTR}="3"><!---t0-->Hello<!---/--> <!---t1-->Bob<!---/--></span>
       </body>
       </html>`)
     );
