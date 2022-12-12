@@ -498,6 +498,46 @@ describe(`page samples`, () => {
     );
   });
 
+  it(`sample 5 - "Data binding" from aremel.org`, async () => {
+    const page = (await load('sample.html', `<html>
+      <head></head>
+      <body>
+        <div :aka="listData" :content=[[{"list":[
+            {"name":"Inbox", "count":3},
+            {"name":"Drafts", "count":null},
+            {"name":"Sent", "count":null},
+            {"name":"Junk", "count":1}
+        ]}]]/>
+        <ul>
+          <li :data=[[listData.content.list]]>
+            [[data.name]] ([[data.count]])
+          </li>
+        </ul>
+      </body>
+    </html>`)).page as Page;
+    page.refresh();
+    assert.equal(
+      clean(page.getMarkup()),
+      clean(`<html>
+      <head></head>
+      <body>
+        <div></div>
+        <ul>
+          <li>
+            <!---t0-->Inbox<!---/--> (<!---t1-->3<!---/-->)
+          </li><li>
+            <!---t0-->Drafts<!---/--> (<!---t1--><!---/-->)
+          </li><li>
+            <!---t0-->Sent<!---/--> (<!---t1--><!---/-->)
+          </li><li>
+            <!---t0-->Junk<!---/--> (<!---t1-->1<!---/-->)
+          </li>
+        </ul>
+      </body>
+      </html>`)
+    );
+  });
+
 });
 
 // =============================================================================
