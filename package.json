@@ -16,6 +16,7 @@
     "@types/escodegen": "^0.0.7",
     "@types/esprima": "^4.0.3",
     "@types/estraverse": "^5.1.2",
+    "@types/express": "^4.17.14",
     "@types/mocha": "^10.0.1",
     "chai": "^4.3.7",
     "coverage-badges-cli": "^1.0.11",
@@ -29,6 +30,7 @@
     "escodegen": "^2.0.0",
     "esprima": "^4.0.1",
     "estraverse": "^5.3.0",
+    "express": "^4.18.2",
     "happy-dom": "^7.7.0"
   }
 }

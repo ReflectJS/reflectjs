@@ -179,3 +179,10 @@ describe('happy-dom', function () {
 npm i escodegen esprima estraverse
 npm i -D @types/escodegen @types/esprima @types/estraverse
 ```
+
+### Express
+
+```
+npm i express
+npm i -D @types/express
+```
