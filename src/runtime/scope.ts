@@ -179,8 +179,8 @@ export class Scope {
     this.children.forEach(s => s.unlinkValues());
   }
 
-  unlinkValue(value: Value) {
-    if (value.src) {
+  unlinkValue(value?: Value) {
+    if (value?.src) {
       value.src.forEach(o => o?.dst?.delete(value));
       delete value.src;
     }
