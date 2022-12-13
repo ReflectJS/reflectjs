@@ -1,6 +1,6 @@
 import express, { Application, Express } from "express";
 import fs from "fs";
-import { Server } from 'http';
+import * as http from 'http';
 import path from "path";
 import exitHook from "./exit-hook";
 
@@ -20,10 +20,10 @@ interface CachedPageRequest {
 	url: string,
 }
 
-export default class ReflectServer {
+export default class Server {
   props: ServerProps;
   pageCache: Map<string, CachedPage>;
-	server: Server;
+	server: http.Server;
 
   constructor(props: ServerProps, cb?: (port: number) => void) {
     this.props = props;
@@ -127,7 +127,11 @@ export default class ReflectServer {
 
     // serve pages
     const that = this;
-    app.get('*.html', async (req, res) => {
+    app.get('*.html', async (req, res, next) => {
+			if (req.url.endsWith('.plain.html')) {
+        // don't process *.plain.html pages
+        next('route');
+			}
 			var base = `http://${req.headers.host}`;
 			var url = new URL(req.url, base);
 			url.protocol = (props.assumeHttps ? 'https' : req.protocol);
