@@ -10,7 +10,8 @@ describe("server", () => {
 
   before((done) => {
     server = new Server({
-      rootPath: process.cwd() + '/test/server/pages',
+      rootPath: process.cwd() + '/test/server/server',
+      mute: true
     }, (portNr) => {
       port = portNr;
       done();
@@ -24,13 +25,23 @@ describe("server", () => {
   it(`should start`, async () => {
     assert.exists(server);
     assert.exists(port);
-    const res = await new Window().fetch(`http://localhost:${port}/dummy.txt`);
-    assert(res.text, 'dummy text');
+    const res = await new Window().fetch(`http://localhost:${port}/text1.txt`);
+    assert(res.text, 'test text: text1');
   });
 
-  // it(`happy-dom should navigate to page`, async () => {
-  //   const doc = await loadPage(`http://localhost:${port}/dummy.plain.html`);
-  //   assert.equal(doc.body.textContent, 'dummy page');
-  // })
+  it(`should get unprocessed page`, async () => {
+    const doc = await loadPage(`http://localhost:${port}/page1.txt`);
+    assert.equal(doc.body.textContent, 'test text: page1');
+  })
+
+  it(`should get static page`, async () => {
+    const doc = await loadPage(`http://localhost:${port}/page1.html`);
+    assert.equal(doc.body.textContent, 'test text: page1');
+  })
+
+  it(`shouldn't get inexistent page`, async () => {
+    const doc = await loadPage(`http://localhost:${port}/inexistent.html`);
+    assert.equal(doc.body.textContent, 'error: Could not read file "/inexistent.html"');
+  })
 
 });

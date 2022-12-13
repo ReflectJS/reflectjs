@@ -515,6 +515,7 @@ describe(`page samples`, () => {
         </ul>
       </body>
     </html>`)).page as Page;
+    //FIXME: this logs exceptions
     page.refresh();
     assert.equal(
       clean(page.getMarkup()),

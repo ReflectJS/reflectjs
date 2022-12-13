@@ -2,12 +2,17 @@ import express, { Application, Express } from "express";
 import fs from "fs";
 import * as http from 'http';
 import path from "path";
+import Preprocessor, { PreprocessorError } from "../preprocessor/preprocessor";
 import exitHook from "./exit-hook";
+import { compileDoc, PageError } from "../../src/compiler/page-compiler";
+import { HtmlDocument } from "../preprocessor/htmldom";
+import { Window } from "happy-dom";
+import { Page } from "../runtime/page";
+import { StringBuf } from "../preprocessor/util";
 
 export interface ServerProps {
 	port?: number,
 	rootPath: string,
-	useCache?: boolean,
 	assumeHttps?: boolean,
 	trustProxy?: boolean,
   init?: (props: ServerProps, app: Application) => void,
@@ -15,19 +20,12 @@ export interface ServerProps {
 	mute?: boolean,
 }
 
-interface CachedPageRequest {
-	filePath: string,
-	url: string,
-}
-
 export default class Server {
   props: ServerProps;
-  pageCache: Map<string, CachedPage>;
 	server: http.Server;
 
   constructor(props: ServerProps, cb?: (port: number) => void) {
     this.props = props;
-    this.pageCache = new Map();
 		const app = express();
 
     app.use(express.json());
@@ -127,20 +125,18 @@ export default class Server {
 
     // serve pages
     const that = this;
-    app.get('*.html', async (req, res, next) => {
-			if (req.url.endsWith('.plain.html')) {
-        // don't process *.plain.html pages
-        next('route');
-			}
+    app.get('*.html', async (req, res) => {
 			var base = `http://${req.headers.host}`;
 			var url = new URL(req.url, base);
 			url.protocol = (props.assumeHttps ? 'https' : req.protocol);
 			url.hostname = req.hostname;
       try {
-        const cache = props.useCache ? that.pageCache : undefined;
-  			const html = await that.getPage(url, cache);
+  			const page = await that.getPage(url);
+				if (page.errors) {
+					throw page.errors.map(pe => `${pe.type}: ${pe.msg}`).join('\n');
+				}
 				res.header("Content-Type",'text/html');
-				res.send(html);
+				res.send(page.html ?? '');
       } catch (err: any) {
 				res.header("Content-Type",'text/plain');
 				res.send(`${err}`);
@@ -150,25 +146,44 @@ export default class Server {
     });
   }
 
-  async getPage(url: URL, cache?: Map<string, CachedPage>): Promise<string> {
+  async getPage(url: URL): Promise<CompiledPage> {
 		const filePath = path.normalize(path.join(this.props.rootPath, url.pathname) + '_');
-		const cachedPage = cache?.get(filePath);
-    const upToDate = (cachedPage ? await cachedPage.isUpToDate() : false);
-    
-    if (upToDate) {
-      return this.getFromCache(cachedPage as CachedPage, url);
-    }
-
     return this.getFromSources(filePath, url);
   }
 
-  async getFromCache(page: CachedPage, url: URL) {
-    return ''; //TODO
+  async getFromSources(filePath: string, url: URL): Promise<CompiledPage> {
+		const ret: CompiledPage = {};
+		try {
+			const pre = new Preprocessor(this.props.rootPath);
+			const doc = await pre.read(url.pathname) as HtmlDocument;
+			if (!doc) {
+				throw `failed to load page "${url.pathname}"`;
+			}
+			const { js, errors } = compileDoc(doc);
+			if (errors.length > 0) {
+				throw errors;
+			}
+      const props = eval(`(${js})`);
+      const win = new Window({ url: url.toString() });
+      win.document.write(doc.toString());
+      const root = win.document.documentElement as unknown as Element;
+      const page = new Page(win, root, props);
+			page.refresh();
+			ret.html = doc.toString();
+		} catch (err: any) {
+			if (Array.isArray(err)) {
+				ret.errors = err;
+			} else {
+				ret.errors = [{ type: 'error', msg: `${err}` }];
+			}
+		}
+    return ret;
   }
+}
 
-  async getFromSources(filePath: string, url: URL) {
-    return ''; //TODO
-  }
+type CompiledPage = {
+	html?: string,
+	errors?: PageError[]
 }
 
 /**

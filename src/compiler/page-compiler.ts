@@ -10,7 +10,7 @@ import { isDynamic, preprocess } from "./expr-preprocessor";
 import { loadPage } from "./page-preprocessor";
 
 export interface PageError {
-  type: 'err' | 'warn';
+  type: 'error' | 'warning';
   msg: string;
   //TODO: pos
 }
