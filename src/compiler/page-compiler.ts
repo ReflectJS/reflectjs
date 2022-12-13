@@ -65,8 +65,11 @@ function compileScopes(scopes: ScopeProps[], errors: PageError[]) {
 function compileValues(values: { [key: string]: ValueProps }, errors: PageError[]) {
   const dst: es.Property[] = [];
   Reflect.ownKeys(values).forEach(key => {
-    const props: ValueProps = values[key as string];
-    dst.push(makeProperty(key as string, compileValue(key as string, props, errors)));
+    if (typeof key === 'string') {
+      const props: ValueProps = values[key];
+      key = key.replace('-', '_');  
+      dst.push(makeProperty(key, compileValue(key, props, errors)));
+    }
   });
   return {
     type: 'ObjectExpression',
@@ -91,11 +94,11 @@ function compileValue(key: string, value: ValueProps, errors: PageError[]) {
       if (key.startsWith(HANDLER_VALUE_PREFIX)) {
         refs.add(key.substring(HANDLER_VALUE_PREFIX.length));
       }
-    }
-    if (refs.size > 0) {
-      const ee: es.Literal[] = [];
-      refs.forEach(ref => ee.push({ type: "Literal", value: ref }));
-      dst.push(makeProperty("refs", { type: "ArrayExpression", elements: ee }));
+      if (refs.size > 0) {
+        const ee: es.Literal[] = [];
+        refs.forEach(ref => ee.push({ type: "Literal", value: ref }));
+        dst.push(makeProperty("refs", { type: "ArrayExpression", elements: ee }));
+      }
     }
     value.val = null;
   } else {

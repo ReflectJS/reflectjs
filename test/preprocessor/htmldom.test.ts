@@ -91,9 +91,9 @@ describe('htmldom', () => {
 
   it(`add/remove event listener (dummy)`, () => {
     const doc = HtmlParser.parse(`<html><head></head><body></body></html>`);
-    const handler = () => {};
-    doc.addEventListener('dummy', handler);
-    doc.removeEventListener('dummy', handler);
+    const listener = () => {};
+    doc.addEventListener('dummy', listener);
+    doc.removeEventListener('dummy', listener);
   });
 
   it(`scan()`, () => {

@@ -85,8 +85,7 @@ describe("page-compiler", () => {
         values: {
           myfun: {
             val: function (s) { return s.trim() + this.x; },
-            passive: true,
-            refs: ['x']
+            passive: true
           }
         },
         children: [

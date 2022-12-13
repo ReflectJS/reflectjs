@@ -4,7 +4,7 @@ import { compileDoc, PageError } from "../../src/compiler/page-compiler";
 import { HtmlDocument } from "../../src/preprocessor/htmldom";
 import Preprocessor from "../../src/preprocessor/preprocessor";
 import { normalizeSpace, normalizeText } from "../../src/preprocessor/util";
-import { OUTER_PROPERTY, Page } from "../../src/runtime/page";
+import { EVENT_ATTR_PREFIX, HANDLER_ATTR_PREFIX, OUTER_PROPERTY, Page } from "../../src/runtime/page";
 
 describe(`page samples`, () => {
 
@@ -197,7 +197,7 @@ describe(`page samples`, () => {
 
   it(`event value`, async () => {
     const html = `<html>
-      <body :on_click=[[function(ev) { v = ev.type }]] :v="">[[v]]</body>
+      <body :${EVENT_ATTR_PREFIX}click=[[function(ev) { v = ev.type }]] :v="">[[v]]</body>
     </html>`;
     const page = (await load('sample1.html', html)).page as Page;
 
@@ -294,7 +294,7 @@ describe(`page samples`, () => {
   it(`sample 3/4 - "Reactivity/Isomorphism" from aremel.org`, async () => {
     const page = (await load('sample.html', `<html>
       <body :count=[[0]] data-test=[[false]]
-            :handle_count=[[
+            :${HANDLER_ATTR_PREFIX}count=[[
               !count && setTimeout(() => count++, 0);
               attr_dataTest = true;
             ]]>
