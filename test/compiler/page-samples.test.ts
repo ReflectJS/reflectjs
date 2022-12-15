@@ -223,9 +223,9 @@ describe(`page samples`, () => {
   it(`sample 1 - "Augmented HTML" from aremel.org`, async () => {
     const page = (await load('sample.html', `<html>
       <body :v=[[10]]>
-        <button :on_click=[[function() { v--; }]]>-</button>
+        <button :on_click=[[() => v--]]>-</button>
         [[v]]
-        <button :on_click=[[function() { v++; }]]>+</button>
+        <button :on_click=[[() => v++]]>+</button>
       </body>
     </html>`)).page as Page;
     page.refresh();

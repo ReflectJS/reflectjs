@@ -10,6 +10,10 @@ export const LOGIC_ATTR_PREFIX = ':';
 export const AKA_ATTR = LOGIC_ATTR_PREFIX + 'aka';
 
 export const DOM_ID_ATTR = 'data-reflectjs';
+export const PROPS_SCRIPT_ID = 'reflectjs-props';
+export const PROPS_JS_ID = 'reflectjs_props';
+export const RUNTIME_SCRIPT_ID = 'reflectjs-runtime';
+export const RUNTIME_URL = '/.reflectjs/runtime.js';
 
 export const ROOT_SCOPE_NAME = 'page';
 export const HEAD_SCOPE_NAME = 'head';

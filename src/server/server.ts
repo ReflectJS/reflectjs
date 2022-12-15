@@ -7,7 +7,7 @@ import exitHook from "./exit-hook";
 import { compileDoc, PageError } from "../../src/compiler/page-compiler";
 import { HtmlDocument } from "../preprocessor/htmldom";
 import { Window } from "happy-dom";
-import { Page } from "../runtime/page";
+import { PROPS_JS_ID, PROPS_SCRIPT_ID, Page, RUNTIME_SCRIPT_ID, RUNTIME_URL } from "../runtime/page";
 import { StringBuf } from "../preprocessor/util";
 
 export interface ServerProps {
@@ -46,7 +46,7 @@ export default class Server {
       if (cb) {
         cb(port);
       } else {
-        this.log('info',`${this.getTimestamp()}: START `
+        this.log('info', `${this.getTimestamp()}: START `
           + `http://localhost:${port} [${props.rootPath}]`);
       }
     }
@@ -56,12 +56,12 @@ export default class Server {
       : app.listen(listenCB);
 
 		exitHook(() => {
-			console.log('WILL EXIT');
+			this.log('info', 'WILL EXIT');
 		});
   }
 
-	async close() {
-    return new Promise(resolve => this.server.close(resolve));
+	close() {
+		this.server.close();
 	}
 
   log(type:string, msg:string) {
@@ -147,29 +147,52 @@ export default class Server {
   }
 
   async getPage(url: URL): Promise<CompiledPage> {
-		const filePath = path.normalize(path.join(this.props.rootPath, url.pathname) + '_');
-    return this.getFromSources(filePath, url);
+		const pathname = decodeURIComponent(url.pathname);
+		// const filePath = path.normalize(path.join(this.props.rootPath, pathname) + '_');
+    return this.getFromSources(url);
   }
 
-  async getFromSources(filePath: string, url: URL): Promise<CompiledPage> {
+  async getFromSources(url: URL): Promise<CompiledPage> {
 		const ret: CompiledPage = {};
 		try {
+			const pathname = decodeURIComponent(url.pathname);
 			const pre = new Preprocessor(this.props.rootPath);
-			const doc = await pre.read(url.pathname) as HtmlDocument;
+			const doc = await pre.read(pathname) as HtmlDocument;
 			if (!doc) {
-				throw `failed to load page "${url.pathname}"`;
+				throw `failed to load page "${pathname}"`;
 			}
 			const { js, errors } = compileDoc(doc);
 			if (errors.length > 0) {
 				throw errors;
 			}
       const props = eval(`(${js})`);
-      const win = new Window({ url: url.toString() });
+      const win = new Window({
+				url: url.toString(),
+				// https://github.com/capricorn86/happy-dom/tree/master/packages/happy-dom#settings
+				settings: {
+					disableJavaScriptFileLoading: true,
+					disableJavaScriptEvaluation: true,
+					disableCSSFileLoading: true,
+					enableFileSystemHttpRequests: false
+				}
+			} as any);
       win.document.write(doc.toString());
       const root = win.document.documentElement as unknown as Element;
       const page = new Page(win, root, props);
 			page.refresh();
-			ret.html = doc.toString();
+
+			const propsScript = win.document.createElement('script');
+			propsScript.id = PROPS_SCRIPT_ID;
+			propsScript.innerHTML = `${PROPS_JS_ID} = (${js})`;
+			win.document.body.appendChild(propsScript);
+
+			const runtimeScript = win.document.createElement('script');
+			runtimeScript.id = RUNTIME_SCRIPT_ID;
+			runtimeScript.setAttribute('src', RUNTIME_URL);
+			// win.document.body.appendChild(runtimeScript);
+
+			ret.html = `<!DOCTYPE html>\n` + win.document.documentElement.outerHTML;
+			win.happyDOM.cancelAsync();
 		} catch (err: any) {
 			if (Array.isArray(err)) {
 				ret.errors = err;
