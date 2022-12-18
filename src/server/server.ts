@@ -178,7 +178,7 @@ export default class Server {
 			} as any);
       win.document.write(doc.toString());
       const root = win.document.documentElement as unknown as Element;
-      const page = new Page(win, root, props);
+      const page = new Page(win as any, root, props);
 			page.refresh();
 
 			const propsScript = win.document.createElement('script');

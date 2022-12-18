@@ -18,6 +18,7 @@ tsconfig.json:
     "module": "commonjs",
     "outDir": "./dist",
     "rootDir": "./src",
+    "removeComments": true,
     ...
 ```
 

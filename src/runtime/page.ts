@@ -1,4 +1,3 @@
-import { Window } from "happy-dom";
 import { Scope, ScopeProps } from "./scope";
 import { Value } from "./value";
 
