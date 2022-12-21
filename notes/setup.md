@@ -187,3 +187,39 @@ npm i -D @types/escodegen @types/esprima @types/estraverse
 npm i express
 npm i -D @types/express
 ```
+
+### Swcpack
+
+we're using [swc](https://swc.rs)'s bundling feature (instead of browserify w/ tsify)
+for testing speeed
+
+https://swc.rs/docs/usage/bundling
+
+```bash
+npm i -D @swc/cli @swc/core
+```
+
+`spack.config.js`:
+
+```js
+module.exports = {
+  entry: {
+    web: __dirname + "/src/client.ts",
+  },
+  output: {
+    path: __dirname + "/dist",
+    name: "client.js",
+  },
+  options: {
+    // "minify": true,
+  }
+};
+```
+
+`package.json` "scripts":
+
+```json
+    "test": "spack && mocha --exit -r ts-node/register test/**/*.test.ts",
+    "coverage": "nyc npm run test && coverage-badges --output res/coverage-badge.svg",
+    "build-client": "spack"
+```

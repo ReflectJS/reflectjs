@@ -14,7 +14,8 @@ describe('roundtrip', async () => {
   before((done) => {
     server = new Server({
       rootPath: process.cwd() + '/test/roundtrip/pages',
-      mute: true
+      mute: true,
+      clientJsFilePath: process.cwd() + '/dist/client.js'
     }, (portNr) => {
       port = portNr;
       done();
@@ -46,9 +47,10 @@ describe('roundtrip', async () => {
               const url = `http://localhost:${port}/${dname}/${fname}`
               const dom = await JSDOM.fromURL(url, {
                 resources: 'usable',
-                runScripts: 'dangerously'
+                // runScripts: 'dangerously'
               });
               //TODO
+              // console.log(dom.serialize());
             });
 
           }

@@ -1,5 +1,4 @@
-import { Page } from "./runtime/page";
+import { Page, PageProps } from "./runtime/page";
 
-const page = new Page(window, document.documentElement, {
-  root: { id: '0' }
-});
+// @ts-ignore
+const page = new Page(window, document.documentElement, reflectjs_props);

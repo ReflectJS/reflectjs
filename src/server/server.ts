@@ -1,14 +1,13 @@
 import express, { Application, Express } from "express";
 import fs from "fs";
+import { Window } from "happy-dom";
 import * as http from 'http';
 import path from "path";
-import Preprocessor, { PreprocessorError } from "../preprocessor/preprocessor";
-import exitHook from "./exit-hook";
-import { compileDoc, PageError } from "../../src/compiler/page-compiler";
+import { PageError, compileDoc } from "../../src/compiler/page-compiler";
 import { HtmlDocument } from "../preprocessor/htmldom";
-import { Window } from "happy-dom";
+import Preprocessor from "../preprocessor/preprocessor";
 import { PROPS_JS_ID, PROPS_SCRIPT_ID, Page, RUNTIME_SCRIPT_ID, RUNTIME_URL } from "../runtime/page";
-import { StringBuf } from "../preprocessor/util";
+import exitHook from "./exit-hook";
 
 export interface ServerProps {
 	port?: number,
@@ -18,11 +17,13 @@ export interface ServerProps {
   init?: (props: ServerProps, app: Application) => void,
 	logger?: (type: string, msg: string) => void,
 	mute?: boolean,
+	clientJsFilePath?: string,
 }
 
 export default class Server {
   props: ServerProps;
 	server: http.Server;
+	clientJs?: string;
 
   constructor(props: ServerProps, cb?: (port: number) => void) {
     this.props = props;
@@ -144,6 +145,11 @@ export default class Server {
 					+ `ERROR ${url.toString()}: ${err}`);
       }
     });
+
+		// load client runtime
+		if (props.clientJsFilePath) {
+			this.clientJs = fs.readFileSync(props.clientJsFilePath, { encoding: 'utf8'});
+		}
   }
 
   async getPage(url: URL): Promise<CompiledPage> {
@@ -188,8 +194,14 @@ export default class Server {
 
 			const runtimeScript = win.document.createElement('script');
 			runtimeScript.id = RUNTIME_SCRIPT_ID;
-			runtimeScript.setAttribute('src', RUNTIME_URL);
-			// win.document.body.appendChild(runtimeScript);
+			if (this.clientJs) {
+				runtimeScript.appendChild(
+					win.document.createTextNode(this.clientJs)
+				);
+			} else {
+				runtimeScript.setAttribute('src', RUNTIME_URL);
+			}
+			win.document.body.appendChild(runtimeScript);
 
 			ret.html = `<!DOCTYPE html>\n` + win.document.documentElement.outerHTML;
 			win.happyDOM.cancelAsync();

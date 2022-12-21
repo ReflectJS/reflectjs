@@ -4,14 +4,18 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --exit -r ts-node/register test/**/*.test.ts",
-    "coverage": "nyc npm run test && coverage-badges --output res/coverage-badge.svg"
+    "test": "spack && mocha --exit -r ts-node/register test/**/*.test.ts",
+    "coverage": "nyc npm run test && coverage-badges --output res/coverage-badge.svg",
+    "build": "npm run build-server && npm run build-client",
+    "build-client": "spack",
+    "build-server": "tsc"
   },
   "keywords": [],
   "author": "Fabrizio Capolini",
   "license": "MIT",
   "devDependencies": {
-    "@swc/core": "^1.3.21",
+    "@swc/cli": "^0.1.57",
+    "@swc/core": "^1.3.23",
     "@types/chai": "^4.3.4",
     "@types/escodegen": "^0.0.7",
     "@types/esprima": "^4.0.3",
