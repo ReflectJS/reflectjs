@@ -3,7 +3,7 @@ import { normalizeText } from "../../src/preprocessor/util";
 import { DATA_VALUE, DOM_ID_ATTR, TEXT_NODE } from "../../src/runtime/page";
 import { addScope, baseApp, itemAt } from "./page.test";
 
-describe('scope', () => {
+describe('runtime: scope', () => {
 
   it('should collect a DOM text', () => {
     const page = baseApp(null, props => {

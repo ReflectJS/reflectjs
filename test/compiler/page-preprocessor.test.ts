@@ -7,7 +7,7 @@ import { getDoc } from "./page-compiler.test";
 
 const pre = new Preprocessor(process.cwd() + '/test/compiler/page-preprocessor');
 
-describe("page-preprocessor", () => {
+describe("compiler: page-preprocessor", () => {
 
   it(`empty page`, async () => {
     const doc = await getDoc(pre, `<html></html>`);

@@ -4,7 +4,7 @@ import { ScopeProps } from "../../src/runtime/scope";
 import { attrCB, camelToHyphen, textCB, Value } from "../../src/runtime/value";
 import { addScope, baseApp, itemAt } from "./page.test";
 
-describe('value', () => {
+describe('runtime: value', () => {
 
   it('should create a logic value', () => {
     const page = baseApp(null, props => {

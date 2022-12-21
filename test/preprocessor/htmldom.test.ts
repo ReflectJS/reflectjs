@@ -4,7 +4,7 @@ import { HtmlElement, HtmlNode } from "../../src/preprocessor/htmldom";
 import HtmlParser from "../../src/preprocessor/htmlparser";
 import { normalizeText } from "../../src/preprocessor/util";
 
-describe('htmldom', () => {
+describe('preprocessor: htmldom', () => {
 
   it(`nextSibling`, () => {
     const doc = HtmlParser.parse(`<html><head></head><body></body></html>`);

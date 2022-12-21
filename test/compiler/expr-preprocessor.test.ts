@@ -2,7 +2,7 @@ import { assert } from "chai";
 import { preprocess } from "../../src/compiler/expr-preprocessor";
 import { NOTNULL_FN } from "../../src/runtime/page";
 
-describe("expr-preprocessor", () => {
+describe("compiler: expr-preprocessor", () => {
 
   it("should prepare empty expressions", () => {
     assert.equal(preprocess('').src, "''");

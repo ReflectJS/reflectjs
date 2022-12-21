@@ -25,7 +25,7 @@ function countNodes(doc:HtmlDocument): any {
   return ret;
 }
 
-describe("htmlparser", () => {
+describe("preprocessor: htmlparser", () => {
 
   it("should parse <html></html>", () => {
     var doc = HtmlParser.parse('<html></html>');

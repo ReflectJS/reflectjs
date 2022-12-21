@@ -5,7 +5,7 @@ import { checkFunctionKind, makeFunction, makeValueFunction } from "../../src/co
 import { preprocess } from "../../src/compiler/expr-preprocessor";
 import { normalizeSpace } from "../../src/preprocessor/util";
 
-describe("expr-compiler", () => {
+describe("compiler: expr-compiler", () => {
 
   it(`empty script`, () => {
     const ids = new Set<string>();

@@ -6,7 +6,7 @@ import { normalizeText } from "../../src/preprocessor/util";
 
 const preprocessor = new Preprocessor(process.cwd() + '/test/preprocessor/preprocessor');
 
-describe("preprocessor", () => {
+describe("preprocessor: preprocessor", () => {
 
   it("should complain about missing file", async () => {
     let msg = '';

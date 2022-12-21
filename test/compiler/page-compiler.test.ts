@@ -7,7 +7,7 @@ import { DOM_ID_ATTR } from "../../src/runtime/page";
 
 const pre = new Preprocessor(process.cwd() + '/test/compiler/page-compiler');
 
-describe("page-compiler", () => {
+describe("compiler: page-compiler", () => {
 
   it(`empty page`, async () => {
     const doc = await getDoc(pre, `<html></html>`);

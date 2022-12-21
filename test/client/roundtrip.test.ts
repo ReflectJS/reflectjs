@@ -4,16 +4,16 @@ import fs from 'fs';
 import path from 'path';
 import { JSDOM } from 'jsdom';
 
-const rootPath = process.cwd() + '/test/roundtrip/pages';
+const rootPath = process.cwd() + '/test/client/roundtrip';
 
 let server: Server;
 let port: number;
 
-describe('roundtrip', async () => {
+describe('client: roundtrip', async () => {
 
   before((done) => {
     server = new Server({
-      rootPath: process.cwd() + '/test/roundtrip/pages',
+      rootPath: process.cwd() + '/test/client/roundtrip',
       mute: true,
       clientJsFilePath: process.cwd() + '/dist/client.js'
     }, (portNr) => {

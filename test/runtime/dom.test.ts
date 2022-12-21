@@ -1,7 +1,7 @@
 import { assert } from "chai";
 import { Window } from 'happy-dom';
 
-describe('dom', function () {
+describe('runtime: dom', function () {
 
   it("should execute happy-dom example", () => {
     // https://github.com/capricorn86/happy-dom/tree/master/packages/happy-dom

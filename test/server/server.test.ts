@@ -7,7 +7,7 @@ import { loadPage } from "./jsdom.test";
 let server: Server;
 let port: number;
 
-describe("server", () => {
+describe("server: server", () => {
 
   before((done) => {
     server = new Server({

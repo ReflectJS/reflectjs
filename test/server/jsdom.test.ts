@@ -10,7 +10,7 @@ const rootPath = process.cwd() + '/test/server/jsdom';
  * we're only using jsdom for testing
  */
 
-describe('jsdom', () => {
+describe('server: jsdom', () => {
   let server: Server;
   let port: number;
 

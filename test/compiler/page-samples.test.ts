@@ -6,7 +6,7 @@ import Preprocessor from "../../src/preprocessor/preprocessor";
 import { normalizeSpace, normalizeText } from "../../src/preprocessor/util";
 import { EVENT_ATTR_PREFIX, HANDLER_ATTR_PREFIX, OUTER_PROPERTY, Page } from "../../src/runtime/page";
 
-describe(`page samples`, () => {
+describe(`compiler: page-samples`, () => {
 
   it(`hyphen attribute name`, async () => {
     const html = `<html data-dummy=[['']]></html>`;
@@ -571,7 +571,7 @@ async function load(fname: string, src?: string): Promise<Loaded> {
       const win = new GlobalWindow();
       win.document.write(ret.doc.toString());
       const root = win.document.documentElement as unknown as Element;
-      ret.page = new Page(win, root, props);
+      ret.page = new Page(win as any, root, props);
     }
   }
   return ret;

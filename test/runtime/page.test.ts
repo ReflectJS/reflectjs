@@ -3,7 +3,7 @@ import { Window } from "happy-dom";
 import { BODY_SCOPE_NAME, DOM_ID_ATTR, HEAD_SCOPE_NAME, Page, PageProps, ROOT_SCOPE_NAME } from "../../src/runtime/page";
 import { Scope, ScopeProps } from "../../src/runtime/scope";
 
-describe('page', () => {
+describe('runtime: page', () => {
 
   it('should create an empty page', () => {
     const page = baseApp(null);
@@ -83,7 +83,7 @@ export function baseApp(markup: string | null, cb?: (props: PageProps) => void):
     }
   }
   cb ? cb(props) : null;
-  return new Page(win, doc.documentElement as unknown as Element, props);
+  return new Page(win as any, doc.documentElement as unknown as Element, props);
 }
 
 export function addScope(props: PageProps, pos: number[], scope: ScopeProps) {
