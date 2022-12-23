@@ -92,6 +92,7 @@ function compileValue(key: string, value: ValueProps, errors: PageError[]) {
       dst.push(makeProperty('fn', fn));
       dst.push(makeProperty("val", { type: "Literal", value: null }));
       if (key.startsWith(HANDLER_VALUE_PREFIX)) {
+        refs.clear();
         refs.add(key.substring(HANDLER_VALUE_PREFIX.length));
       }
       if (refs.size > 0) {

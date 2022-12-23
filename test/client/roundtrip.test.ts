@@ -3,7 +3,7 @@ import Server from "../../src/server/server-impl";
 import fs from 'fs';
 import path from 'path';
 import { JSDOM } from 'jsdom';
-import { PAGE_JS_ID } from "../../src/runtime/page";
+import { PAGE_JS_ID, PAGE_READY_CB, Page } from "../../src/runtime/page";
 
 const rootPath = process.cwd() + '/test/client/roundtrip';
 
@@ -43,9 +43,19 @@ describe('client: roundtrip', async () => {
 
             it(file.replace(/(\.html)$/, ''), async () => {
               const dom = await loadPage(dir, file);
-              assert.exists(dom.window[PAGE_JS_ID]);
-              //TODO
-              console.log(dom.serialize());
+              try {
+                // console.log(dom.serialize())
+                const page: Page = dom.window[PAGE_JS_ID];
+                assert.exists(page);
+                assert.exists(page.root);
+                assert.exists(page.root.values['testIn']);
+                assert.isFalse(page.root.proxy['testIn']);
+                assert.notEqual(page.root.proxy['testOut'], 'OK');
+                page.root.proxy['testIn'] = true;
+                assert.equal(page.root.proxy['testOut'], 'OK');
+              } finally {
+                dom.window.close();
+              }
             });
 
           }
@@ -66,5 +76,6 @@ async function loadPage(dir: string, file: string): Promise<JSDOM> {
     resources: 'usable',
     runScripts: 'dangerously'
   });
+  await new Promise<void>(resolve => dom.window[PAGE_READY_CB] = resolve);
   return dom;
 }

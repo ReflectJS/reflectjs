@@ -189,18 +189,20 @@ export default class ServerImpl {
 
 			const propsScript = win.document.createElement('script');
 			propsScript.id = PROPS_SCRIPT_ID;
-			propsScript.innerHTML = `${PROPS_JS_ID} = (${js})`;
+			propsScript.setAttribute('type', 'text/json');
+			propsScript.appendChild(win.document.createTextNode(js));
 			win.document.body.appendChild(propsScript);
 
 			const runtimeScript = win.document.createElement('script');
 			runtimeScript.id = RUNTIME_SCRIPT_ID;
-			if (this.clientJs) {
-				runtimeScript.appendChild(
-					win.document.createTextNode(this.clientJs)
-				);
-			} else {
-				runtimeScript.setAttribute('src', RUNTIME_URL);
-			}
+			// if (this.clientJs) {
+			// 	runtimeScript.appendChild(
+			// 		win.document.createTextNode(this.clientJs)
+			// 	);
+			// } else {
+			// 	runtimeScript.setAttribute('src', RUNTIME_URL);
+			// }
+			runtimeScript.setAttribute('src', RUNTIME_URL);
 			win.document.body.appendChild(runtimeScript);
 
 			ret.html = `<!DOCTYPE html>\n` + win.document.documentElement.outerHTML;

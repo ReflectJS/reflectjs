@@ -1,8 +1,7 @@
 <!DOCTYPE html>
-<html>
-  <body :v=[[10]]>
-    <button :on-click=[[() => v--]]>-</button>
-    <span>[[v]]</span>
-    <button :on-click=[[() => v++]]>+</button>
-  </body>
+<html :testIn=[[false]] :testOut=[['']] :handle-testIn=[[
+if (testIn) {
+  testOut = 'OK';
+}
+]]>
 </html>

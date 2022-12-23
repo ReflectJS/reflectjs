@@ -2,7 +2,7 @@ import { assert } from "chai";
 import fs from "fs";
 import { GlobalWindow, Window } from "happy-dom";
 import { loadClientPage } from "../../src/client/client-impl";
-import { PAGE_JS_ID, PAGE_LOADED_EVENT, PROPS_SCRIPT_ID, Page, RUNTIME_SCRIPT_ID } from "../../src/runtime/page";
+import { PAGE_JS_ID, PROPS_SCRIPT_ID, Page, RUNTIME_SCRIPT_ID } from "../../src/runtime/page";
 import { loadTestPage } from "../compiler/page-samples.test";
 
 const rtPath = process.cwd() + '/dist/client.js';
@@ -19,9 +19,8 @@ describe('client: client-impl', async () => {
     const html = await servePage(`<html lang=[['en']]></html>`);
     const win = new GlobalWindow();
     win.document.write(html);
-    const page = loadClientPage(win, () => {
-      win.document.getElementById(PROPS_SCRIPT_ID).remove();
-    });  
+    const page = loadClientPage(win);
+    win.document.getElementById(PROPS_SCRIPT_ID).remove();
     assert.equal(
       page.getMarkup(),
       `<!DOCTYPE html><html data-reflectjs="0" lang="en">` +
