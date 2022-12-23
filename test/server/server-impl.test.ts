@@ -1,17 +1,17 @@
 import { assert } from "chai";
 import { Window } from 'happy-dom';
 import { PROPS_SCRIPT_ID } from "../../src/runtime/page";
-import Server from "../../src/server/server";
+import Server from "../../src/server/server-impl";
 import { loadPage } from "./jsdom.test";
 
 let server: Server;
 let port: number;
 
-describe("server: server", () => {
+describe("server: server-impl", () => {
 
   before((done) => {
     server = new Server({
-      rootPath: process.cwd() + '/test/server/server',
+      rootPath: process.cwd() + '/test/server/server-impl',
       mute: true
     }, (portNr) => {
       port = portNr;

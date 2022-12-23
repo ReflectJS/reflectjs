@@ -2,7 +2,7 @@
   "name": "reflectjs",
   "version": "0.1.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "spack && mocha --exit -r ts-node/register test/**/*.test.ts",
     "coverage": "nyc npm run test && coverage-badges --output res/coverage-badge.svg",

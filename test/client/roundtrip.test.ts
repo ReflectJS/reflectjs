@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import Server from "../../src/server/server";
+import Server from "../../src/server/server-impl";
 import fs from 'fs';
 import path from 'path';
 import { JSDOM } from 'jsdom';

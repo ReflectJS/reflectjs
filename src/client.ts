@@ -1,4 +1,4 @@
-import { Page, PageProps } from "./runtime/page";
+import { loadClientPage } from "./client/client-impl";
+import { PAGE_JS_ID, PAGE_LOADED_EVENT } from "./runtime/page";
 
-// @ts-ignore
-const page = new Page(window, document.documentElement, reflectjs_props);
+(window as any)[PAGE_JS_ID] = loadClientPage(window);

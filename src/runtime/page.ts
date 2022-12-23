@@ -11,6 +11,8 @@ export const AKA_ATTR = LOGIC_ATTR_PREFIX + 'aka';
 export const DOM_ID_ATTR = 'data-reflectjs';
 export const PROPS_SCRIPT_ID = 'reflectjs-props';
 export const PROPS_JS_ID = 'reflectjs_props';
+export const PAGE_JS_ID = 'reflectjs_page';
+export const PAGE_LOADED_EVENT = 'reflectjsDidLoad';
 export const RUNTIME_SCRIPT_ID = 'reflectjs-runtime';
 export const RUNTIME_URL = '/.reflectjs/runtime.js';
 

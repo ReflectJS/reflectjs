@@ -3,7 +3,7 @@ import fs from "fs";
 import { Window } from "happy-dom";
 import * as http from 'http';
 import path from "path";
-import { PageError, compileDoc } from "../../src/compiler/page-compiler";
+import { PageError, compileDoc } from "../compiler/page-compiler";
 import { HtmlDocument } from "../preprocessor/htmldom";
 import Preprocessor from "../preprocessor/preprocessor";
 import { PROPS_JS_ID, PROPS_SCRIPT_ID, Page, RUNTIME_SCRIPT_ID, RUNTIME_URL } from "../runtime/page";
@@ -20,7 +20,7 @@ export interface ServerProps {
 	clientJsFilePath?: string,
 }
 
-export default class Server {
+export default class ServerImpl {
   props: ServerProps;
 	server: http.Server;
 	clientJs?: string;

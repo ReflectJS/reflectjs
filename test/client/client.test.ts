@@ -1,4 +1,0 @@
-
-describe('client: client', async () => {
-
-});
