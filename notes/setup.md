@@ -188,10 +188,10 @@ npm i express
 npm i -D @types/express
 ```
 
-### Swcpack
+### ~~Swcpack~~
 
-we're using [swc](https://swc.rs)'s bundling feature (instead of browserify w/ tsify)
-for testing speeed
+~~we're using [swc](https://swc.rs)'s bundling feature (instead of browserify w/ tsify)
+for testing speeed~~
 
 https://swc.rs/docs/usage/bundling
 
@@ -222,4 +222,27 @@ module.exports = {
     "test": "spack && mocha --exit -r ts-node/register test/**/*.test.ts",
     "coverage": "nyc npm run test && coverage-badges --output res/coverage-badge.svg",
     "build-client": "spack"
+```
+
+### browserify w/ tsify
+
+[tsify](https://github.com/TypeStrong/tsify)
+
+```
+npm install -D browserify tsify
+```
+
+`package.json` "scripts":
+
+```json
+    "test": "npm run build-client && mocha --exit -r ts-node/register test/**/*.test.ts",
+    "coverage": "nyc npm run test && coverage-badges --output res/coverage-badge.svg",
+    "build": "npm run build-server && npm run build-client",
+    "build-client": "browserify src/client.ts -p tsify > dist/client.js",
+    "build-server": "tsc"
+```
+
+```
+rm spack.config.js
+npm remove -D @swc/cli
 ```
