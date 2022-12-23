@@ -3,6 +3,7 @@ import Server from "../../src/server/server-impl";
 import fs from 'fs';
 import path from 'path';
 import { JSDOM } from 'jsdom';
+import { PAGE_JS_ID } from "../../src/runtime/page";
 
 const rootPath = process.cwd() + '/test/client/roundtrip';
 
@@ -33,7 +34,6 @@ describe('client: roundtrip', async () => {
     ) {
 
       describe(dir, () => {
-        const dname = encodeURIComponent(dir);
         const dirPath = path.join(rootPath, dir);
         fs.readdirSync(dirPath).forEach(file => {
           if (
@@ -42,15 +42,10 @@ describe('client: roundtrip', async () => {
           ) {
 
             it(file.replace(/(\.html)$/, ''), async () => {
-              const fname = encodeURIComponent(file);
-              // https://github.com/jsdom/jsdom/blob/master/README.md
-              const url = `http://localhost:${port}/${dname}/${fname}`
-              const dom = await JSDOM.fromURL(url, {
-                resources: 'usable',
-                // runScripts: 'dangerously'
-              });
+              const dom = await loadPage(dir, file);
+              assert.exists(dom.window[PAGE_JS_ID]);
               //TODO
-              // console.log(dom.serialize());
+              console.log(dom.serialize());
             });
 
           }
@@ -61,3 +56,15 @@ describe('client: roundtrip', async () => {
   });
 
 });
+
+async function loadPage(dir: string, file: string): Promise<JSDOM> {
+  dir = encodeURIComponent(dir);
+  file = encodeURIComponent(file);
+  // https://github.com/jsdom/jsdom/blob/master/README.md
+  const url = `http://localhost:${port}/${dir}/${file}`
+  const dom = await JSDOM.fromURL(url, {
+    resources: 'usable',
+    runScripts: 'dangerously'
+  });
+  return dom;
+}
