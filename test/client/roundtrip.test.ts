@@ -48,11 +48,9 @@ describe('client: roundtrip', async () => {
                 const page: Page = dom.window[PAGE_JS_ID];
                 assert.exists(page);
                 assert.exists(page.root);
-                assert.exists(page.root.values['testIn']);
-                assert.isFalse(page.root.proxy['testIn']);
-                assert.notEqual(page.root.proxy['testOut'], 'OK');
-                page.root.proxy['testIn'] = true;
-                assert.equal(page.root.proxy['testOut'], 'OK');
+                assert.exists(page.root.proxy['test']);
+                const res = page.root.proxy['test']();
+                assert.equal(res, 'OK');
               } finally {
                 dom.window.close();
               }
