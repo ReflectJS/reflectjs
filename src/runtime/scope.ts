@@ -38,6 +38,7 @@ export class Scope {
     this.proxyHandler = new ScopeProxyHandler(page, this);
     this.values = this.initValues();
     this.proxy = new Proxy<any>(this.values, this.proxyHandler);
+    this.collectClones();
     if (parent) {
       parent.children.push(this);
       if (props.name && !cloneOf) {
@@ -77,7 +78,7 @@ export class Scope {
     }
     const dst = this.page.load(this.parent, props, this);
     !this.clones && (this.clones = []);
-    this.clones.push(dst);
+    this.clones[nr] = dst;
     this.page.refresh(dst);
     return dst;
   }
@@ -253,6 +254,18 @@ export class Scope {
       refs: src.refs
     };
     return dst;
+  }
+
+  collectClones() {
+    const prefix = this.props.id + '.';
+    const preflen = prefix.length;
+    let prev = this.dom.previousElementSibling, id;
+    while (prev && (id = prev.getAttribute(pg.DOM_ID_ATTR))?.startsWith(prefix)) {
+      const i2 = id.indexOf('.', preflen);
+      const nr = parseInt(id.substring(preflen, (i2 >= 0 ? i2 : undefined)));
+      const clone = this.clone(nr, prev);
+      prev = prev.previousElementSibling;
+    }
   }
 
   // ---------------------------------------------------------------------------

@@ -47,7 +47,7 @@ describe('client: client-impl', async () => {
   });
 
   // it(`should load replicated items 1`, async () => {
-  //   const html = await servePage(`<html><body><ul :aka="content">
+  //   const html = await servePage(`<html><body><ul id="content" :aka="content">
   //     <li :aka="item" :data=[[[1, 2, 3]]]>[[data]]</li>
   //   </ul></body></html>`);
   //   const win = new GlobalWindow();
@@ -56,9 +56,9 @@ describe('client: client-impl', async () => {
   //   win.document.getElementById(PROPS_SCRIPT_ID).remove();
   //   assert.equal(
   //     page.doc.getElementById('content')?.innerHTML?.trim(),
-  //     `<li data-reflectjs="3.0"><!---t0-->1<!---/--></li>` +
-  //     `<li data-reflectjs="3.1"><!---t0-->2<!---/--></li>` +
-  //     `<li data-reflectjs="3"><!---t0-->3<!---/--></li>`
+  //     `<li data-reflectjs="4.0"><!---t0-->1<!---/--></li>` +
+  //     `<li data-reflectjs="4.1"><!---t0-->2<!---/--></li>` +
+  //     `<li data-reflectjs="4"><!---t0-->3<!---/--></li>`
   //   );
   //   page.root.proxy['body']['content']['item']['data'] = ['a', 'b'];
   //   assert.equal(
