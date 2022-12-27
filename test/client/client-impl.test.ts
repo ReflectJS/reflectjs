@@ -4,6 +4,7 @@ import { GlobalWindow, Window } from "happy-dom";
 import { loadClientPage } from "../../src/client/client-impl";
 import { PAGE_JS_ID, PROPS_SCRIPT_ID, Page, RUNTIME_SCRIPT_ID } from "../../src/runtime/page";
 import { loadTestPage } from "../compiler/page-samples.test";
+import { JSDOM } from 'jsdom';
 
 const rtPath = process.cwd() + '/dist/client.js';
 const rootPath = process.cwd() + '/test/client/client-impl';
@@ -44,6 +45,47 @@ describe('client: client-impl', async () => {
     page.root.proxy['attr_lang'] = 'it';
     assert.equal(page.doc.documentElement.getAttribute('lang'), 'it');
   });
+
+  // it(`should load replicated items 1`, async () => {
+  //   const html = await servePage(`<html><body><ul :aka="content">
+  //     <li :aka="item" :data=[[[1, 2, 3]]]>[[data]]</li>
+  //   </ul></body></html>`);
+  //   const win = new GlobalWindow();
+  //   win.document.write(html);
+  //   const page = loadClientPage(win);
+  //   win.document.getElementById(PROPS_SCRIPT_ID).remove();
+  //   assert.equal(
+  //     page.doc.getElementById('content')?.innerHTML?.trim(),
+  //     `<li data-reflectjs="3.0"><!---t0-->1<!---/--></li>` +
+  //     `<li data-reflectjs="3.1"><!---t0-->2<!---/--></li>` +
+  //     `<li data-reflectjs="3"><!---t0-->3<!---/--></li>`
+  //   );
+  //   page.root.proxy['body']['content']['item']['data'] = ['a', 'b'];
+  //   assert.equal(
+  //     page.doc.getElementById('content')?.innerHTML?.trim(),
+  //     `<li data-reflectjs="3.0"><!---t0-->a<!---/--></li>` +
+  //     `<li data-reflectjs="3"><!---t0-->b<!---/--></li>`
+  //   );
+  // });
+
+  // it(`should load replicated items 2`, async () => {
+  //   const html = await servePage(`<html><body><ul :aka="content">
+  //     <li :aka="item" :data=[[[1, 2, 3]]]>[[data]]</li>
+  //   </ul></body></html>`);
+  //   const page = await loadPage(html);
+  //   assert.equal(
+  //     page.doc.getElementById('content')?.innerHTML?.trim(),
+  //     `<li data-reflectjs="3.0"><!---t0-->1<!---/--></li>` +
+  //     `<li data-reflectjs="3.1"><!---t0-->2<!---/--></li>` +
+  //     `<li data-reflectjs="3"><!---t0-->3<!---/--></li>`
+  //   );
+  //   page.root.proxy['body']['content']['item']['data'] = ['a', 'b'];
+  //   assert.equal(
+  //     page.doc.getElementById('content')?.innerHTML?.trim(),
+  //     `<li data-reflectjs="3.0"><!---t0-->a<!---/--></li>` +
+  //     `<li data-reflectjs="3"><!---t0-->b<!---/--></li>`
+  //   );
+  // });
 
 });
 

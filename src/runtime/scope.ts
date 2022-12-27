@@ -301,7 +301,6 @@ export class Scope {
       }
     }
   }
-
 }
 
 /**
