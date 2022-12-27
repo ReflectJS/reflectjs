@@ -18,7 +18,7 @@ describe(`compiler: page-samples`, () => {
     assert.equal(
       normalizeSpace(test.js),
       normalizeSpace(`{ root: {
-        id: '0', name: 'page', query: 'html',
+        id: '0', name: 'page',
         values: {
           attr_dataDummy: {
             fn: function () { return ''; },
@@ -26,8 +26,8 @@ describe(`compiler: page-samples`, () => {
           }
         },
         children: [
-          { id: '1', name: 'head', query: 'head' },
-          { id: '2', name: 'body', query: 'body' }
+          { id: '1', name: 'head' },
+          { id: '2', name: 'body' }
         ]
       } }`)
     );
@@ -360,17 +360,16 @@ describe(`compiler: page-samples`, () => {
       root: {
         id: '0',
         name: 'page',
-        query: 'html',
         children: [
-          { id: '1', name: 'head', query: 'head' },
-          { id: '2', name: 'body', query: 'body',
+          { id: '1', name: 'head' },
+          { id: '2', name: 'body',
             values: {
               data: {
                 fn: function () { return { id: 1, name: 'Alice' }; },
                 val: null
               }
             },
-            children: [{ id: '3', query: '[data-reflectjs="3"]',
+            children: [{ id: '3',
               values: {
                 __t0: {
                   fn: function () { return this.data; },
@@ -423,17 +422,14 @@ describe(`compiler: page-samples`, () => {
         root: {
           id: '0',
           name: 'page',
-          query: 'html',
           children: [
             {
               id: '1',
-              name: 'head',
-              query: 'head'
+              name: 'head'
             },
             {
               id: '2',
               name: 'body',
-              query: 'body',
               values: {
                 data: {
                   fn: function () { return { list: [ 1, 2, 3 ] }; },
@@ -442,7 +438,6 @@ describe(`compiler: page-samples`, () => {
               },
               children: [{
                 id: '3',
-                query: '[data-reflectjs="3"]',
                 values: {
                   __t0: {
                     fn: function () { return this.data; },

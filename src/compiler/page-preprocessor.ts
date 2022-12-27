@@ -55,18 +55,13 @@ function loadScope(e: HtmlElement, errors: PageError[]): ScopeProps {
   switch (e.tagName) {
     case 'HTML':
       ret.name = page.ROOT_SCOPE_NAME;
-      ret.query = 'html';
       break;
     case 'HEAD':
       ret.name = page.HEAD_SCOPE_NAME;
-      ret.query = 'head';
       break;
     case 'BODY':
       ret.name = page.BODY_SCOPE_NAME;
-      ret.query = 'body';
       break;
-    default:
-      ret.query = `[${page.DOM_ID_ATTR}="${ret.id}"]`;
   }
   e.getAttribute(page.AKA_ATTR) && (ret.name = e.getAttribute(page.AKA_ATTR));
   e.removeAttribute(page.AKA_ATTR);

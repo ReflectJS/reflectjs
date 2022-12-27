@@ -1,22 +1,21 @@
-import { COMMENT_NODE, DATA_VALUE, DOM_ID_ATTR, ELEMENT_NODE, OUTER_PROPERTY, Page, RESERVED_PREFIX, TEXT_MARKER1_PREFIX, TEXT_NODE } from "./page";
-import { Value, ValueProps } from "./value";
+import * as pg from "./page";
+import * as vl from "./value";
 
 export interface ScopeProps {
   id: string;
   name?: string;
-  query?: string;
   markup?: string;
   values?: ScopeValuesProps;
   children?: ScopeProps[];
 }
 
-export type ScopeValuesProps = { [key: string]: ValueProps };
+export type ScopeValuesProps = { [key: string]: vl.ValueProps };
 
 /**
  * Scope
  */
 export class Scope {
-  page: Page;
+  page: pg.Page;
   parent: Scope | null;
   props: ScopeProps;
   children: Scope[];
@@ -24,11 +23,11 @@ export class Scope {
   dom: Element;
   texts?: Node[];
   proxyHandler: ScopeProxyHandler;
-  values: { [key: string]: Value };
+  values: { [key: string]: vl.Value };
   proxy: any;
   clones?: Scope[];
 
-  constructor(page: Page, parent: Scope | null, props: ScopeProps, cloneOf?: Scope) {
+  constructor(page: pg.Page, parent: Scope | null, props: ScopeProps, cloneOf?: Scope) {
     this.page = page;
     this.parent = parent;
     this.props = props;
@@ -42,7 +41,7 @@ export class Scope {
     if (parent) {
       parent.children.push(this);
       if (props.name && !cloneOf) {
-        parent.values[props.name] = new Value(props.name, {
+        parent.values[props.name] = new vl.Value(props.name, {
           val: this.proxy,
           passive: true
         }, parent);
@@ -68,13 +67,13 @@ export class Scope {
     }
   }
 
-  clone(nr: number): Scope {
+  clone(nr: number, dom?: Element): Scope {
     const props = this.cloneProps(nr);
-    const dom = this.cloneDom(props.id);
-    if (props.values && props.values[DATA_VALUE]) {
+    !dom && (dom = this.cloneDom(props.id));
+    if (props.values && props.values[pg.DATA_VALUE]) {
       // clones are generated and updated based on original scope's data value;
-      // their own data value is updated by the original scope
-      delete props.values[DATA_VALUE].refs;
+      // their own data value is updated by their original scope
+      delete props.values[pg.DATA_VALUE].refs;
     }
     const dst = this.page.load(this.parent, props, this);
     !this.clones && (this.clones = []);
@@ -94,8 +93,8 @@ export class Scope {
   initDom() {
     const ret = this.props.markup
       ? this.initDomFromMarkup(this.props.markup)
-      : this.initDomFromDomQuery(this.props.query as string);
-    ret.setAttribute(DOM_ID_ATTR, this.props.id);
+      : this.initDomFromDomId(this.props.id);
+    ret.setAttribute(pg.DOM_ID_ATTR, this.props.id);
     return ret;
   }
 
@@ -110,12 +109,13 @@ export class Scope {
     return ret;
   }
 
-  initDomFromDomQuery(query: string): Element {
+  initDomFromDomId(id: string): Element {
     if (this.cloneOf) {
+      //FIXME
       return this.cloneOf?.dom?.previousElementSibling as Element;
     }
     const e = this.parent?.dom ?? this.page.doc;
-    const ret = e.querySelector(query) as Element;
+    const ret = e.querySelector(`[${pg.DOM_ID_ATTR}="${id}"]`) as Element;
     return ret;
   }
 
@@ -124,18 +124,18 @@ export class Scope {
     const f = (p: Element) => {
       p.childNodes.forEach(n => {
         if (
-          n.nodeType === COMMENT_NODE &&
-          n.nodeValue?.startsWith(TEXT_MARKER1_PREFIX)
+          n.nodeType === p.COMMENT_NODE &&
+          n.nodeValue?.startsWith(pg.TEXT_MARKER1_PREFIX)
         ) {
-          const s = n.nodeValue.substring(TEXT_MARKER1_PREFIX.length);
+          const s = n.nodeValue.substring(pg.TEXT_MARKER1_PREFIX.length);
           const i = parseInt(s);
           let t = n.nextSibling;
-          if (t && t.nodeType !== TEXT_NODE) {
+          if (t && t.nodeType !== p.TEXT_NODE) {
             t = p.insertBefore(this.page.doc.createTextNode(''), t);
           }
           ret[i] = t as Node;
-        } else if (n.nodeType === ELEMENT_NODE) {
-          if (!(n as Element).hasAttribute(DOM_ID_ATTR)) {
+        } else if (n.nodeType === p.ELEMENT_NODE) {
+          if (!(n as Element).hasAttribute(pg.DOM_ID_ATTR)) {
             f(n as Element);
           }
         }
@@ -150,15 +150,15 @@ export class Scope {
   // ---------------------------------------------------------------------------
 
   initValues() {
-    const ret: { [key: string]: Value } = {};
+    const ret: { [key: string]: vl.Value } = {};
     Reflect.ownKeys(this.props.values ?? {}).forEach(key => {
       const props = (this.props.values as any)[key];
-      ret[key as string] = new Value(key as string, props, this);
+      ret[key as string] = new vl.Value(key as string, props, this);
     });
     return ret;
   }
 
-  lookupValue(prop: string, outer?: boolean): Value | undefined {
+  lookupValue(prop: string, outer?: boolean): vl.Value | undefined {
     let ret = undefined;
     let scope: Scope | null = (outer ? this.parent : this);
     while (scope && !ret) {
@@ -179,7 +179,7 @@ export class Scope {
     this.children.forEach(s => s.unlinkValues());
   }
 
-  unlinkValue(value?: Value) {
+  unlinkValue(value?: vl.Value) {
     if (value?.src) {
       value.src.forEach(o => o?.dst?.delete(value));
       delete value.src;
@@ -215,7 +215,7 @@ export class Scope {
   cloneDom(id: string): Element {
     const src = this.dom as Element;
     const dst = src.cloneNode(true) as Element;
-    dst.setAttribute(DOM_ID_ATTR, id);
+    dst.setAttribute(pg.DOM_ID_ATTR, id);
     src.parentElement?.insertBefore(dst, src);
     return dst;
   }
@@ -224,7 +224,7 @@ export class Scope {
     const dst: ScopeProps = {
       id: `${this.props.id}.${nr}`,
       name: this.props.name,
-      query: `[${DOM_ID_ATTR}="${this.props.id}.${nr}"]`,
+      // query: `[${pg.DOM_ID_ATTR}="${this.props.id}.${nr}"]`,
       values: this.cloneValues()
     };
     return dst;
@@ -243,9 +243,9 @@ export class Scope {
     return dst;
   }
 
-  cloneValue(key: string): ValueProps {
+  cloneValue(key: string): vl.ValueProps {
     const src = (this.props.values as ScopeValuesProps)[key];
-    const dst: ValueProps = {
+    const dst: vl.ValueProps = {
       val: src._origVal ?? src.val,
       passive: src.passive,
       fn: src.fn,
@@ -259,7 +259,7 @@ export class Scope {
   // replication
   // ---------------------------------------------------------------------------
 
-  static dataCB(v: Value) {
+  static dataCB(v: vl.Value) {
     const that = v.scope as Scope;
     if (!v.props.val || !Array.isArray(v.props.val)) {
       if (that.clones && that.clones.length > 0) {
@@ -280,10 +280,12 @@ export class Scope {
     // create/update clones
     for (; di < (offset + length - 1); ci++, di++) {
       if (ci < that.clones.length) {
-        that.clones[ci].proxy[DATA_VALUE] = vv[di];
+        // update
+        that.clones[ci].proxy[pg.DATA_VALUE] = vv[di];
       } else {
+        // create
         const clone = that.clone(ci);
-        clone.proxy[DATA_VALUE] = vv[di];
+        clone.proxy[pg.DATA_VALUE] = vv[di];
       }
     }
     // remove excess clones
@@ -307,16 +309,16 @@ export class Scope {
  * ScopeProxyHandler
  */
 class ScopeProxyHandler implements ProxyHandler<any> {
-  page: Page;
+  page: pg.Page;
   scope: Scope;
 
-  constructor(page: Page, scope: Scope) {
+  constructor(page: pg.Page, scope: Scope) {
     this.page = page;
     this.scope = scope;
   }
 
   get(target: any, prop: string, receiver?: any) {
-    if (prop === OUTER_PROPERTY) {
+    if (prop === pg.OUTER_PROPERTY) {
       return this.scope.parent?.proxy;
     }
     const value = this.scope.lookupValue(prop);
@@ -325,7 +327,7 @@ class ScopeProxyHandler implements ProxyHandler<any> {
   }
 
   set(target: any, prop: string, val: any, receiver?: any) {
-    if (prop.startsWith(RESERVED_PREFIX)) {
+    if (prop.startsWith(pg.RESERVED_PREFIX)) {
       return false;
     }
     const value = this.scope.lookupValue(prop);
@@ -345,7 +347,7 @@ class ScopeProxyHandler implements ProxyHandler<any> {
     return target.apply(this.scope.proxy, argumentsList);
   }
 
-  private update(value: Value) {
+  private update(value: vl.Value) {
     if (value.fn) {
       if (!value.props.cycle || value.props.cycle < (this.page.props.cycle ?? 0)) {
         value.props.cycle = this.page.props.cycle ?? 0;
@@ -353,7 +355,7 @@ class ScopeProxyHandler implements ProxyHandler<any> {
         try {
           value.props.val = value.fn.apply((value.scope as Scope).proxy);
         } catch (ex: any) {
-          //TODO (+ use ValueProps.pos if available)
+          //TODO (+ use v.ValueProps.pos if available)
           console.log(ex);
         }
         if (old == null ? value.props.val != null : old !== value.props.val) {
@@ -367,7 +369,7 @@ class ScopeProxyHandler implements ProxyHandler<any> {
     }
   }
 
-  private propagate(value: Value) {
+  private propagate(value: vl.Value) {
     if (this.page.pushLevel != null) {
       if ((this.page.pushLevel ?? 0) === 0) {
         this.page.props.cycle = (this.page.props.cycle ?? 0) + 1;
@@ -375,7 +377,7 @@ class ScopeProxyHandler implements ProxyHandler<any> {
       this.page.pushLevel++;
       try {
         const that = this;
-        (value.dst as Set<Value>).forEach(function(v) {
+        (value.dst as Set<vl.Value>).forEach(function(v) {
           that.update(v);
         });
       } catch (ignored: any) {}

@@ -24,7 +24,7 @@ describe('runtime: scope', () => {
     const page = baseApp(null, props => {
       addScope(props, [1], {
         id: '3',
-        markup: `<span>Hello <!---t0--><!----->!</span>`
+        markup: `<span ${DOM_ID_ATTR}="3">Hello <!---t0--><!----->!</span>`
       });
     });
     const body = page.root.children[1];
@@ -48,7 +48,6 @@ describe('runtime: scope', () => {
       addScope(props, [1], {
         id: '3',
         name: 'theSpan',
-        query: `[${DOM_ID_ATTR}="3"]`,
         values: {
           name: { val: null, fn: function() { return 'Alice'; } },
           __t0: { val: null, fn: function() { return this.greeting; }, refs: ['greeting'] },
@@ -147,7 +146,6 @@ describe('runtime: scope', () => {
       addScope(props, [1], {
         id: '3',
         name: 'theSpan',
-        query: `[${DOM_ID_ATTR}="3"]`,
         values: {
           data: { val: null, fn: function() { return this.__outer.data.list; }, refs: ['data'] },
           __t0: { val: null, fn: function() { return this.greeting; }, refs: ['greeting'] },
@@ -161,6 +159,9 @@ describe('runtime: scope', () => {
     const span = body.children[0];
     assert.notExists(span.clones);
 
+    //
+    // 1. it should replicate based on data
+    //
     page.refresh();
     assert.equal(body.children.length, 3);
     assert.equal(span.clones?.length, 2);
@@ -176,6 +177,9 @@ describe('runtime: scope', () => {
       </html>`)
     );
 
+    //
+    // 2. it should update clones based on data
+    //
     body.proxy[DATA_VALUE] = { list: [ 'Alice', 'Bob' ] };
     assert.equal(body.children.length, 2);
     assert.equal(span.clones?.length, 1);
@@ -186,6 +190,23 @@ describe('runtime: scope', () => {
       <body ${DOM_ID_ATTR}="2">
         <span ${DOM_ID_ATTR}="3.0"><!---t0-->Hello<!---/--> <!---t1-->Alice<!---/--></span>` +
         `<span ${DOM_ID_ATTR}="3"><!---t0-->Hello<!---/--> <!---t1-->Bob<!---/--></span>
+      </body>
+      </html>`)
+    );
+
+    //
+    // 3. it should update clones based on other values
+    //
+    body.proxy['greeting'] = 'Hi';
+    assert.equal(body.children.length, 2);
+    assert.equal(span.clones?.length, 1);
+    assert.equal(
+      normalizeText(page.getMarkup()),
+      normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>
+      <body ${DOM_ID_ATTR}="2">
+        <span ${DOM_ID_ATTR}="3.0"><!---t0-->Hi<!---/--> <!---t1-->Alice<!---/--></span>` +
+        `<span ${DOM_ID_ATTR}="3"><!---t0-->Hi<!---/--> <!---t1-->Bob<!---/--></span>
       </body>
       </html>`)
     );

@@ -41,7 +41,6 @@ function compileScope(src: ScopeProps, errors: PageError[]) {
   const dst: es.Property[] = [];
   dst.push(makeProperty('id', { type: 'Literal', value: src.id }));
   src.name && dst.push(makeProperty('name', { type: 'Literal', value: src.name }));
-  src.query && dst.push(makeProperty('query', { type: 'Literal', value: src.query }));
   src.markup && dst.push(makeProperty('markup', { type: 'Literal', value: src.markup }));
   src.values && dst.push(makeProperty('values', compileValues(src.values, errors)));
   src.children && dst.push(makeProperty('children', compileScopes(src.children, errors)));

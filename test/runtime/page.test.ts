@@ -65,20 +65,20 @@ function scopeCount(page: Page): number {
 export function baseApp(markup: string | null, cb?: (props: PageProps) => void): Page {
   const win = new Window();
   const doc = win.document;
+  doc.documentElement.setAttribute(DOM_ID_ATTR, '0');
+  doc.head.setAttribute(DOM_ID_ATTR, '1');
+  doc.body.setAttribute(DOM_ID_ATTR, '2');
   markup && win.document.write(markup);
   const props: PageProps = {
     root: {
       id: '0',
       name: ROOT_SCOPE_NAME,
-      query: 'html',
       children: [{
         id: '1',
-        name: HEAD_SCOPE_NAME,
-        query: 'head'
+        name: HEAD_SCOPE_NAME
       }, {
         id: '2',
-        name: BODY_SCOPE_NAME,
-        query: 'body'
+        name: BODY_SCOPE_NAME
       }]
     }
   }

@@ -23,10 +23,10 @@ describe("compiler: page-compiler", () => {
     assert.equal(
       normalizeSpace(js),
       normalizeSpace(`{ root: {
-        id: '0', name: 'page', query: 'html',
+        id: '0', name: 'page',
         children: [
-          { id: '1', name: 'head', query: 'head' },
-          { id: '2', name: 'body', query: 'body' }
+          { id: '1', name: 'head' },
+          { id: '2', name: 'body' }
         ]
       } }`)
     );
@@ -46,7 +46,7 @@ describe("compiler: page-compiler", () => {
     assert.equal(
       normalizeSpace(js),
       normalizeSpace(`{ root: {
-        id: '0', name: 'page', query: 'html',
+        id: '0', name: 'page',
         values: {
           attr_lang: {
             fn: function () {
@@ -60,8 +60,8 @@ describe("compiler: page-compiler", () => {
           }
         },
         children: [
-          { id: '1', name: 'head', query: 'head' },
-          { id: '2', name: 'body', query: 'body' }
+          { id: '1', name: 'head' },
+          { id: '2', name: 'body' }
         ]
       } }`)
     );
@@ -81,7 +81,7 @@ describe("compiler: page-compiler", () => {
     assert.equal(
       normalizeSpace(js),
       normalizeSpace(`{ root: {
-        id: '0', name: 'page', query: 'html',
+        id: '0', name: 'page',
         values: {
           myfun: {
             val: function (s) { return s.trim() + this.x; },
@@ -89,8 +89,8 @@ describe("compiler: page-compiler", () => {
           }
         },
         children: [
-          { id: '1', name: 'head', query: 'head' },
-          { id: '2', name: 'body', query: 'body' }
+          { id: '1', name: 'head' },
+          { id: '2', name: 'body' }
         ]
       } }`)
     );
@@ -110,7 +110,7 @@ describe("compiler: page-compiler", () => {
     assert.equal(
       normalizeSpace(js),
       normalizeSpace(`{ root: {
-        id: '0', name: 'page', query: 'html',
+        id: '0', name: 'page',
         values: {
           myfun: {
             val: function (s) { return s.trim(); },
@@ -118,8 +118,8 @@ describe("compiler: page-compiler", () => {
           }
         },
         children: [
-          { id: '1', name: 'head', query: 'head' },
-          { id: '2', name: 'body', query: 'body' }
+          { id: '1', name: 'head' },
+          { id: '2', name: 'body' }
         ]
       } }`)
     );
