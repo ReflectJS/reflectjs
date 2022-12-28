@@ -38,7 +38,7 @@ export class Scope {
     this.proxyHandler = new ScopeProxyHandler(page, this);
     this.values = this.initValues();
     this.proxy = new Proxy<any>(this.values, this.proxyHandler);
-    this.collectClones();
+    !cloneOf && this.collectClones();
     if (parent) {
       parent.children.push(this);
       if (props.name && !cloneOf) {
@@ -112,7 +112,6 @@ export class Scope {
 
   initDomFromDomId(id: string): Element {
     if (this.cloneOf) {
-      //FIXME
       return this.cloneOf?.dom?.previousElementSibling as Element;
     }
     const e = this.parent?.dom ?? this.page.doc;
@@ -258,14 +257,26 @@ export class Scope {
 
   collectClones() {
     const prefix = this.props.id + '.';
-    const preflen = prefix.length;
-    let prev = this.dom.previousElementSibling, id;
-    while (prev && (id = prev.getAttribute(pg.DOM_ID_ATTR))?.startsWith(prefix)) {
-      const i2 = id.indexOf('.', preflen);
-      const nr = parseInt(id.substring(preflen, (i2 >= 0 ? i2 : undefined)));
-      const clone = this.clone(nr, prev);
-      prev = prev.previousElementSibling;
+    let p, e = this.dom.previousElementSibling;
+    if (!e || !e.getAttribute(pg.DOM_ID_ATTR)?.startsWith(prefix)) {
+      return;
     }
+    const preflen = prefix.length;
+    const ee = [];
+    while (e?.getAttribute(pg.DOM_ID_ATTR)?.startsWith(prefix)) {
+      p = e.previousElementSibling;
+      ee.unshift(e);
+      e.remove();
+      e = p;
+    }
+    p = this.dom.parentElement as Element;
+    ee.forEach(e => {
+      const id = e.getAttribute(pg.DOM_ID_ATTR) as string;
+      const i2 = id?.indexOf('.', preflen);
+      const nr = parseInt(id.substring(preflen, (i2 >= 0 ? i2 : undefined)));
+      this.dom.parentElement?.insertBefore(e, this.dom);
+      this.clone(nr, e);
+    });
   }
 
   // ---------------------------------------------------------------------------
