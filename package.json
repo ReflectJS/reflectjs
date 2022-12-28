@@ -4,11 +4,9 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "npm run build-client && mocha --exit -r ts-node/register test/**/*.test.ts",
+    "test": "npm run build && mocha --exit -r ts-node/register test/**/*.test.ts",
     "coverage": "nyc npm run test && coverage-badges --output res/coverage-badge.svg",
-    "build": "npm run build-server && npm run build-client",
-    "build-client": "mkdir -p dist && browserify src/client.ts -p tsify > dist/client.js",
-    "build-server": "tsc"
+    "build": "tsc && browserify dist/client/client-main.js -o dist/client.js"
   },
   "keywords": [],
   "author": "Fabrizio Capolini",
