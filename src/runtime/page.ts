@@ -1,4 +1,4 @@
-import { Scope, ScopeProps } from "./scope";
+import { Scope, ScopeCloning, ScopeProps } from "./scope";
 import { Value } from "./value";
 
 export const ELEMENT_NODE = 1; //TODO
@@ -64,8 +64,8 @@ export interface PageProps {
     }, this.root);
   }
 
-  load(parent: Scope | null, props: ScopeProps, cloneOf?: Scope) {
-    const ret = new Scope(this, parent, props, cloneOf);
+  load(parent: Scope | null, props: ScopeProps, cloned?: ScopeCloning) {
+    const ret = new Scope(this, parent, props, cloned);
     props.children?.forEach(props => {
       this.load(ret, props);
     });

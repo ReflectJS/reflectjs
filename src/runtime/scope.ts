@@ -9,7 +9,14 @@ export interface ScopeProps {
   children?: ScopeProps[];
 }
 
-export type ScopeValuesProps = { [key: string]: vl.ValueProps };
+export type ScopeValuesProps = {
+  [key: string]: vl.ValueProps;
+};
+
+export interface ScopeCloning {
+  from: Scope;
+  dom: Element;
+}
 
 /**
  * Scope
@@ -19,7 +26,7 @@ export class Scope {
   parent: Scope | null;
   props: ScopeProps;
   children: Scope[];
-  cloneOf?: Scope;
+  cloned?: ScopeCloning;
   dom: Element;
   texts?: Node[];
   proxyHandler: ScopeProxyHandler;
@@ -27,21 +34,21 @@ export class Scope {
   proxy: any;
   clones?: Scope[];
 
-  constructor(page: pg.Page, parent: Scope | null, props: ScopeProps, cloneOf?: Scope) {
+  constructor(page: pg.Page, parent: Scope | null, props: ScopeProps, cloned?: ScopeCloning) {
     this.page = page;
     this.parent = parent;
     this.props = props;
     this.children = [];
-    this.cloneOf = cloneOf;
+    this.cloned = cloned;
     this.dom = this.initDom();
     this.texts = this.collectTextNodes();
     this.proxyHandler = new ScopeProxyHandler(page, this);
     this.values = this.initValues();
     this.proxy = new Proxy<any>(this.values, this.proxyHandler);
-    !cloneOf && this.collectClones();
+    !cloned && this.collectClones();
     if (parent) {
       parent.children.push(this);
-      if (props.name && !cloneOf) {
+      if (props.name && !cloned) {
         parent.values[props.name] = new vl.Value(props.name, {
           val: this.proxy,
           passive: true
@@ -56,13 +63,13 @@ export class Scope {
     if (this.parent) {
       const i = this.parent.children.indexOf(this);
       i >= 0 && this.parent.children.splice(i, 1);
-      if (!this.cloneOf && this.props.name) {
+      if (!this.cloned && this.props.name) {
         this.unlinkValue(this.parent.values[this.props.name]);
         delete this.parent.values[this.props.name];
       }
     }
-    if (this.cloneOf) {
-      const clones = this.cloneOf.clones ?? [];
+    if (this.cloned) {
+      const clones = this.cloned.from.clones ?? [];
       const i = clones.indexOf(this);
       i >= 0 && clones.splice(i, 1);
     }
@@ -76,7 +83,7 @@ export class Scope {
       // their own data value is updated by their original scope
       delete props.values[pg.DATA_VALUE].refs;
     }
-    const dst = this.page.load(this.parent, props, this);
+    const dst = this.page.load(this.parent, props, { from: this, dom: dom });
     !this.clones && (this.clones = []);
     this.clones[nr] = dst;
     this.page.refresh(dst);
@@ -111,8 +118,8 @@ export class Scope {
   }
 
   initDomFromDomId(id: string): Element {
-    if (this.cloneOf) {
-      return this.cloneOf?.dom?.previousElementSibling as Element;
+    if (this.cloned) {
+      return this.cloned.dom; //this.cloneOf?.dom?.previousElementSibling as Element;
     }
     const e = this.parent?.dom ?? this.page.doc;
     const ret = e.querySelector(`[${pg.DOM_ID_ATTR}="${id}"]`) as Element;
@@ -257,26 +264,18 @@ export class Scope {
 
   collectClones() {
     const prefix = this.props.id + '.';
-    let p, e = this.dom.previousElementSibling;
+    let e = this.dom.previousElementSibling, s;
     if (!e || !e.getAttribute(pg.DOM_ID_ATTR)?.startsWith(prefix)) {
       return;
     }
     const preflen = prefix.length;
-    const ee = [];
-    while (e?.getAttribute(pg.DOM_ID_ATTR)?.startsWith(prefix)) {
-      p = e.previousElementSibling;
-      ee.unshift(e);
-      e.remove();
-      e = p;
-    }
-    p = this.dom.parentElement as Element;
-    ee.forEach(e => {
+    while (e && (s = e.getAttribute(pg.DOM_ID_ATTR)) != null && s.startsWith(prefix)) {
       const id = e.getAttribute(pg.DOM_ID_ATTR) as string;
       const i2 = id?.indexOf('.', preflen);
       const nr = parseInt(id.substring(preflen, (i2 >= 0 ? i2 : undefined)));
-      this.dom.parentElement?.insertBefore(e, this.dom);
       this.clone(nr, e);
-    });
+      e = e.previousElementSibling;
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -292,7 +291,7 @@ export class Scope {
       return;
     }
     // value is an array
-    if (that.cloneOf) {
+    if (that.cloned) {
       // clones ignore array data
       v.props.val = null;
       return;
