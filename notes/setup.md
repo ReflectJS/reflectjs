@@ -246,3 +246,9 @@ npm install -D browserify tsify
 rm spack.config.js
 npm remove -D @swc/cli
 ```
+
+### express-rate-limit
+
+```
+npm i express-rate-limit
+```

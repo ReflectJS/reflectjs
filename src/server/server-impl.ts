@@ -1,12 +1,13 @@
 import express, { Application, Express } from "express";
+import rateLimit from 'express-rate-limit';
 import fs from "fs";
 import { Window } from "happy-dom";
 import * as http from 'http';
 import path from "path";
-import { PageError, compileDoc } from "../compiler/page-compiler";
+import { compileDoc, PageError } from "../compiler/page-compiler";
 import { HtmlDocument } from "../preprocessor/htmldom";
 import Preprocessor from "../preprocessor/preprocessor";
-import { PROPS_JS_ID, PROPS_SCRIPT_ID, Page, RUNTIME_SCRIPT_ID, RUNTIME_URL } from "../runtime/page";
+import { Page, PROPS_SCRIPT_ID, RUNTIME_SCRIPT_ID, RUNTIME_URL } from "../runtime/page";
 import exitHook from "./exit-hook";
 
 export interface ServerProps {
@@ -14,10 +15,16 @@ export interface ServerProps {
 	rootPath: string,
 	assumeHttps?: boolean,
 	trustProxy?: boolean,
+	pageLimit?: TrafficLimit,
   init?: (props: ServerProps, app: Application) => void,
 	logger?: (type: string, msg: string) => void,
 	mute?: boolean,
 	clientJsFilePath?: string,
+}
+
+export interface TrafficLimit {
+	windowMs: number,
+	maxRequests: number,
 }
 
 export default class ServerImpl {
@@ -80,6 +87,18 @@ export default class ServerImpl {
 		}
 	}
 
+	static setLimiter(limit: TrafficLimit, paths: Array<string>, app: Application) {
+		const limiter = rateLimit({
+			windowMs: limit.windowMs,
+			max: limit.maxRequests,
+			standardHeaders: true,
+			legacyHeaders: false,
+		});
+		for (var path of paths) {
+			app.use(path, limiter);
+		}
+	}
+
   // ---------------------------------------------------------------------------
   // private
   // ---------------------------------------------------------------------------
@@ -95,6 +114,11 @@ export default class ServerImpl {
 	}
 
   private init(props: ServerProps, app: Express) {
+		// limit page requests rate
+		if (props.pageLimit) {
+			ServerImpl.setLimiter(props.pageLimit, ['*', '*.html'], app);
+		}
+
 		// externally redirect requests for directories to <dir>/index
 		// internally redirect requests to files w/o suffix to <file>.html
 		app.get("*", async (req, res, next) => {
@@ -195,13 +219,6 @@ export default class ServerImpl {
 
 			const runtimeScript = win.document.createElement('script');
 			runtimeScript.id = RUNTIME_SCRIPT_ID;
-			// if (this.clientJs) {
-			// 	runtimeScript.appendChild(
-			// 		win.document.createTextNode(this.clientJs)
-			// 	);
-			// } else {
-			// 	runtimeScript.setAttribute('src', RUNTIME_URL);
-			// }
 			runtimeScript.setAttribute('src', RUNTIME_URL);
 			win.document.body.appendChild(runtimeScript);
 
@@ -226,38 +243,38 @@ type CompiledPage = {
 /**
  * CachedPage
  */
-class CachedPage {
-	tstamp: number;
-	sources: string[];
+// class CachedPage {
+// 	tstamp: number;
+// 	sources: string[];
 
-	constructor(tstamp: number, sources: Array<string>) {
-		this.tstamp = tstamp;
-		this.sources = sources;
-		while (this.sources.length > 0) {
-			if (this.sources[this.sources.length - 1] === 'embedded') {
-				this.sources.pop();
-			} else {
-				break;
-			}
-		}
-	}
+// 	constructor(tstamp: number, sources: Array<string>) {
+// 		this.tstamp = tstamp;
+// 		this.sources = sources;
+// 		while (this.sources.length > 0) {
+// 			if (this.sources[this.sources.length - 1] === 'embedded') {
+// 				this.sources.pop();
+// 			} else {
+// 				break;
+// 			}
+// 		}
+// 	}
 
-	//TODO: no two actual checks within the same second
-	async isUpToDate(): Promise<boolean> {
-    let ret = true;
+// 	//TODO: no two actual checks within the same second
+// 	async isUpToDate(): Promise<boolean> {
+//     let ret = true;
 
-    for (const source of this.sources) {
-      try {
-        const stat = await fs.promises.stat(source);
-        if (stat.mtime.valueOf() > this.tstamp) {
-          throw '';
-        }
-      } catch (err: any) {
-        ret = false;
-        break;
-      }
-    }
+//     for (const source of this.sources) {
+//       try {
+//         const stat = await fs.promises.stat(source);
+//         if (stat.mtime.valueOf() > this.tstamp) {
+//           throw '';
+//         }
+//       } catch (err: any) {
+//         ret = false;
+//         break;
+//       }
+//     }
 
-    return ret;
-	}
-}
+//     return ret;
+// 	}
+// }
