@@ -80,13 +80,13 @@ export class Scope {
     !dom && (dom = this.cloneDom(props.id));
     if (props.values && props.values[pg.DATA_VALUE]) {
       // clones are generated and updated based on original scope's data value;
-      // their own data value is updated by their original scope
+      // their own data value is updated by the original scope
       delete props.values[pg.DATA_VALUE].refs;
+      delete props.values[pg.DATA_VALUE].fn;
     }
     const dst = this.page.load(this.parent, props, { from: this, dom: dom });
     !this.clones && (this.clones = []);
     this.clones[nr] = dst;
-    this.page.refresh(dst);
     return dst;
   }
 
@@ -273,7 +273,9 @@ export class Scope {
       const id = e.getAttribute(pg.DOM_ID_ATTR) as string;
       const i2 = id?.indexOf('.', preflen);
       const nr = parseInt(id.substring(preflen, (i2 >= 0 ? i2 : undefined)));
-      this.clone(nr, e);
+      const clone = this.clone(nr, e);
+      clone.unlinkValues();
+      clone.relinkValues();
       e = e.previousElementSibling;
     }
   }
@@ -308,7 +310,8 @@ export class Scope {
       } else {
         // create
         const clone = that.clone(ci);
-        clone.proxy[pg.DATA_VALUE] = vv[di];
+        clone.values[pg.DATA_VALUE].props.val = vv[di];
+        that.page.refresh(clone);
       }
     }
     // remove excess clones

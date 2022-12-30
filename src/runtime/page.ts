@@ -74,7 +74,7 @@ export interface PageProps {
     return ret;
   }
 
-  refresh(scope?: Scope, noincrement?: boolean) {
+  refresh(scope?: Scope, noincrement?: boolean, noupdate?: boolean) {
     this.props.cycle
       ? (noincrement ? null : this.props.cycle++)
       : this.props.cycle = 1;
@@ -82,7 +82,7 @@ export interface PageProps {
     scope || (scope = this.root);
     scope.unlinkValues();
     scope.relinkValues();
-    scope.updateValues();
+    noupdate ? null : scope.updateValues();
     this.pushLevel = 0;
     return this;
   }

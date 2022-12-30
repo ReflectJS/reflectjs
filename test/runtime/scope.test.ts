@@ -72,6 +72,7 @@ describe('runtime: scope', () => {
     assert.equal(span.proxy['__t1'], 'Alice');
 
     const clone = span.clone(0);
+    page.refresh(clone);
     assert.equal(
       normalizeText(page.getMarkup()),
       normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
