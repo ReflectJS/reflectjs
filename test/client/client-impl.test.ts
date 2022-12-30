@@ -86,6 +86,39 @@ describe('client: client-impl', async () => {
     );
   });
 
+  it(`should load roundtrip sample 6`, async () => {
+    const html = await servePage(`<!DOCTYPE html>
+    <html>
+      <body>
+        <ul :aka="content" id="content">
+          <li :aka="item" :data=[[[
+            { name: 'a', count: 1 },
+            { name: 'b', count: 3 },
+            { name: 'c', count: 0 },
+          ]]]>
+            [[data.name]] ([[data.count]])
+          </li>
+        </ul>
+      </body>
+    </html>`);
+    const page = await loadPage(html);
+    assert.equal(
+      page.doc.getElementById('content')?.innerHTML.replace(/\s+/g, ' '),
+      ` <li data-reflectjs="4.0"> <!---t0-->a<!---/--> (<!---t1-->1<!---/-->) </li>` +
+      `<li data-reflectjs="4.1"> <!---t0-->b<!---/--> (<!---t1-->3<!---/-->) </li>` +
+      `<li data-reflectjs="4"> <!---t0-->c<!---/--> (<!---t1-->0<!---/-->) </li> `
+    );
+    page.root.proxy['body']['content']['item']['data'] = [
+      { name: 'a', count: 1 },
+      { name: 'b', count: 3 }
+    ];
+    assert.equal(
+      page.doc.getElementById('content')?.innerHTML.replace(/\s+/g, ' '),
+      ` <li data-reflectjs="4.0"> <!---t0-->a<!---/--> (<!---t1-->1<!---/-->) </li>` +
+      `<li data-reflectjs="4"> <!---t0-->b<!---/--> (<!---t1-->3<!---/-->) </li> `
+    );
+  });
+
 });
 
 async function loadPage(html: string): Promise<Page> {

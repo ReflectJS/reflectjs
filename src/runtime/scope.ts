@@ -269,7 +269,7 @@ export class Scope {
       return;
     }
     const preflen = prefix.length;
-    while (e && (s = e.getAttribute(pg.DOM_ID_ATTR)) != null && s.startsWith(prefix)) {
+    while (e && (s = e.getAttribute(pg.DOM_ID_ATTR)) !== null && s.startsWith(prefix)) {
       const id = e.getAttribute(pg.DOM_ID_ATTR) as string;
       const i2 = id?.indexOf('.', preflen);
       const nr = parseInt(id.substring(preflen, (i2 >= 0 ? i2 : undefined)));
