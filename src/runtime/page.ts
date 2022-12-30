@@ -58,6 +58,8 @@ export interface PageProps {
     this.dom = dom;
     this.props = props;
     this.globals = new Map<string, Value>();
+    this.setGlobal('window', win);
+    this.setGlobal('document', this.doc);
     this.root = this.load(null, props.root);
     this.root.values[ROOT_SCOPE_NAME] = new Value(ROOT_SCOPE_NAME, {
       val: this.root.proxy
@@ -85,13 +87,18 @@ export interface PageProps {
     return this;
   }
 
+  setGlobal(key: string, val: any) {
+    this.globals.set(key, new Value(key, { passive: true, val: val }));
+  }
+
   lookupGlobal(key: string): Value | undefined {
-    let ret = this.globals.get(key);
-    if (!ret && Reflect.has(this.win, key)) {
-      ret = new Value(key, { passive: true, val: Reflect.get(this.win, key) });
-      this.globals.set(key, ret);
-    }
-    return ret;
+    // let ret = this.globals.get(key);
+    // if (!ret && Reflect.has(this.win, key)) {
+    //   ret = new Value(key, { passive: true, val: Reflect.get(this.win, key) });
+    //   this.globals.set(key, ret);
+    // }
+    // return ret;
+    return this.globals.get(key);
   }
 
   getMarkup() {

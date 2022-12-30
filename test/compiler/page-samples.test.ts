@@ -297,7 +297,7 @@ describe(`compiler: page-samples`, () => {
     const page = (await loadTestPage(rootPath, 'sample.html', `<html>
       <body :count=[[0]] data-test=[[false]]
             :${HANDLER_ATTR_PREFIX}count=[[
-              !count && setTimeout(() => count++, 0);
+              !count && window.setTimeout(() => count++, 0);
               attr_dataTest = true;
             ]]>
         Seconds: [[count]]
