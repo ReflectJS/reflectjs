@@ -212,7 +212,9 @@ export class Scope {
       const v = this.values[k];
       !v.props.passive && this.proxy[k];
     });
-    this.children.forEach(s => s.updateValues());
+    this.children.forEach(s => {
+      !s.cloned && s.updateValues();
+    });
   }
 
   // ---------------------------------------------------------------------------

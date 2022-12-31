@@ -121,15 +121,27 @@ describe('client: client-impl', async () => {
 
 });
 
+// async function loadPage_(html: string): Promise<Page> {
+//   const win = new Window();
+//   const doc = win.document;
+//   doc.write(html);
+
+//   const page = loadClientPage(win);
+
+//   return page;
+// }
+
 async function loadPage(html: string): Promise<Page> {
   const win = new Window();
   const doc = win.document;
   doc.write(html);
+
   const e = doc.createElement('script');
   e.id = RUNTIME_SCRIPT_ID;
   e.appendChild(doc.createTextNode(runtimeJs));
   doc.body.appendChild(e);
   const page: Page = win[PAGE_JS_ID];
+  
   return page;
 }
 
