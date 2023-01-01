@@ -76,7 +76,7 @@ export class Scope {
   }
 
   clone(nr: number, dom?: Element): Scope {
-    const props = this.cloneProps(nr);
+    const props = Scope.cloneProps(this.props, nr);
     !dom && (dom = this.cloneDom(props.id));
     if (props.values && props.values[pg.DATA_VALUE]) {
       // clones are generated and updated based on original scope's data value;
@@ -231,31 +231,29 @@ export class Scope {
     return dst;
   }
 
-  cloneProps(nr: number): ScopeProps {
+  static cloneProps(src: ScopeProps, nr?: number): ScopeProps {
     const dst: ScopeProps = {
-      id: `${this.props.id}.${nr}`,
-      name: this.props.name,
-      // query: `[${pg.DOM_ID_ATTR}="${this.props.id}.${nr}"]`,
-      values: this.cloneValues()
+      id: nr != null ? `${src.id}.${nr}` : src.id,
+      name: src.name,
+      values: src.values ? Scope.cloneValues(src.values) : undefined
     };
+    if (src.children) {
+      dst.children = src.children.map(p => Scope.cloneProps(p));
+    }
     return dst;
   }
 
-  cloneValues(): ScopeValuesProps | undefined {
-    if (!this.props.values) {
-      return undefined;
-    }
+  static cloneValues(src: ScopeValuesProps): ScopeValuesProps {
     const dst: ScopeValuesProps = {};
-    for (const key of Reflect.ownKeys(this.props.values)) {
+    for (const key of Reflect.ownKeys(src)) {
       if (typeof key === 'string') {
-        dst[key] = this.cloneValue(key);
+        dst[key] = Scope.cloneValue(src[key]);
       }
     }
     return dst;
   }
 
-  cloneValue(key: string): vl.ValueProps {
-    const src = (this.props.values as ScopeValuesProps)[key];
+  static cloneValue(src: vl.ValueProps): vl.ValueProps {
     const dst: vl.ValueProps = {
       val: src._origVal ?? src.val,
       passive: src.passive,
@@ -320,7 +318,7 @@ export class Scope {
     }
     // remove excess clones
     that.removeExcessClones(Math.max(0, length - 1));
-    // update original scope
+    // refine data for the original scope
     if (di < (offset + length)) {
       v.props.val = vv[di];
     }
@@ -390,7 +388,7 @@ class ScopeProxyHandler implements ProxyHandler<any> {
         }
         if (old == null ? value.props.val != null : old !== value.props.val) {
           value.cb && value.cb(value);
-          value.dst && this.propagate(value);
+          value.dst && this.page.refreshLevel < 1 && this.propagate(value);
         }
       }
     } else if (value.props.cycle == null) {
@@ -400,18 +398,16 @@ class ScopeProxyHandler implements ProxyHandler<any> {
   }
 
   private propagate(value: vl.Value) {
-    if (this.page.refreshLevel < 1) {
-      if (this.page.pushLevel < 1) {
-        this.page.props.cycle = (this.page.props.cycle ?? 0) + 1;
-      }
-      this.page.pushLevel++;
-      try {
-        const that = this;
-        (value.dst as Set<vl.Value>).forEach(function(v) {
-          that.update(v);
-        });
-      } catch (ignored: any) {}
-      this.page.pushLevel--;
+    if (this.page.pushLevel < 1) {
+      this.page.props.cycle = (this.page.props.cycle ?? 0) + 1;
     }
+    this.page.pushLevel++;
+    try {
+      const that = this;
+      (value.dst as Set<vl.Value>).forEach(function(v) {
+        that.update(v);
+      });
+    } catch (ignored: any) {}
+    this.page.pushLevel--;
   }
 }

@@ -338,74 +338,144 @@ describe('runtime: scope', () => {
     );
   });
 
-  // it('should support nested replication 3', () => {
-  //   const page = baseApp(`<html ${DOM_ID_ATTR}="0">
-  //     <head ${DOM_ID_ATTR}="1"></head>
-  //     <body ${DOM_ID_ATTR}="2">
-  //       <span ${DOM_ID_ATTR}="3">
-  //         <b><!---t0--><!---/--> <!---t1--><!---/--></b>
-  //         <span ${DOM_ID_ATTR}="4">
-  //           <b><!---t0--><!---/--> <!---t1--><!---/--></b>
-  //         </span>
-  //       </span>
-  //     </body>
-  //   </html>`, props => {
-  //     props.root.children && (props.root.children[1].values = {
-  //       greeting: { val: 'Hello' },
-  //       data: { val: {
-  //         list: [
-  //           { name: 'Alice', list: [
-  //             { name: 'Alice1' },
-  //             { name: 'Alice2' },
-  //           ] },
-  //           { name: 'Bob', list: [] }
-  //         ]
-  //       } }
-  //     });
-  //     addScope(props, [1], {
-  //       id: '3',
-  //       name: 'outerSpan',
-  //       values: {
-  //         data: { val: null, fn: function() { return this.__outer.data.list; }, refs: ['data'] },
-  //         __t0: { val: null, fn: function() { return this.greeting; }, refs: ['greeting'] },
-  //         __t1: { val: null, fn: function() { return this.data.name; }, refs: ['data'] }
-  //       }
-  //     });
-  //     addScope(props, [1, 0], {
-  //       id: '4',
-  //       name: 'innerSpan',
-  //       values: {
-  //         data: { val: null, fn: function() { return this.__outer.data.list; }, refs: ['data'] },
-  //         __t0: { val: null, fn: function() { return this.greeting; }, refs: ['greeting'] },
-  //         __t1: { val: null, fn: function() { return this.data && this.data.name; }, refs: ['data'] }
-  //       }
-  //     });
-  //   });
+  it('should support nested replication 3', () => {
+    const page = baseApp(`<html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>
+      <body ${DOM_ID_ATTR}="2">
+        <span ${DOM_ID_ATTR}="3">
+          <b><!---t0--><!---/--> <!---t1--><!---/--></b>
+          <span ${DOM_ID_ATTR}="4">
+            <b><!---t0--><!---/--> <!---t1--><!---/--></b>
+          </span>
+        </span>
+      </body>
+    </html>`, props => {
+      props.root.children && (props.root.children[1].values = {
+        greeting: { val: 'Hello' },
+        data: { val: {
+          list: [
+            { name: 'Alice', list: [] },
+            { name: 'Bob', list: [
+              { name: 'Bob1' },
+              { name: 'Bob2' },
+            ] }
+          ]
+        } }
+      });
+      addScope(props, [1], {
+        id: '3',
+        name: 'outerSpan',
+        values: {
+          data: { val: null, fn: function() { return this.__outer.data.list; }, refs: ['data'] },
+          __t0: { val: null, fn: function() { return this.greeting; }, refs: ['greeting'] },
+          __t1: { val: null, fn: function() { return this.data.name; }, refs: ['data'] }
+        }
+      });
+      addScope(props, [1, 0], {
+        id: '4',
+        name: 'innerSpan',
+        values: {
+          data: { val: null, fn: function() { return this.__outer.data.list; }, refs: ['data'] },
+          __t0: { val: null, fn: function() { return this.greeting; }, refs: ['greeting'] },
+          __t1: { val: null, fn: function() { return this.data && this.data.name; }, refs: ['data'] }
+        }
+      });
+    });
 
-  //   page.refresh();
-  //   assert.equal(
-  //     normalizeText(page.getMarkup()),
-  //     normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
-  //     <head ${DOM_ID_ATTR}="1"></head>
-  //     <body ${DOM_ID_ATTR}="2">
-  //       <span ${DOM_ID_ATTR}="3.0">
-  //         <b><!---t0-->Hello<!---/--> <!---t1-->Alice<!---/--></b>
-  //         <span ${DOM_ID_ATTR}="4.0">
-  //           <b><!---t0-->Hello<!---/--> <!---t1-->Alice1<!---/--></b>
-  //         </span>` +
-  //         `<span ${DOM_ID_ATTR}="4">
-  //           <b><!---t0-->Hello<!---/--> <!---t1-->Alice2<!---/--></b>
-  //         </span>
-  //       </span>` +
-  //       `<span ${DOM_ID_ATTR}="3">
-  //         <b><!---t0-->Hello<!---/--> <!---t1-->Bob<!---/--></b>
-  //         <span ${DOM_ID_ATTR}="4">
-  //           <b><!---t0-->Hello<!---/--> <!---t1--><!---/--></b>
-  //         </span>
-  //       </span>
-  //     </body>
-  //     </html>`)
-  //   );
-  // });
+    page.refresh();
+    assert.equal(
+      normalizeText(page.getMarkup()),
+      normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>
+      <body ${DOM_ID_ATTR}="2">
+        <span ${DOM_ID_ATTR}="3.0">
+          <b><!---t0-->Hello<!---/--> <!---t1-->Alice<!---/--></b>
+          <span ${DOM_ID_ATTR}="4">
+            <b><!---t0-->Hello<!---/--> <!---t1--><!---/--></b>
+          </span>
+        </span>` +
+        `<span ${DOM_ID_ATTR}="3">
+          <b><!---t0-->Hello<!---/--> <!---t1-->Bob<!---/--></b>
+          <span ${DOM_ID_ATTR}="4.0">
+            <b><!---t0-->Hello<!---/--> <!---t1-->Bob1<!---/--></b>
+          </span>` +
+          `<span ${DOM_ID_ATTR}="4">
+            <b><!---t0-->Hello<!---/--> <!---t1-->Bob2<!---/--></b>
+          </span>
+        </span>
+      </body>
+      </html>`)
+    );
+  });
+
+  it('should support nested replication 4', () => {
+    const page = baseApp(`<html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>
+      <body ${DOM_ID_ATTR}="2">
+        <span ${DOM_ID_ATTR}="3">
+          <b><!---t0--><!---/--> <!---t1--><!---/--></b>
+          <span ${DOM_ID_ATTR}="4">
+            <b><!---t0--><!---/--> <!---t1--><!---/--></b>
+          </span>
+        </span>
+      </body>
+    </html>`, props => {
+      props.root.children && (props.root.children[1].values = {
+        greeting: { val: 'Hello' },
+        data: { val: {
+          list: [
+            { name: 'Alice', list: [
+              { name: 'Alice1' },
+              { name: 'Alice2' },
+            ] },
+            { name: 'Bob', list: [] }
+          ]
+        } }
+      });
+      addScope(props, [1], {
+        id: '3',
+        name: 'outerSpan',
+        values: {
+          data: { val: null, fn: function() { return this.__outer.data.list; }, refs: ['data'] },
+          __t0: { val: null, fn: function() { return this.greeting; }, refs: ['greeting'] },
+          __t1: { val: null, fn: function() { return this.data.name; }, refs: ['data'] }
+        }
+      });
+      addScope(props, [1, 0], {
+        id: '4',
+        name: 'innerSpan',
+        values: {
+          data: { val: null, fn: function() { return this.__outer.data.list; }, refs: ['data'] },
+          __t0: { val: null, fn: function() { return this.greeting; }, refs: ['greeting'] },
+          __t1: { val: null, fn: function() { return this.data && this.data.name; }, refs: ['data'] }
+        }
+      });
+    });
+
+    page.refresh();
+    assert.equal(
+      normalizeText(page.getMarkup()),
+      normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>
+      <body ${DOM_ID_ATTR}="2">
+        <span ${DOM_ID_ATTR}="3.0">
+          <b><!---t0-->Hello<!---/--> <!---t1-->Alice<!---/--></b>
+          <span ${DOM_ID_ATTR}="4.0">
+            <b><!---t0-->Hello<!---/--> <!---t1-->Alice1<!---/--></b>
+          </span>` +
+          `<span ${DOM_ID_ATTR}="4">
+            <b><!---t0-->Hello<!---/--> <!---t1-->Alice2<!---/--></b>
+          </span>
+        </span>` +
+        `<span ${DOM_ID_ATTR}="3">
+          <b><!---t0-->Hello<!---/--> <!---t1-->Bob<!---/--></b>
+          <span ${DOM_ID_ATTR}="4">
+            <b><!---t0-->Hello<!---/--> <!---t1--><!---/--></b>
+          </span>
+        </span>
+      </body>
+      </html>`)
+    );
+  });
 
 });
