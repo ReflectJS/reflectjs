@@ -400,8 +400,8 @@ class ScopeProxyHandler implements ProxyHandler<any> {
   }
 
   private propagate(value: vl.Value) {
-    if (this.page.pushLevel != null) {
-      if ((this.page.pushLevel) === 0) {
+    if (this.page.refreshLevel < 1) {
+      if (this.page.pushLevel < 1) {
         this.page.props.cycle = (this.page.props.cycle ?? 0) + 1;
       }
       this.page.pushLevel++;

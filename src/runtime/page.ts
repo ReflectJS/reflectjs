@@ -50,7 +50,8 @@ export interface PageProps {
   props: PageProps;
   globals: Map<string, Value>;
   root: Scope;
-  pushLevel?: number;
+  refreshLevel: number;
+  pushLevel: number;
 
   constructor(win: Window, dom: Element, props: PageProps) {
     this.win = win;
@@ -64,6 +65,7 @@ export interface PageProps {
     this.root.values[ROOT_SCOPE_NAME] = new Value(ROOT_SCOPE_NAME, {
       val: this.root.proxy
     }, this.root);
+    this.refreshLevel = this.pushLevel = 0;
   }
 
   load(parent: Scope | null, props: ScopeProps, cloned?: ScopeCloning) {
@@ -75,15 +77,17 @@ export interface PageProps {
   }
 
   refresh(scope?: Scope, noincrement?: boolean, noupdate?: boolean) {
-    this.props.cycle
-      ? (noincrement ? null : this.props.cycle++)
-      : this.props.cycle = 1;
-    delete this.pushLevel;
-    scope || (scope = this.root);
-    scope.unlinkValues();
-    scope.relinkValues();
-    noupdate ? null : scope.updateValues();
-    this.pushLevel = 0;
+    this.refreshLevel++;
+    try {
+      this.props.cycle
+        ? (noincrement ? null : this.props.cycle++)
+        : this.props.cycle = 1;
+      scope || (scope = this.root);
+      scope.unlinkValues();
+      scope.relinkValues();
+      noupdate ? null : scope.updateValues();
+    } catch (ignored: any) {}
+    this.refreshLevel--;
     return this;
   }
 
