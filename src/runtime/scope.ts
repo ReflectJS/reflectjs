@@ -213,6 +213,8 @@ export class Scope {
       !v.props.passive && this.proxy[k];
     });
     this.children.forEach(s => {
+      // clones are only directly refreshed by the original scope
+      // (in dataCB() create)
       !s.cloned && s.updateValues();
     });
   }

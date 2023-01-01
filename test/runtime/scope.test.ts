@@ -213,4 +213,8 @@ describe('runtime: scope', () => {
     );
   });
 
+  it('should support nested replication', () => {
+    //TODO assert.fail();
+  });
+
 });
