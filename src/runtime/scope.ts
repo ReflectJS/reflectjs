@@ -18,21 +18,24 @@ export interface ScopeCloning {
   dom: Element;
 }
 
-/**
- * Scope
- */
+// =============================================================================
+// Scope
+// =============================================================================
+
 export class Scope {
   page: pg.Page;
   parent: Scope | null;
   props: ScopeProps;
   children: Scope[];
   cloned?: ScopeCloning;
+  recursed?: ScopeCloning;
   dom: Element;
   texts?: Node[];
   proxyHandler: ScopeProxyHandler;
   values: { [key: string]: vl.Value };
   proxy: any;
   clones?: Scope[];
+  recursions?: Scope[];
 
   constructor(page: pg.Page, parent: Scope | null, props: ScopeProps, cloned?: ScopeCloning) {
     this.page = page;
@@ -79,7 +82,7 @@ export class Scope {
     const props = Scope.cloneProps(this.props, nr);
     !dom && (dom = this.cloneDom(props.id));
     if (props.values && props.values[pg.DATA_VALUE]) {
-      // clones are generated and updated based on original scope's data value;
+      // clones are generated and updated based on original scope's data;
       // their own data value is updated by the original scope
       delete props.values[pg.DATA_VALUE].refs;
       delete props.values[pg.DATA_VALUE].fn;
@@ -87,6 +90,21 @@ export class Scope {
     const dst = this.page.load(this.parent, props, { from: this, dom: dom });
     !this.clones && (this.clones = []);
     this.clones[nr] = dst;
+    return dst;
+  }
+
+  recurse(nr: number, parent: Scope, dom?: Element): Scope {
+    const props = Scope.cloneProps(this.props, nr);
+    !dom && (dom = this.recurseDom(props.id, parent));
+    if (props.values && props.values[pg.DATA_VALUE]) {
+      // recursions are generated and updated based on original scope's data;
+      // their own data value is updated by the original scope
+      delete props.values[pg.DATA_VALUE].refs;
+      delete props.values[pg.DATA_VALUE].fn;
+    }
+    const dst = this.page.load(this.parent, props, { from: this, dom: dom });
+    !this.recursions && (this.recursions = []);
+    this.recursions[nr] = dst;
     return dst;
   }
 
@@ -231,6 +249,14 @@ export class Scope {
     return dst;
   }
 
+  recurseDom(id: string, parent: Scope): Element {
+    const src = this.dom as Element;
+    const dst = src.cloneNode(true) as Element;
+    dst.setAttribute(pg.DOM_ID_ATTR, id);
+    parent.dom.appendChild(dst);
+    return dst;
+  }
+
   static cloneProps(src: ScopeProps, nr?: number): ScopeProps {
     const dst: ScopeProps = {
       id: nr != null ? `${src.id}.${nr}` : src.id,
@@ -287,8 +313,9 @@ export class Scope {
   // ---------------------------------------------------------------------------
 
   static dataCB(v: vl.Value) {
+    // console.log('dataCB()', v.scope?.props.id);//tempdebug
     const that = v.scope as Scope;
-    if (!v.props.val || !Array.isArray(v.props.val)) {
+    if (!Array.isArray(v.props.val)) {
       if (that.clones && that.clones.length > 0) {
         that.removeExcessClones(0);
       }
@@ -331,11 +358,61 @@ export class Scope {
       }
     }
   }
+
+  // ---------------------------------------------------------------------------
+  // recursion (recursive replication)
+  // ---------------------------------------------------------------------------
+
+  static recurseOnCB(v: vl.Value) {
+    // console.log('recurseOnCB()', v.scope?.props.id);//tempdebug
+    const that = v.scope as Scope;
+    if (!Array.isArray(v.props.val) || !v.scope) {
+      if (that.recursions && that.recursions.length > 0) {
+        that.removeExcessRecursions(0);
+      }
+      return;
+    }
+    // value is an array
+    if (that.recursed) {
+      // clones ignore array data
+      v.props.val = null;
+      return;
+    }
+    const vv: any[] = v.props.val;
+    const offset = 0, length = vv.length;
+    let ci = 0, di = offset;
+    !that.recursions && (that.recursions = []);
+    // create/update recursions
+    for (; di < (offset + length); ci++, di++) {
+      const vi = vv[di];
+      console.log('recurseOnCB()', v.scope.props.id, vi);
+      if (ci < that.recursions.length) {
+        // update
+        that.recursions[ci].proxy[pg.DATA_VALUE] = vv[di];
+      } else {
+        // create
+        const recursion = that.recurse(ci, v.scope);
+        recursion.values[pg.DATA_VALUE].props.val = vi;
+        that.page.refresh(recursion);
+      }
+    }
+    // remove excess recursions
+    that.removeExcessClones(Math.max(0, length));
+  }
+
+  removeExcessRecursions(maxCount: number) {
+    if (this.recursions) {
+      while (this.recursions.length > maxCount) {
+        this.recursions.pop()?.dispose();
+      }
+    }
+  }
 }
 
-/**
- * ScopeProxyHandler
- */
+// =============================================================================
+// ScopeProxyHandler
+// =============================================================================
+
 class ScopeProxyHandler implements ProxyHandler<any> {
   page: pg.Page;
   scope: Scope;

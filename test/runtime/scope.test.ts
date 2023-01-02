@@ -1,6 +1,7 @@
 import { assert } from "chai";
 import { normalizeText } from "../../src/preprocessor/util";
-import { DATA_VALUE, DOM_ID_ATTR, TEXT_NODE } from "../../src/runtime/page";
+import { DATA_VALUE, DOM_ID_ATTR, Page, TEXT_NODE } from "../../src/runtime/page";
+import { Scope } from "../../src/runtime/scope";
 import { addScope, baseApp, itemAt } from "./page.test";
 
 describe('runtime: scope', () => {
@@ -478,4 +479,166 @@ describe('runtime: scope', () => {
     );
   });
 
+  it('should support recursive replication', () => {
+    const page = baseApp(`<html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>
+      <body ${DOM_ID_ATTR}="2">
+        <span ${DOM_ID_ATTR}="3">
+          <b><!---t0--><!---/--> <!---t1--><!---/--></b>
+        </span>
+      </body>
+    </html>`, props => {
+      props.root.children && (props.root.children[1].values = {
+        greeting: { val: 'Hello' },
+        data: { val: {
+          list: [
+            { name: 'Alice', list: [
+              { name: 'Alice1' },
+              // { name: 'Alice2', list: [
+              //   { name: 'Alice2.1' },
+              // ] },
+            ] },
+            // { name: 'Bob', list: [] }
+          ]
+        } }
+      });
+      addScope(props, [1], {
+        id: '3',
+        name: 'theSpan',
+        values: {
+          recurseOn: { val: null, fn: function() { return this.data.list; }, refs: ['data'] },
+          data: { val: null, fn: function() { return this.__outer.data.list; }, refs: ['data'] },
+          __t0: { val: null, fn: function() { return this.greeting; }, refs: ['greeting'] },
+          __t1: { val: null, fn: function() { return this.data.name; }, refs: ['data'] }
+        }
+      });
+    });
+    assert.equal(countScopes(page), 4);
+    assert.equal(countScopes(page, s => s.dom.tagName === 'SPAN'), 1);
+
+    page.refresh();
+    assert.equal(countScopes(page), 5);
+    assert.equal(countScopes(page, s => s.dom.tagName === 'SPAN'), 2);
+    assert.equal(
+      normalizeText(page.getMarkup()),
+      normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>
+      <body ${DOM_ID_ATTR}="2">
+        <span ${DOM_ID_ATTR}="3">
+          <b><!---t0-->Hello<!---/--> <!---t1-->Alice<!---/--></b>
+          <span ${DOM_ID_ATTR}="3.0">
+            <b><!---t0-->Hello<!---/--> <!---t1-->Alice1<!---/--></b>
+          </span>` +
+        `</span>
+      </body>
+      </html>`)
+    );
+
+    const body = page.root.children[1];
+    body.proxy['greeting'] = 'Hi';
+    assert.equal(countScopes(page), 5);
+    assert.equal(countScopes(page, s => s.dom.tagName === 'SPAN'), 2);
+    assert.equal(
+      normalizeText(page.getMarkup()),
+      normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>
+      <body ${DOM_ID_ATTR}="2">
+        <span ${DOM_ID_ATTR}="3">
+          <b><!---t0-->Hi<!---/--> <!---t1-->Alice<!---/--></b>
+          <span ${DOM_ID_ATTR}="3.0">
+            <b><!---t0-->Hi<!---/--> <!---t1-->Alice1<!---/--></b>
+          </span>` +
+        `</span>
+      </body>
+      </html>`)
+    );
+
+    body.proxy['data'] = {
+      list: [
+        { name: 'Alice' },
+        // { name: 'Bob', list: [] }
+      ]
+    };
+    assert.equal(countScopes(page), 4);
+    assert.equal(countScopes(page, s => s.dom.tagName === 'SPAN'), 1);
+    assert.equal(
+      normalizeText(page.getMarkup()),
+      normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>
+      <body ${DOM_ID_ATTR}="2">
+        <span ${DOM_ID_ATTR}="3">
+          <b><!---t0-->Hi<!---/--> <!---t1-->Alice<!---/--></b>
+        </span>
+      </body>
+      </html>`)
+    );
+
+    body.proxy['data'] = {
+      list: [
+        { name: 'Alice' },
+        { name: 'Bob' },
+      ]
+    };
+    assert.equal(countScopes(page), 5);
+    assert.equal(countScopes(page, s => s.dom.tagName === 'SPAN'), 2);
+    assert.equal(
+      normalizeText(page.getMarkup()),
+      normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>
+      <body ${DOM_ID_ATTR}="2">
+        <span ${DOM_ID_ATTR}="3.0">
+          <b><!---t0-->Hi<!---/--> <!---t1-->Alice<!---/--></b>
+        </span>` +
+        `<span ${DOM_ID_ATTR}="3">
+          <b><!---t0-->Hi<!---/--> <!---t1-->Bob<!---/--></b>
+        </span>
+      </body>
+      </html>`)
+    );
+
+    //FIXME
+    // body.proxy['data'] = {
+    //   list: [
+    //     { name: 'Alice', list: [
+    //       { name: 'Alice1' },
+    //       { name: 'Alice2' },
+    //     ] },
+    //     { name: 'Bob' },
+    //   ]
+    // };
+    // assert.equal(countScopes(page), 7);
+    // assert.equal(countScopes(page, s => s.dom.tagName === 'SPAN'), 4);
+    // assert.equal(
+    //   normalizeText(page.getMarkup()),
+    //   normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
+    //   <head ${DOM_ID_ATTR}="1"></head>
+    //   <body ${DOM_ID_ATTR}="2">
+    //     <span ${DOM_ID_ATTR}="3.0">
+    //       <b><!---t0-->Hi<!---/--> <!---t1-->Alice<!---/--></b>
+    //       <span ${DOM_ID_ATTR}="3.0">
+    //         <b><!---t0-->Hi<!---/--> <!---t1-->Alice1<!---/--></b>
+    //       </span>` +
+    //       `<span ${DOM_ID_ATTR}="3.0">
+    //         <b><!---t0-->Hi<!---/--> <!---t1-->Alice1<!---/--></b>
+    //       </span>` +
+    //     `</span>` +
+    //     `<span ${DOM_ID_ATTR}="3">
+    //       <b><!---t0-->Hi<!---/--> <!---t1-->Bob<!---/--></b>
+    //     </span>
+    //   </body>
+    //   </html>`)
+    // );
+  });
 });
+
+function countScopes(page: Page, filter?: (s: Scope) => boolean): number {
+  let ret = 0;
+  function f(scope: Scope) {
+    if (!filter || filter(scope)) {
+      ret++;
+    }
+    scope.children.forEach(f);
+  }
+  page.root && f(page.root);
+  return ret;
+}

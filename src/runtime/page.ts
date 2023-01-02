@@ -28,6 +28,7 @@ export const HANDLER_VALUE_PREFIX = 'handle_';
 export const EVENT_ATTR_PREFIX = 'on-';
 export const HANDLER_ATTR_PREFIX = 'handle-';
 export const DATA_VALUE = 'data';
+export const RECURSEON_VALUE = 'recurseOn';
 export const TEXT_VALUE_PREFIX = RESERVED_PREFIX + 't';
 
 export const TEXT_MARKER1_PREFIX = '-t';
