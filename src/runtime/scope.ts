@@ -76,10 +76,20 @@ export class Scope {
       const i = clones.indexOf(this);
       i >= 0 && clones.splice(i, 1);
     }
+    if (this.recursed) {
+      const recursions = this.recursed.from.recursions ?? [];
+      const i = recursions.indexOf(this);
+      i >= 0 && recursions.splice(i, 1);
+    }
+    if (this.recursions) {
+      while (this.recursions.length > 0) {
+        this.recursions.pop()?.dispose();
+      }
+    }
   }
 
   clone(nr: number, dom?: Element): Scope {
-    const props = Scope.cloneProps(this.props, nr);
+    const props = Scope.cloneProps(this.props, `.${nr}`);
     !dom && (dom = this.cloneDom(props.id));
     if (props.values && props.values[pg.DATA_VALUE]) {
       // clones are generated and updated based on original scope's data;
@@ -94,7 +104,7 @@ export class Scope {
   }
 
   recurse(nr: number, parent: Scope, dom?: Element): Scope {
-    const props = Scope.cloneProps(this.props, nr);
+    const props = Scope.cloneProps(this.props, `/${nr}`);
     !dom && (dom = this.recurseDom(props.id, parent));
     if (props.values && props.values[pg.DATA_VALUE]) {
       // recursions are generated and updated based on original scope's data;
@@ -243,7 +253,7 @@ export class Scope {
 
   cloneDom(id: string): Element {
     const src = this.dom as Element;
-    const dst = src.cloneNode(true) as Element;
+    const dst = Scope.cloneElement(src);
     dst.setAttribute(pg.DOM_ID_ATTR, id);
     src.parentElement?.insertBefore(dst, src);
     return dst;
@@ -251,15 +261,44 @@ export class Scope {
 
   recurseDom(id: string, parent: Scope): Element {
     const src = this.dom as Element;
-    const dst = src.cloneNode(true) as Element;
+    const srcId = src.getAttribute(pg.DOM_ID_ATTR) || '-';
+    const dst = Scope.cloneElement(
+      src,
+      e => !(e.getAttribute(pg.DOM_ID_ATTR) || '').startsWith(srcId)
+    );
     dst.setAttribute(pg.DOM_ID_ATTR, id);
     parent.dom.appendChild(dst);
     return dst;
   }
 
-  static cloneProps(src: ScopeProps, nr?: number): ScopeProps {
+  static cloneElement(src: Element, filter?: (e: Element) => boolean): Element {
+    const doc = src.ownerDocument;
+
+    function f(e: Element) {
+      const ret = doc.createElement(e.tagName);
+      for (let a of e.attributes) {
+        ret.setAttribute(a.name, a.value);
+      }
+      for (let node of e.childNodes) {
+        if (node.nodeType === pg.ELEMENT_NODE) {
+          if (!filter || filter(node as Element)) {
+            ret.appendChild(f(node as Element));
+          }
+        } else if (node.nodeType === pg.TEXT_NODE) {
+          ret.appendChild(doc.createTextNode(node.nodeValue ?? ''));
+        } else if (node.nodeType === pg.COMMENT_NODE) {
+          ret.appendChild(doc.createComment(node.nodeValue ?? ''));
+        }
+      }
+      return ret;
+    }
+
+    return f(src);
+  }
+
+  static cloneProps(src: ScopeProps, idSuffix?: string): ScopeProps {
     const dst: ScopeProps = {
-      id: nr != null ? `${src.id}.${nr}` : src.id,
+      id: idSuffix != null ? `${src.id}${idSuffix}` : src.id,
       name: src.name,
       values: src.values ? Scope.cloneValues(src.values) : undefined
     };
@@ -313,7 +352,6 @@ export class Scope {
   // ---------------------------------------------------------------------------
 
   static dataCB(v: vl.Value) {
-    // console.log('dataCB()', v.scope?.props.id);//tempdebug
     const that = v.scope as Scope;
     if (!Array.isArray(v.props.val)) {
       if (that.clones && that.clones.length > 0) {
@@ -364,7 +402,6 @@ export class Scope {
   // ---------------------------------------------------------------------------
 
   static recurseOnCB(v: vl.Value) {
-    // console.log('recurseOnCB()', v.scope?.props.id);//tempdebug
     const that = v.scope as Scope;
     if (!Array.isArray(v.props.val) || !v.scope) {
       if (that.recursions && that.recursions.length > 0) {
@@ -385,10 +422,9 @@ export class Scope {
     // create/update recursions
     for (; di < (offset + length); ci++, di++) {
       const vi = vv[di];
-      console.log('recurseOnCB()', v.scope.props.id, vi);
       if (ci < that.recursions.length) {
         // update
-        that.recursions[ci].proxy[pg.DATA_VALUE] = vv[di];
+        that.recursions[ci].proxy[pg.DATA_VALUE] = vi;
       } else {
         // create
         const recursion = that.recurse(ci, v.scope);

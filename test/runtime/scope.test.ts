@@ -526,7 +526,7 @@ describe('runtime: scope', () => {
       <body ${DOM_ID_ATTR}="2">
         <span ${DOM_ID_ATTR}="3">
           <b><!---t0-->Hello<!---/--> <!---t1-->Alice<!---/--></b>
-          <span ${DOM_ID_ATTR}="3.0">
+          <span ${DOM_ID_ATTR}="3/0">
             <b><!---t0-->Hello<!---/--> <!---t1-->Alice1<!---/--></b>
           </span>` +
         `</span>
@@ -545,7 +545,7 @@ describe('runtime: scope', () => {
       <body ${DOM_ID_ATTR}="2">
         <span ${DOM_ID_ATTR}="3">
           <b><!---t0-->Hi<!---/--> <!---t1-->Alice<!---/--></b>
-          <span ${DOM_ID_ATTR}="3.0">
+          <span ${DOM_ID_ATTR}="3/0">
             <b><!---t0-->Hi<!---/--> <!---t1-->Alice1<!---/--></b>
           </span>` +
         `</span>
@@ -596,38 +596,121 @@ describe('runtime: scope', () => {
       </html>`)
     );
 
-    //FIXME
-    // body.proxy['data'] = {
-    //   list: [
-    //     { name: 'Alice', list: [
-    //       { name: 'Alice1' },
-    //       { name: 'Alice2' },
-    //     ] },
-    //     { name: 'Bob' },
-    //   ]
-    // };
-    // assert.equal(countScopes(page), 7);
-    // assert.equal(countScopes(page, s => s.dom.tagName === 'SPAN'), 4);
-    // assert.equal(
-    //   normalizeText(page.getMarkup()),
-    //   normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
-    //   <head ${DOM_ID_ATTR}="1"></head>
-    //   <body ${DOM_ID_ATTR}="2">
-    //     <span ${DOM_ID_ATTR}="3.0">
-    //       <b><!---t0-->Hi<!---/--> <!---t1-->Alice<!---/--></b>
-    //       <span ${DOM_ID_ATTR}="3.0">
-    //         <b><!---t0-->Hi<!---/--> <!---t1-->Alice1<!---/--></b>
-    //       </span>` +
-    //       `<span ${DOM_ID_ATTR}="3.0">
-    //         <b><!---t0-->Hi<!---/--> <!---t1-->Alice1<!---/--></b>
-    //       </span>` +
-    //     `</span>` +
-    //     `<span ${DOM_ID_ATTR}="3">
-    //       <b><!---t0-->Hi<!---/--> <!---t1-->Bob<!---/--></b>
-    //     </span>
-    //   </body>
-    //   </html>`)
-    // );
+    body.proxy['data'] = {
+      list: [
+        { name: 'Alice', list: [
+          { name: 'Alice1' },
+          { name: 'Alice2' },
+        ] },
+        { name: 'Bob' },
+      ]
+    };
+    assert.equal(countScopes(page), 7);
+    assert.equal(countScopes(page, s => s.dom.tagName === 'SPAN'), 4);
+    assert.equal(
+      normalizeText(page.getMarkup()),
+      normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>
+      <body ${DOM_ID_ATTR}="2">
+        <span ${DOM_ID_ATTR}="3.0">
+          <b><!---t0-->Hi<!---/--> <!---t1-->Alice<!---/--></b>
+          <span ${DOM_ID_ATTR}="3.0/0">
+            <b><!---t0-->Hi<!---/--> <!---t1-->Alice1<!---/--></b>
+          </span>` +
+          `<span ${DOM_ID_ATTR}="3.0/1">
+            <b><!---t0-->Hi<!---/--> <!---t1-->Alice2<!---/--></b>
+          </span>` +
+        `</span>` +
+        `<span ${DOM_ID_ATTR}="3">
+          <b><!---t0-->Hi<!---/--> <!---t1-->Bob<!---/--></b>
+        </span>
+      </body>
+      </html>`)
+    );
+
+    body.proxy['data'] = {
+      list: [
+        { name: 'Alice', list: [
+          { name: 'Alice1b' },
+          { name: 'Alice2b' },
+        ] },
+        { name: 'Bob' },
+      ]
+    };
+    assert.equal(countScopes(page), 7);
+    assert.equal(countScopes(page, s => s.dom.tagName === 'SPAN'), 4);
+    assert.equal(
+      normalizeText(page.getMarkup()),
+      normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>
+      <body ${DOM_ID_ATTR}="2">
+        <span ${DOM_ID_ATTR}="3.0">
+          <b><!---t0-->Hi<!---/--> <!---t1-->Alice<!---/--></b>
+          <span ${DOM_ID_ATTR}="3.0/0">
+            <b><!---t0-->Hi<!---/--> <!---t1-->Alice1b<!---/--></b>
+          </span>` +
+          `<span ${DOM_ID_ATTR}="3.0/1">
+            <b><!---t0-->Hi<!---/--> <!---t1-->Alice2b<!---/--></b>
+          </span>` +
+        `</span>` +
+        `<span ${DOM_ID_ATTR}="3">
+          <b><!---t0-->Hi<!---/--> <!---t1-->Bob<!---/--></b>
+        </span>
+      </body>
+      </html>`)
+    );
+
+    body.proxy['greeting'] = 'Ciao';
+    assert.equal(countScopes(page), 7);
+    assert.equal(countScopes(page, s => s.dom.tagName === 'SPAN'), 4);
+    assert.equal(
+      normalizeText(page.getMarkup()),
+      normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>
+      <body ${DOM_ID_ATTR}="2">
+        <span ${DOM_ID_ATTR}="3.0">
+          <b><!---t0-->Ciao<!---/--> <!---t1-->Alice<!---/--></b>
+          <span ${DOM_ID_ATTR}="3.0/0">
+            <b><!---t0-->Ciao<!---/--> <!---t1-->Alice1b<!---/--></b>
+          </span>` +
+          `<span ${DOM_ID_ATTR}="3.0/1">
+            <b><!---t0-->Ciao<!---/--> <!---t1-->Alice2b<!---/--></b>
+          </span>` +
+        `</span>` +
+        `<span ${DOM_ID_ATTR}="3">
+          <b><!---t0-->Ciao<!---/--> <!---t1-->Bob<!---/--></b>
+        </span>
+      </body>
+      </html>`)
+    );
+
+    body.proxy['data'] = {
+      list: [
+        { name: 'Alice', list: [
+          { name: 'Alice1b' },
+          { name: 'Alice2b' },
+        ] }
+      ]
+    };
+    assert.equal(countScopes(page), 6);
+    assert.equal(countScopes(page, s => s.dom.tagName === 'SPAN'), 3);
+    assert.equal(
+      normalizeText(page.getMarkup()),
+      normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>
+      <body ${DOM_ID_ATTR}="2">
+        <span ${DOM_ID_ATTR}="3">
+          <b><!---t0-->Ciao<!---/--> <!---t1-->Alice<!---/--></b>
+          <span ${DOM_ID_ATTR}="3/0">
+            <b><!---t0-->Ciao<!---/--> <!---t1-->Alice1b<!---/--></b>
+          </span>` +
+          `<span ${DOM_ID_ATTR}="3/1">
+            <b><!---t0-->Ciao<!---/--> <!---t1-->Alice2b<!---/--></b>
+          </span>` +
+        `</span>
+      </body>
+      </html>`)
+    );
   });
 });
 
