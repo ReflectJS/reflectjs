@@ -55,14 +55,14 @@ describe('client: client-impl', async () => {
     const page = loadClientPage(win);
     assert.equal(
       page.doc.getElementById('content')?.innerHTML?.trim(),
-      `<li data-reflectjs="4.0"><!---t0-->1<!---/--></li>` +
-      `<li data-reflectjs="4.1"><!---t0-->2<!---/--></li>` +
+      `<li data-reflectjs="4|0"><!---t0-->1<!---/--></li>` +
+      `<li data-reflectjs="4|1"><!---t0-->2<!---/--></li>` +
       `<li data-reflectjs="4"><!---t0-->3<!---/--></li>`
     );
     page.root.proxy['body']['content']['item']['data'] = ['a', 'b'];
     assert.equal(
       page.doc.getElementById('content')?.innerHTML?.trim(),
-      `<li data-reflectjs="4.0"><!---t0-->a<!---/--></li>` +
+      `<li data-reflectjs="4|0"><!---t0-->a<!---/--></li>` +
       `<li data-reflectjs="4"><!---t0-->b<!---/--></li>`
     );
   });
@@ -74,14 +74,14 @@ describe('client: client-impl', async () => {
     const page = await loadPage(html);
     assert.equal(
       page.doc.getElementById('content')?.innerHTML?.trim(),
-      `<li data-reflectjs="4.0"><!---t0-->1<!---/--></li>` +
-      `<li data-reflectjs="4.1"><!---t0-->2<!---/--></li>` +
+      `<li data-reflectjs="4|0"><!---t0-->1<!---/--></li>` +
+      `<li data-reflectjs="4|1"><!---t0-->2<!---/--></li>` +
       `<li data-reflectjs="4"><!---t0-->3<!---/--></li>`
     );
     page.root.proxy['body']['content']['item']['data'] = ['a', 'b'];
     assert.equal(
       page.doc.getElementById('content')?.innerHTML?.trim(),
-      `<li data-reflectjs="4.0"><!---t0-->a<!---/--></li>` +
+      `<li data-reflectjs="4|0"><!---t0-->a<!---/--></li>` +
       `<li data-reflectjs="4"><!---t0-->b<!---/--></li>`
     );
   });
@@ -104,8 +104,8 @@ describe('client: client-impl', async () => {
     const page = await loadPage(html);
     assert.equal(
       page.doc.getElementById('content')?.innerHTML.replace(/\s+/g, ' '),
-      ` <li data-reflectjs="4.0"> <!---t0-->a<!---/--> (<!---t1-->1<!---/-->) </li>` +
-      `<li data-reflectjs="4.1"> <!---t0-->b<!---/--> (<!---t1-->3<!---/-->) </li>` +
+      ` <li data-reflectjs="4|0"> <!---t0-->a<!---/--> (<!---t1-->1<!---/-->) </li>` +
+      `<li data-reflectjs="4|1"> <!---t0-->b<!---/--> (<!---t1-->3<!---/-->) </li>` +
       `<li data-reflectjs="4"> <!---t0-->c<!---/--> (<!---t1-->0<!---/-->) </li> `
     );
     page.root.proxy['body']['content']['item']['data'] = [
@@ -114,7 +114,7 @@ describe('client: client-impl', async () => {
     ];
     assert.equal(
       page.doc.getElementById('content')?.innerHTML.replace(/\s+/g, ' '),
-      ` <li data-reflectjs="4.0"> <!---t0-->a<!---/--> (<!---t1-->1<!---/-->) </li>` +
+      ` <li data-reflectjs="4|0"> <!---t0-->a<!---/--> (<!---t1-->1<!---/-->) </li>` +
       `<li data-reflectjs="4"> <!---t0-->b<!---/--> (<!---t1-->3<!---/-->) </li> `
     );
   });

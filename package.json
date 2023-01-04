@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "npm run build && mocha --exit -r ts-node/register test/**/*.test.ts",
+    "serve-roundtrip-tests": "cd test/client/roundtrip && ts-node ../../../src/index.ts",
     "coverage": "nyc npm run test && coverage-badges --output res/coverage-badge.svg",
     "build": "tsc && browserify dist/client/client-main.js -o dist/client.js"
   },

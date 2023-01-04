@@ -79,7 +79,7 @@ describe('runtime: scope', () => {
       normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
       <head ${DOM_ID_ATTR}="1"></head>
       <body ${DOM_ID_ATTR}="2">
-        <span ${DOM_ID_ATTR}="3.0"><!---t0-->Hello<!---/--> <!---t1-->Alice<!---/--></span>` +
+        <span ${DOM_ID_ATTR}="3|0"><!---t0-->Hello<!---/--> <!---t1-->Alice<!---/--></span>` +
         `<span ${DOM_ID_ATTR}="3"><!---t0-->Hello<!---/--> <!---t1-->Alice<!---/--></span>
       </body>
       </html>`)
@@ -92,7 +92,7 @@ describe('runtime: scope', () => {
       normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
       <head ${DOM_ID_ATTR}="1"></head>
       <body ${DOM_ID_ATTR}="2">
-        <span ${DOM_ID_ATTR}="3.0"><!---t0-->Hi<!---/--> <!---t1-->Alice<!---/--></span>` +
+        <span ${DOM_ID_ATTR}="3|0"><!---t0-->Hi<!---/--> <!---t1-->Alice<!---/--></span>` +
         `<span ${DOM_ID_ATTR}="3"><!---t0-->Hi<!---/--> <!---t1-->Alice<!---/--></span>
       </body>
       </html>`)
@@ -104,7 +104,7 @@ describe('runtime: scope', () => {
       normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
       <head ${DOM_ID_ATTR}="1"></head>
       <body ${DOM_ID_ATTR}="2">
-        <span ${DOM_ID_ATTR}="3.0"><!---t0-->Hi<!---/--> <!---t1-->Bob<!---/--></span>` +
+        <span ${DOM_ID_ATTR}="3|0"><!---t0-->Hi<!---/--> <!---t1-->Bob<!---/--></span>` +
         `<span ${DOM_ID_ATTR}="3"><!---t0-->Hi<!---/--> <!---t1-->Alice<!---/--></span>
       </body>
       </html>`)
@@ -172,8 +172,8 @@ describe('runtime: scope', () => {
       normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
       <head ${DOM_ID_ATTR}="1"></head>
       <body ${DOM_ID_ATTR}="2">
-        <span ${DOM_ID_ATTR}="3.0"><!---t0-->Hello<!---/--> <!---t1-->Alice<!---/--></span>` +
-        `<span ${DOM_ID_ATTR}="3.1"><!---t0-->Hello<!---/--> <!---t1-->Bob<!---/--></span>` +
+        <span ${DOM_ID_ATTR}="3|0"><!---t0-->Hello<!---/--> <!---t1-->Alice<!---/--></span>` +
+        `<span ${DOM_ID_ATTR}="3|1"><!---t0-->Hello<!---/--> <!---t1-->Bob<!---/--></span>` +
         `<span ${DOM_ID_ATTR}="3"><!---t0-->Hello<!---/--> <!---t1-->Charles<!---/--></span>
       </body>
       </html>`)
@@ -190,7 +190,7 @@ describe('runtime: scope', () => {
       normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
       <head ${DOM_ID_ATTR}="1"></head>
       <body ${DOM_ID_ATTR}="2">
-        <span ${DOM_ID_ATTR}="3.0"><!---t0-->Hello<!---/--> <!---t1-->Alice<!---/--></span>` +
+        <span ${DOM_ID_ATTR}="3|0"><!---t0-->Hello<!---/--> <!---t1-->Alice<!---/--></span>` +
         `<span ${DOM_ID_ATTR}="3"><!---t0-->Hello<!---/--> <!---t1-->Bob<!---/--></span>
       </body>
       </html>`)
@@ -207,7 +207,7 @@ describe('runtime: scope', () => {
       normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
       <head ${DOM_ID_ATTR}="1"></head>
       <body ${DOM_ID_ATTR}="2">
-        <span ${DOM_ID_ATTR}="3.0"><!---t0-->Hi<!---/--> <!---t1-->Alice<!---/--></span>` +
+        <span ${DOM_ID_ATTR}="3|0"><!---t0-->Hi<!---/--> <!---t1-->Alice<!---/--></span>` +
         `<span ${DOM_ID_ATTR}="3"><!---t0-->Hi<!---/--> <!---t1-->Bob<!---/--></span>
       </body>
       </html>`)
@@ -327,7 +327,7 @@ describe('runtime: scope', () => {
       <body ${DOM_ID_ATTR}="2">
         <span ${DOM_ID_ATTR}="3">
           <b><!---t0-->Hello<!---/--> <!---t1-->Alice<!---/--></b>
-          <span ${DOM_ID_ATTR}="4.0">
+          <span ${DOM_ID_ATTR}="4|0">
             <b><!---t0-->Hello<!---/--> <!---t1-->Alice1<!---/--></b>
           </span>` +
           `<span ${DOM_ID_ATTR}="4">
@@ -389,7 +389,7 @@ describe('runtime: scope', () => {
       normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
       <head ${DOM_ID_ATTR}="1"></head>
       <body ${DOM_ID_ATTR}="2">
-        <span ${DOM_ID_ATTR}="3.0">
+        <span ${DOM_ID_ATTR}="3|0">
           <b><!---t0-->Hello<!---/--> <!---t1-->Alice<!---/--></b>
           <span ${DOM_ID_ATTR}="4">
             <b><!---t0-->Hello<!---/--> <!---t1--><!---/--></b>
@@ -397,7 +397,7 @@ describe('runtime: scope', () => {
         </span>` +
         `<span ${DOM_ID_ATTR}="3">
           <b><!---t0-->Hello<!---/--> <!---t1-->Bob<!---/--></b>
-          <span ${DOM_ID_ATTR}="4.0">
+          <span ${DOM_ID_ATTR}="4|0">
             <b><!---t0-->Hello<!---/--> <!---t1-->Bob1<!---/--></b>
           </span>` +
           `<span ${DOM_ID_ATTR}="4">
@@ -459,9 +459,9 @@ describe('runtime: scope', () => {
       normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
       <head ${DOM_ID_ATTR}="1"></head>
       <body ${DOM_ID_ATTR}="2">
-        <span ${DOM_ID_ATTR}="3.0">
+        <span ${DOM_ID_ATTR}="3|0">
           <b><!---t0-->Hello<!---/--> <!---t1-->Alice<!---/--></b>
-          <span ${DOM_ID_ATTR}="4.0">
+          <span ${DOM_ID_ATTR}="4|0">
             <b><!---t0-->Hello<!---/--> <!---t1-->Alice1<!---/--></b>
           </span>` +
           `<span ${DOM_ID_ATTR}="4">
@@ -586,7 +586,7 @@ describe('runtime: scope', () => {
       normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
       <head ${DOM_ID_ATTR}="1"></head>
       <body ${DOM_ID_ATTR}="2">
-        <span ${DOM_ID_ATTR}="3.0">
+        <span ${DOM_ID_ATTR}="3|0">
           <b><!---t0-->Hi<!---/--> <!---t1-->Alice<!---/--></b>
         </span>` +
         `<span ${DOM_ID_ATTR}="3">
@@ -612,12 +612,12 @@ describe('runtime: scope', () => {
       normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
       <head ${DOM_ID_ATTR}="1"></head>
       <body ${DOM_ID_ATTR}="2">
-        <span ${DOM_ID_ATTR}="3.0">
+        <span ${DOM_ID_ATTR}="3|0">
           <b><!---t0-->Hi<!---/--> <!---t1-->Alice<!---/--></b>
-          <span ${DOM_ID_ATTR}="3.0/0">
+          <span ${DOM_ID_ATTR}="3|0/0">
             <b><!---t0-->Hi<!---/--> <!---t1-->Alice1<!---/--></b>
           </span>` +
-          `<span ${DOM_ID_ATTR}="3.0/1">
+          `<span ${DOM_ID_ATTR}="3|0/1">
             <b><!---t0-->Hi<!---/--> <!---t1-->Alice2<!---/--></b>
           </span>` +
         `</span>` +
@@ -644,12 +644,12 @@ describe('runtime: scope', () => {
       normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
       <head ${DOM_ID_ATTR}="1"></head>
       <body ${DOM_ID_ATTR}="2">
-        <span ${DOM_ID_ATTR}="3.0">
+        <span ${DOM_ID_ATTR}="3|0">
           <b><!---t0-->Hi<!---/--> <!---t1-->Alice<!---/--></b>
-          <span ${DOM_ID_ATTR}="3.0/0">
+          <span ${DOM_ID_ATTR}="3|0/0">
             <b><!---t0-->Hi<!---/--> <!---t1-->Alice1b<!---/--></b>
           </span>` +
-          `<span ${DOM_ID_ATTR}="3.0/1">
+          `<span ${DOM_ID_ATTR}="3|0/1">
             <b><!---t0-->Hi<!---/--> <!---t1-->Alice2b<!---/--></b>
           </span>` +
         `</span>` +
@@ -668,12 +668,12 @@ describe('runtime: scope', () => {
       normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
       <head ${DOM_ID_ATTR}="1"></head>
       <body ${DOM_ID_ATTR}="2">
-        <span ${DOM_ID_ATTR}="3.0">
+        <span ${DOM_ID_ATTR}="3|0">
           <b><!---t0-->Ciao<!---/--> <!---t1-->Alice<!---/--></b>
-          <span ${DOM_ID_ATTR}="3.0/0">
+          <span ${DOM_ID_ATTR}="3|0/0">
             <b><!---t0-->Ciao<!---/--> <!---t1-->Alice1b<!---/--></b>
           </span>` +
-          `<span ${DOM_ID_ATTR}="3.0/1">
+          `<span ${DOM_ID_ATTR}="3|0/1">
             <b><!---t0-->Ciao<!---/--> <!---t1-->Alice2b<!---/--></b>
           </span>` +
         `</span>` +
