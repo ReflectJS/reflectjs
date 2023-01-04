@@ -49,6 +49,7 @@ export class Scope {
     this.values = this.initValues();
     this.proxy = new Proxy<any>(this.values, this.proxyHandler);
     !cloned && this.collectClones();
+    this.collectRecursions();
     if (parent) {
       parent.children.push(this);
       if (props.name && !cloned) {
@@ -346,29 +347,19 @@ export class Scope {
     }
   }
 
-  // collectRecursions() {
-  //   const prefix = this.props.id + '/';
-  //   Array.from(this.dom.children).forEach(e => {
-  //     if (e.getAttribute(pg.DOM_ID_ATTR)?.startsWith(prefix)) {
-
-  //     }
-  //   });
-
-  //   let e = this.dom.previousElementSibling, s;
-  //   if (!e || !e.getAttribute(pg.DOM_ID_ATTR)?.startsWith(prefix)) {
-  //     return;
-  //   }
-  //   const preflen = prefix.length;
-  //   while (e && (s = e.getAttribute(pg.DOM_ID_ATTR)) !== null && s.startsWith(prefix)) {
-  //     const id = e.getAttribute(pg.DOM_ID_ATTR) as string;
-  //     const i2 = id?.indexOf('.', preflen);//TODO: rather than looking for '.' we should stop at the first non number
-  //     const nr = parseInt(id.substring(preflen, (i2 >= 0 ? i2 : undefined)));
-  //     const clone = this.clone(nr, e);
-  //     clone.unlinkValues();
-  //     clone.relinkValues();
-  //     e = e.previousElementSibling;
-  //   }
-  // }
+  collectRecursions() {
+    const prefix = this.props.id + '/';
+    const preflen = prefix.length;
+    Array.from(this.dom.children).forEach(e => {
+      if (e.getAttribute(pg.DOM_ID_ATTR)?.startsWith(prefix)) {
+        const id = e.getAttribute(pg.DOM_ID_ATTR) as string;
+        const nr = parseInt(id.substring(preflen));
+        const recursion = this.recurse(nr, this, e);
+        recursion.unlinkValues();
+        recursion.relinkValues();
+      }
+    });
+  }
 
   // ---------------------------------------------------------------------------
   // replication

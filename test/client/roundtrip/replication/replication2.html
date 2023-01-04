@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html :test=[[() => {
+  const e = document.getElementById('content');
+  const s = e.textContent.replace(/\s+/g, ' ').trim();
+  return (s === 'root a a1 a2 b c' ? 'OK' : s);
+}]]>
+  <head>
+    <style>
+      div#content > ul {
+        display: contents;
+      }
+      div#content > ul > li {
+        display: none;
+      }
+    </style>
+  </head>
+  <body :data=[[{
+    name: 'root',
+    list: [
+      { name: 'a', list: [
+        { name: 'a1' },
+        { name: 'a2' },
+      ] },
+      { name: 'b' },
+      { name: 'c', list: [
+      ] },
+    ]
+  }]]>
+    <div id="content">
+      <ul :data=[[data]] :recurseOn=[[data.list]]>
+        <li><span>[[data.name]]</span></li>
+      </ul>
+    </div>
+  </body>
+</html>
