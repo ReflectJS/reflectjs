@@ -479,7 +479,7 @@ describe('runtime: scope', () => {
     );
   });
 
-  it('should support recursive replication', () => {
+  it('should support nested replication', () => {
     const page = baseApp(`<html ${DOM_ID_ATTR}="0">
       <head ${DOM_ID_ATTR}="1"></head>
       <body ${DOM_ID_ATTR}="2">
@@ -506,7 +506,7 @@ describe('runtime: scope', () => {
         id: '3',
         name: 'theSpan',
         values: {
-          recurseOn: { val: null, fn: function() { return this.data.list; }, refs: ['data'] },
+          nestFor: { val: null, fn: function() { return this.data.list; }, refs: ['data'] },
           data: { val: null, fn: function() { return this.__outer.data.list; }, refs: ['data'] },
           __t0: { val: null, fn: function() { return this.greeting; }, refs: ['greeting'] },
           __t1: { val: null, fn: function() { return this.data.name; }, refs: ['data'] }

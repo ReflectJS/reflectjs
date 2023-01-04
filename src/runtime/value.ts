@@ -1,5 +1,5 @@
 import { regexMap } from "../preprocessor/util";
-import { ATTR_VALUE_PREFIX, DATA_VALUE, EVENT_VALUE_PREFIX, RECURSEON_VALUE, TEXT_VALUE_PREFIX } from "./page";
+import { ATTR_VALUE_PREFIX, DATA_VALUE, EVENT_VALUE_PREFIX, NEST_VALUE, TEXT_VALUE_PREFIX } from "./page";
 import { Scope } from "./scope";
 
 export interface ValueProps {
@@ -50,8 +50,8 @@ export class Value {
         this.cb = textCB;
       } else if (key === DATA_VALUE) {
         this.cb = Scope.dataCB;
-      } else if (key === RECURSEON_VALUE) {
-        this.cb = Scope.recurseOnCB;
+      } else if (key === NEST_VALUE) {
+        this.cb = Scope.nestOnCB;
       }
     }
     this.fn = props.fn as (() => any) | undefined;

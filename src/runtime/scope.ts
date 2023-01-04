@@ -28,14 +28,14 @@ export class Scope {
   props: ScopeProps;
   children: Scope[];
   cloned?: ScopeCloning;
-  recursed?: ScopeCloning;
+  nested?: ScopeCloning;
   dom: Element;
   texts?: Node[];
   proxyHandler: ScopeProxyHandler;
   values: { [key: string]: vl.Value };
   proxy: any;
   clones?: Scope[];
-  recursions?: Scope[];
+  nestings?: Scope[];
 
   constructor(page: pg.Page, parent: Scope | null, props: ScopeProps, cloned?: ScopeCloning) {
     this.page = page;
@@ -49,7 +49,7 @@ export class Scope {
     this.values = this.initValues();
     this.proxy = new Proxy<any>(this.values, this.proxyHandler);
     !cloned && this.collectClones();
-    this.collectRecursions();
+    this.collectNestings();
     if (parent) {
       parent.children.push(this);
       if (props.name && !cloned) {
@@ -77,14 +77,14 @@ export class Scope {
       const i = clones.indexOf(this);
       i >= 0 && clones.splice(i, 1);
     }
-    if (this.recursed) {
-      const recursions = this.recursed.from.recursions ?? [];
-      const i = recursions.indexOf(this);
-      i >= 0 && recursions.splice(i, 1);
+    if (this.nested) {
+      const nestings = this.nested.from.nestings ?? [];
+      const i = nestings.indexOf(this);
+      i >= 0 && nestings.splice(i, 1);
     }
-    if (this.recursions) {
-      while (this.recursions.length > 0) {
-        this.recursions.pop()?.dispose();
+    if (this.nestings) {
+      while (this.nestings.length > 0) {
+        this.nestings.pop()?.dispose();
       }
     }
   }
@@ -104,18 +104,18 @@ export class Scope {
     return dst;
   }
 
-  recurse(nr: number, parent: Scope, dom?: Element): Scope {
+  nest(nr: number, parent: Scope, dom?: Element): Scope {
     const props = Scope.cloneProps(this.props, `/${nr}`);
-    !dom && (dom = this.recurseDom(props.id, parent));
+    !dom && (dom = this.nestDom(props.id, parent));
     if (props.values && props.values[pg.DATA_VALUE]) {
-      // recursions are generated and updated based on original scope's data;
+      // nestings are generated and updated based on original scope's data;
       // their own data value is updated by the original scope
       delete props.values[pg.DATA_VALUE].refs;
       delete props.values[pg.DATA_VALUE].fn;
     }
     const dst = this.page.load(this.parent, props, { from: this, dom: dom });
-    !this.recursions && (this.recursions = []);
-    this.recursions[nr] = dst;
+    !this.nestings && (this.nestings = []);
+    this.nestings[nr] = dst;
     return dst;
   }
 
@@ -260,7 +260,7 @@ export class Scope {
     return dst;
   }
 
-  recurseDom(id: string, parent: Scope): Element {
+  nestDom(id: string, parent: Scope): Element {
     const src = this.dom as Element;
     const srcId = src.getAttribute(pg.DOM_ID_ATTR) || '-';
     const dst = Scope.cloneElement(
@@ -347,16 +347,16 @@ export class Scope {
     }
   }
 
-  collectRecursions() {
+  collectNestings() {
     const prefix = this.props.id + '/';
     const preflen = prefix.length;
     Array.from(this.dom.children).forEach(e => {
       if (e.getAttribute(pg.DOM_ID_ATTR)?.startsWith(prefix)) {
         const id = e.getAttribute(pg.DOM_ID_ATTR) as string;
         const nr = parseInt(id.substring(preflen));
-        const recursion = this.recurse(nr, this, e);
-        recursion.unlinkValues();
-        recursion.relinkValues();
+        const nesting = this.nest(nr, this, e);
+        nesting.unlinkValues();
+        nesting.relinkValues();
       }
     });
   }
@@ -412,19 +412,19 @@ export class Scope {
   }
 
   // ---------------------------------------------------------------------------
-  // recursion (recursive replication)
+  // nesting
   // ---------------------------------------------------------------------------
 
-  static recurseOnCB(v: vl.Value) {
+  static nestOnCB(v: vl.Value) {
     const that = v.scope as Scope;
     if (!Array.isArray(v.props.val) || !v.scope) {
-      if (that.recursions && that.recursions.length > 0) {
-        that.removeExcessRecursions(0);
+      if (that.nestings && that.nestings.length > 0) {
+        that.removeExcessNestings(0);
       }
       return;
     }
     // value is an array
-    if (that.recursed) {
+    if (that.nested) {
       // clones ignore array data
       v.props.val = null;
       return;
@@ -432,28 +432,28 @@ export class Scope {
     const vv: any[] = v.props.val;
     const offset = 0, length = vv.length;
     let ci = 0, di = offset;
-    !that.recursions && (that.recursions = []);
-    // create/update recursions
+    !that.nestings && (that.nestings = []);
+    // create/update nestings
     for (; di < (offset + length); ci++, di++) {
       const vi = vv[di];
-      if (ci < that.recursions.length) {
+      if (ci < that.nestings.length) {
         // update
-        that.recursions[ci].proxy[pg.DATA_VALUE] = vi;
+        that.nestings[ci].proxy[pg.DATA_VALUE] = vi;
       } else {
         // create
-        const recursion = that.recurse(ci, v.scope);
-        recursion.values[pg.DATA_VALUE].props.val = vi;
-        that.page.refresh(recursion);
+        const nesting = that.nest(ci, v.scope);
+        nesting.values[pg.DATA_VALUE].props.val = vi;
+        that.page.refresh(nesting);
       }
     }
-    // remove excess recursions
-    that.removeExcessClones(Math.max(0, length));
+    // remove excess nestings
+    that.removeExcessNestings(Math.max(0, length));
   }
 
-  removeExcessRecursions(maxCount: number) {
-    if (this.recursions) {
-      while (this.recursions.length > maxCount) {
-        this.recursions.pop()?.dispose();
+  removeExcessNestings(maxCount: number) {
+    if (this.nestings) {
+      while (this.nestings.length > maxCount) {
+        this.nestings.pop()?.dispose();
       }
     }
   }
