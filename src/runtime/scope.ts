@@ -113,7 +113,7 @@ export class Scope {
       delete props.values[pg.DATA_VALUE].refs;
       delete props.values[pg.DATA_VALUE].fn;
     }
-    const dst = this.page.load(this.parent, props, { from: this, dom: dom });
+    const dst = this.page.load(parent, props, { from: this, dom: dom });
     !this.nestings && (this.nestings = []);
     this.nestings[nr] = dst;
     return dst;
@@ -191,6 +191,10 @@ export class Scope {
       const props = (this.props.values as any)[key];
       ret[key as string] = new vl.Value(key as string, props, this);
     });
+    ret[pg.DOM_VALUE] = new vl.Value(pg.DOM_VALUE, {
+      val: this.dom,
+      passive: true
+    }, this);
     return ret;
   }
 
@@ -268,7 +272,10 @@ export class Scope {
       e => !(e.getAttribute(pg.DOM_ID_ATTR) || '').startsWith(srcId)
     );
     dst.setAttribute(pg.DOM_ID_ATTR, id);
-    parent.dom.appendChild(dst);
+    const nestInValue = this.values[pg.NESTIN_VALUE];
+    const nestIn = (nestInValue ? nestInValue.props.val : null);
+    const domParent: Element = (nestIn ? parent.dom.querySelector(nestIn) : parent.dom);
+    domParent && domParent.appendChild(dst);
     return dst;
   }
 
@@ -350,15 +357,20 @@ export class Scope {
   collectNestings() {
     const prefix = this.props.id + '/';
     const preflen = prefix.length;
-    Array.from(this.dom.children).forEach(e => {
-      if (e.getAttribute(pg.DOM_ID_ATTR)?.startsWith(prefix)) {
-        const id = e.getAttribute(pg.DOM_ID_ATTR) as string;
-        const nr = parseInt(id.substring(preflen));
-        const nesting = this.nest(nr, this, e);
-        nesting.unlinkValues();
-        nesting.relinkValues();
-      }
-    });
+    const nestInValue = this.values[pg.NESTIN_VALUE];
+    const nestIn = (nestInValue ? nestInValue.props.val : null);
+    const domParent: Element = (nestIn ? this.dom.querySelector(nestIn) : this.dom);
+    if (domParent) {
+      Array.from(domParent.children).forEach(e => {
+        if (e.getAttribute(pg.DOM_ID_ATTR)?.startsWith(prefix)) {
+          const id = e.getAttribute(pg.DOM_ID_ATTR) as string;
+          const nr = parseInt(id.substring(preflen));
+          const nesting = this.nest(nr, this, e);
+          nesting.unlinkValues();
+          nesting.relinkValues();
+        }
+      });
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -415,7 +427,7 @@ export class Scope {
   // nesting
   // ---------------------------------------------------------------------------
 
-  static nestOnCB(v: vl.Value) {
+  static nestForCB(v: vl.Value) {
     const that = v.scope as Scope;
     if (!Array.isArray(v.props.val) || !v.scope) {
       if (that.nestings && that.nestings.length > 0) {

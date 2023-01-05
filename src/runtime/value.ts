@@ -1,5 +1,5 @@
 import { regexMap } from "../preprocessor/util";
-import { ATTR_VALUE_PREFIX, DATA_VALUE, EVENT_VALUE_PREFIX, NEST_VALUE, TEXT_VALUE_PREFIX } from "./page";
+import * as pg from "./page";
 import { Scope } from "./scope";
 
 export interface ValueProps {
@@ -32,26 +32,26 @@ export class Value {
         props._origVal = props.val;
         props.val = (...args: any[]) => proxy(...args);
       }
-      if (key.startsWith(ATTR_VALUE_PREFIX)) {
-        this.key = camelToHyphen(key.substring(ATTR_VALUE_PREFIX.length));
+      if (key.startsWith(pg.ATTR_VALUE_PREFIX)) {
+        this.key = camelToHyphen(key.substring(pg.ATTR_VALUE_PREFIX.length));
         this.dom = scope.dom;
         this.cb = attrCB;
-      } else if (key.startsWith(EVENT_VALUE_PREFIX)) {
-        this.key = key.substring(EVENT_VALUE_PREFIX.length);
+      } else if (key.startsWith(pg.EVENT_VALUE_PREFIX)) {
+        this.key = key.substring(pg.EVENT_VALUE_PREFIX.length);
         this.dom = scope.dom;
         //TODO:
         // 1) value keys are passed through hyphenToCamel()
         // 2) events may use both hypenized and camelized names
         // 3) we need to add ValueProps.key w/ uncamelized name
         this.dom.addEventListener(this.key, (ev) => props.val(ev));
-      } else if (key.startsWith(TEXT_VALUE_PREFIX)) {
-        const i = parseInt(key.substring(TEXT_VALUE_PREFIX.length));
+      } else if (key.startsWith(pg.TEXT_VALUE_PREFIX)) {
+        const i = parseInt(key.substring(pg.TEXT_VALUE_PREFIX.length));
         this.dom = scope.texts ? scope.texts[i] : undefined;
         this.cb = textCB;
-      } else if (key === DATA_VALUE) {
+      } else if (key === pg.DATA_VALUE) {
         this.cb = Scope.dataCB;
-      } else if (key === NEST_VALUE) {
-        this.cb = Scope.nestOnCB;
+      } else if (key === pg.NESTFOR_VALUE) {
+        this.cb = Scope.nestForCB;
       }
     }
     this.fn = props.fn as (() => any) | undefined;
