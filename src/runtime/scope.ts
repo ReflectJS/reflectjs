@@ -157,7 +157,20 @@ export class Scope {
 
   collectTextNodes() {
     const ret: Node[] = [];
-    const f = (p: Element) => {
+    const collect = (p: Element) => {
+      const textId = p.getAttribute(pg.DOM_TEXTID_ATTR);
+      if (textId) {
+        // this is a "dynamic-text-only" tag, e.g. a <style>
+        if (p.childNodes.length != 1 || !p.firstChild || p.firstChild.nodeType !== pg.TEXT_NODE) {
+          while (p.firstChild) {
+            p.firstChild.remove();
+          }
+          p.appendChild(p.ownerDocument.createTextNode(''));
+        }
+        const i = parseInt(textId);
+        ret[i] = p.firstChild as Node;
+        return;
+      }
       p.childNodes.forEach(n => {
         if (
           n.nodeType === p.COMMENT_NODE &&
@@ -172,12 +185,12 @@ export class Scope {
           ret[i] = t as Node;
         } else if (n.nodeType === p.ELEMENT_NODE) {
           if (!(n as Element).hasAttribute(pg.DOM_ID_ATTR)) {
-            f(n as Element);
+            collect(n as Element);
           }
         }
       });
     }
-    f(this.dom);
+    collect(this.dom);
     return ret.length > 0 ? ret : undefined;
   }
 

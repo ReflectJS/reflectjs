@@ -76,7 +76,12 @@ function loadScope(e: HtmlElement, errors: PageError[]): ScopeProps {
         }
       } else if (n.nodeType === TEXT_NODE) {
         if (isDynamic((n as HtmlText).nodeValue)) {
-          loadTexts(n as HtmlText, values, errors);
+          if (p.tagName !== 'STYLE') {
+            loadTexts(n as HtmlText, values, errors);
+          } else {
+            const textId = loadText(n as HtmlText, values, errors);
+            p.setAttribute(page.DOM_TEXTID_ATTR, `${textId}`);
+          }
         }
       }
     });
@@ -147,6 +152,16 @@ function loadTexts(t: HtmlText, ret: Map<string, ValueProps>, errors: PageError[
   }
   
   t.nodeValue = (i2b < s.length ? s.substring(i2b) : '');
+}
+
+function loadText(t: HtmlText, ret: Map<string, ValueProps>, errors: PageError[]) {
+  // const expr = preprocess(t.nodeValue);//TODO: t.pos
+  const id = ret.size;
+  ret.set(page.TEXT_VALUE_PREFIX + id, {
+    val: t.nodeValue
+  });
+  t.nodeValue = '';
+  return id;
 }
 
 export function hyphenToCamel(s: string) {

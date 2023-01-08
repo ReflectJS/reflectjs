@@ -125,6 +125,48 @@ describe("compiler: page-compiler", () => {
     );
   });
 
+  it(`dynamic text in style tag`, async () => {
+    const doc = await getDoc(pre, `<html>\n` +
+      `<head>\n` +
+        `<style>\n` +
+          `body {\n` +
+            `color: [[fg]];\n` +
+            `background: [[bg]];\n` +
+            `margin: [[mgPx]]px;\n` +
+          `}\n` +
+        `</style>\n` +
+      `</head>\n` +
+      `<body></body>\n` +
+    `</html>`);
+    const { js, errors } = compileDoc(doc);
+    assert.equal(errors.length, 0);
+    assert.equal(
+      doc.toString(),
+      `<html ${DOM_ID_ATTR}="0">\n` +
+      `<head ${DOM_ID_ATTR}="1">\n<style data-reflectjs-text="0"></style>\n</head>\n` +
+      `<body ${DOM_ID_ATTR}="2"></body>\n` +
+      `</html>`
+    );
+    assert.equal(
+      normalizeSpace(js),
+      normalizeSpace(`{ root: {
+        id: '0', name: 'page',
+        children: [
+          { id: '1', name: 'head', values: {
+            __t0: {
+              fn: function () {
+                return '\\nbody {\\ncolor: ' + this.__nn(this.fg) + ';\\nbackground: ' + this.__nn(this.bg) + ';\\nmargin: ' + this.__nn(this.mgPx) + 'px;\\n}\\n';
+              },
+              val: null,
+              refs: [ 'fg', 'bg', 'mgPx' ]
+            }
+          } },
+          { id: '2', name: 'body' }
+        ]
+      } }`)
+    );
+  });
+
 });
 
 // =============================================================================

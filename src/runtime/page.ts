@@ -9,6 +9,7 @@ export const LOGIC_ATTR_PREFIX = ':';
 export const AKA_ATTR = LOGIC_ATTR_PREFIX + 'aka';
 
 export const DOM_ID_ATTR = 'data-reflectjs';
+export const DOM_TEXTID_ATTR = 'data-reflectjs-text';
 export const PROPS_SCRIPT_ID = 'reflectjs-props';
 export const PROPS_JS_ID = 'reflectjs_props';
 export const PAGE_JS_ID = 'reflectjs_page';
@@ -62,6 +63,7 @@ export interface PageProps {
     this.dom = dom;
     this.props = props;
     this.globals = new Map<string, Value>();
+    this.setGlobal(NOTNULL_FN, (v: any) => v != null ? `${v}` : '');
     this.setGlobal('window', win);
     this.setGlobal('document', this.doc);
     this.root = this.load(null, props.root);

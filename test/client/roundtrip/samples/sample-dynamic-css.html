@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html :test="[[() => {
+  const s = window.getComputedStyle(document.body).backgroundColor;
+  return s === 'blue' ? 'OK' : s;
+}]]">
+  <head :bg="blue">
+    <style>
+      body {
+        background: [[bg]];
+      }
+    </style>
+  </head>
+</html>

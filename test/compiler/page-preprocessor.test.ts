@@ -265,6 +265,44 @@ describe("compiler: page-preprocessor", () => {
     assert.deepEqual(props, expected);
   });
 
+  it(`should collect dynamic text in style tags`, async () => {
+    const doc = await getDoc(pre, `<html>
+      <head>
+        <style>\n` +
+          `body {\n` +
+            `color: [[fg]];\n` +
+            `background: [[bg]];\n` +
+            `margin: [[mgPx]]px;\n` +
+          `}\n` +
+        `</style>
+      </head>
+      <body></body>
+    </html>`);
+    const { props, errors } = loadPage(doc);
+    assert.equal(errors.length, 0);
+    assert.equal(
+      normalizeText(doc.toString()),
+      normalizeText(`<html ${DOM_ID_ATTR}="0">
+        <head ${DOM_ID_ATTR}="1">
+          <style data-reflectjs-text="0"></style>
+        </head>
+        <body ${DOM_ID_ATTR}="2"></body>
+      </html>`)
+    );
+    const expected: PageProps = {
+      root: {
+        id: '0', name: 'page',
+        children: [
+          { id: '1', name: 'head', values: {
+            __t0: { val: '\nbody {\ncolor: [[fg]];\nbackground: [[bg]];\nmargin: [[mgPx]]px;\n}\n' }
+          } },
+          { id: '2', name: 'body' }
+        ]
+      }
+    }
+    assert.deepEqual(props, expected);
+  });
+
   it(`dynamic texts should use closest outer scope`, async () => {
     const doc = await getDoc(pre, `<html>
       <body>
