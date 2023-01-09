@@ -84,7 +84,7 @@ describe("compiler: expr-preprocessor", () => {
   it("should prepare complex class expression", () => {
     assert.equal(
       preprocess(`btn btn-[[outline ? 'outline-' : '']][[type]][[nowrap ? ' text-nowrap' : '']][[size ? ' btn-'+size : '']]`).src,
-      `'btn btn-'+__nn(outline ? 'outline-' : '')+__nn(type)+__nn(nowrap ? ' text-nowrap' : '')+__nn(size ? ' btn-'+size : '')`
+      `'btn btn-'+___nn(outline ? 'outline-' : '')+___nn(type)+___nn(nowrap ? ' text-nowrap' : '')+___nn(size ? ' btn-'+size : '')`
     );
   });
 

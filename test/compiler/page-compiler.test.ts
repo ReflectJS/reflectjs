@@ -155,7 +155,7 @@ describe("compiler: page-compiler", () => {
           { id: '1', name: 'head', values: {
             __t0: {
               fn: function () {
-                return '\\nbody {\\ncolor: ' + this.__nn(this.fg) + ';\\nbackground: ' + this.__nn(this.bg) + ';\\nmargin: ' + this.__nn(this.mgPx) + 'px;\\n}\\n';
+                return '\\nbody {\\ncolor: ' + this.___nn(this.fg) + ';\\nbackground: ' + this.___nn(this.bg) + ';\\nmargin: ' + this.___nn(this.mgPx) + 'px;\\n}\\n';
               },
               val: null,
               refs: [ 'fg', 'bg', 'mgPx' ]

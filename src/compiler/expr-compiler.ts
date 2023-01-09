@@ -1,6 +1,6 @@
 import estraverse from "estraverse";
 import * as es from "estree";
-import { OUTER_PROPERTY, RESERVED_PREFIX } from "../runtime/page";
+import { OUTER_PROPERTY, RESERVED_PASSIVE_PREFIX } from "../runtime/page";
 
 export function checkFunctionKind(script: es.Program): string | null {
   if (script.body.length === 1 && script.body[0].type === 'ExpressionStatement') {
@@ -145,7 +145,7 @@ function qualifyIdentifiers(
           return;
         }
         //TODO: exclude function parameters?
-        if (!node.name.startsWith(RESERVED_PREFIX)) {
+        if (!node.name.startsWith(RESERVED_PASSIVE_PREFIX)) {
           references.add(node.name);
         }
         let obj: es.Node;

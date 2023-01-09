@@ -22,6 +22,7 @@ export const HEAD_SCOPE_NAME = 'head';
 export const BODY_SCOPE_NAME = 'body';
 
 export const RESERVED_PREFIX = '__';
+export const RESERVED_PASSIVE_PREFIX = RESERVED_PREFIX + '_';
 export const OUTER_PROPERTY = RESERVED_PREFIX + 'outer';
 export const ATTR_VALUE_PREFIX = 'attr_';
 export const EVENT_VALUE_PREFIX = 'on_';
@@ -37,7 +38,7 @@ export const TEXT_VALUE_PREFIX = RESERVED_PREFIX + 't';
 export const TEXT_MARKER1_PREFIX = '-t';
 export const TEXT_MARKER2 = '-/';
 
-export const NOTNULL_FN = RESERVED_PREFIX + 'nn';
+export const NOTNULL_FN = RESERVED_PASSIVE_PREFIX + 'nn';
 
 export interface PageProps {
   root: ScopeProps;
