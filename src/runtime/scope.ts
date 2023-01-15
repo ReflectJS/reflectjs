@@ -194,20 +194,40 @@ export class Scope {
     return ret.length > 0 ? ret : undefined;
   }
 
+  elementIndex(e?: Element) {
+    e || (e = this.dom);
+    const cc = e.parentElement?.children;
+    for (let i = 0; i < (cc ? cc.length : 0); i++) {
+      if ((cc as HTMLCollection).item(i) === e) {
+        return i;
+      }
+    }
+    return NaN;
+  }
+  
   // ---------------------------------------------------------------------------
   // reactivity
   // ---------------------------------------------------------------------------
 
   initValues() {
+    const that = this;
     const ret: { [key: string]: vl.Value } = {};
     Reflect.ownKeys(this.props.values ?? {}).forEach(key => {
       const props = (this.props.values as any)[key];
       ret[key as string] = new vl.Value(key as string, props, this);
     });
+    ret[pg.ID_VALUE] = new vl.Value(pg.ID_VALUE, {
+      val: this.props.id,
+      passive: true,
+    }, this);
     ret[pg.DOM_VALUE] = new vl.Value(pg.DOM_VALUE, {
       val: this.dom,
-      passive: true
+      passive: true,
     }, this);
+    // ret[pg.DOMINDEX_VALUE] = new vl.Value(pg.DOMINDEX_VALUE, {
+    //   val: NaN,
+    //   fn: function() { return that.elementIndex(); },
+    // }, this);
     return ret;
   }
 
