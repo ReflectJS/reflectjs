@@ -44,6 +44,10 @@ export class Value {
         // 2) events may use both hypenized and camelized names
         // 3) we need to add ValueProps.key w/ uncamelized name
         this.dom.addEventListener(this.key, (ev) => props.val(ev));
+      } else if (key.startsWith(pg.CLASS_VALUE_PREFIX)) {
+        this.key = camelToHyphen(key.substring(pg.CLASS_VALUE_PREFIX.length));
+        this.dom = scope.dom;
+        this.cb = classCB;
       } else if (key.startsWith(pg.TEXT_VALUE_PREFIX)) {
         const i = parseInt(key.substring(pg.TEXT_VALUE_PREFIX.length));
         this.dom = scope.texts ? scope.texts[i] : undefined;
@@ -69,6 +73,14 @@ export function attrCB(v: Value) {
     (v.dom as Element).setAttribute(v.key as string, `${v.props.val}`);
   } else {
     (v.dom as Element).removeAttribute(v.key as string);
+  }
+}
+
+export function classCB(v: Value) {
+  if (v.props.val) {
+    (v.dom as Element).classList.add(v.key as string);
+  } else {
+    (v.dom as Element).classList.remove(v.key as string);
   }
 }
 

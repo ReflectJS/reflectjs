@@ -112,7 +112,9 @@ function loadValue(
   if (key.startsWith(page.EVENT_ATTR_PREFIX)) {
     key = page.EVENT_ATTR_PREFIX + hyphenToCamel(key.substring(page.EVENT_ATTR_PREFIX.length));
   } else if (key.startsWith(page.HANDLER_ATTR_PREFIX)) {
-    key = page.HANDLER_ATTR_PREFIX + hyphenToCamel(key.substring(page.HANDLER_ATTR_PREFIX.length));
+    key = page.HANDLER_VALUE_PREFIX + hyphenToCamel(key.substring(page.HANDLER_ATTR_PREFIX.length));
+  } else if (key.startsWith(page.CLASS_ATTR_PREFIX)) {
+    key = page.CLASS_VALUE_PREFIX + hyphenToCamel(key.substring(page.CLASS_ATTR_PREFIX.length));
   } else {
     key = hyphenToCamel(key);
   }

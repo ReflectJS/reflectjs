@@ -6,6 +6,10 @@ import { addScope, baseApp, itemAt } from "./page.test";
 
 describe('runtime: scope', () => {
 
+  // ---------------------------------------------------------------------------
+  // dom
+  // ---------------------------------------------------------------------------
+
   it('should collect a DOM text', () => {
     const page = baseApp(null, props => {
       addScope(props, [1], {
@@ -35,6 +39,72 @@ describe('runtime: scope', () => {
     assert.equal(text?.nodeType, TEXT_NODE);
     assert.equal(text?.nodeValue, '');
   });
+
+  it('should support class attributes 1', () => {
+    const page = baseApp(`<html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>
+      <body ${DOM_ID_ATTR}="2" class="block">
+      </body>
+    </html>`, props => {
+      props.root.children && (props.root.children[1].values = {
+        class_highlight: { val: null, fn: function() { return false; } }
+      });
+    });
+    page.refresh();
+    assert.equal(
+      normalizeText(page.getMarkup()),
+      normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>
+      <body ${DOM_ID_ATTR}="2" class="block">
+      </body>
+      </html>`)
+    );
+    const body = page.root.children[1];
+    body.proxy['class_highlight'] = true;
+    assert.equal(
+      normalizeText(page.getMarkup()),
+      normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>
+      <body ${DOM_ID_ATTR}="2" class="block highlight">
+      </body>
+      </html>`)
+    );
+  });
+
+  it('should support class attributes 2', () => {
+    const page = baseApp(`<html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>
+      <body ${DOM_ID_ATTR}="2" class="block highlight">
+      </body>
+    </html>`, props => {
+      props.root.children && (props.root.children[1].values = {
+        class_highlight: { val: null, fn: function() { return true; } }
+      });
+    });
+    page.refresh();
+    assert.equal(
+      normalizeText(page.getMarkup()),
+      normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>
+      <body ${DOM_ID_ATTR}="2" class="block highlight">
+      </body>
+      </html>`)
+    );
+    const body = page.root.children[1];
+    body.proxy['class_highlight'] = false;
+    assert.equal(
+      normalizeText(page.getMarkup()),
+      normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>
+      <body ${DOM_ID_ATTR}="2" class="block">
+      </body>
+      </html>`)
+    );
+  });
+
+  // ---------------------------------------------------------------------------
+  // cloning
+  // ---------------------------------------------------------------------------
 
   it(`should clone and dispose`, () => {
     const page = baseApp(`<html ${DOM_ID_ATTR}="0">
@@ -134,6 +204,10 @@ describe('runtime: scope', () => {
     );
   });
 
+  // ---------------------------------------------------------------------------
+  // replication
+  // ---------------------------------------------------------------------------
+
   it('should replicate', () => {
     const page = baseApp(`<html ${DOM_ID_ATTR}="0">
       <head ${DOM_ID_ATTR}="1"></head>
@@ -213,6 +287,10 @@ describe('runtime: scope', () => {
       </html>`)
     );
   });
+
+  // ---------------------------------------------------------------------------
+  // nesting
+  // ---------------------------------------------------------------------------
 
   it('should support nested replication 1', () => {
     const page = baseApp(`<html ${DOM_ID_ATTR}="0">
@@ -714,7 +792,11 @@ describe('runtime: scope', () => {
   });
 });
 
-function countScopes(page: Page, filter?: (s: Scope) => boolean): number {
+  // ---------------------------------------------------------------------------
+  // util
+  // ---------------------------------------------------------------------------
+
+  function countScopes(page: Page, filter?: (s: Scope) => boolean): number {
   let ret = 0;
   function f(scope: Scope) {
     if (!filter || filter(scope)) {
