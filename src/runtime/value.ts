@@ -48,6 +48,10 @@ export class Value {
         this.key = camelToHyphen(key.substring(pg.CLASS_VALUE_PREFIX.length));
         this.dom = scope.dom;
         this.cb = classCB;
+      } else if (key.startsWith(pg.STYLE_VALUE_PREFIX)) {
+        this.key = camelToHyphen(key.substring(pg.STYLE_VALUE_PREFIX.length));
+        this.dom = scope.dom;
+        this.cb = styleCB;
       } else if (key.startsWith(pg.TEXT_VALUE_PREFIX)) {
         const i = parseInt(key.substring(pg.TEXT_VALUE_PREFIX.length));
         this.dom = scope.texts ? scope.texts[i] : undefined;
@@ -81,6 +85,14 @@ export function classCB(v: Value) {
     (v.dom as Element).classList.add(v.key as string);
   } else {
     (v.dom as Element).classList.remove(v.key as string);
+  }
+}
+
+export function styleCB(v: Value) {
+  if (v.props.val) {
+    (v.dom as HTMLElement).style.setProperty(v.key as string, `${v.props.val}`);
+  } else {
+    (v.dom as HTMLElement).style.removeProperty(v.key as string);
   }
 }
 

@@ -102,6 +102,68 @@ describe('runtime: scope', () => {
     );
   });
 
+  it('should support style attributes 1', () => {
+    const page = baseApp(`<html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>
+      <body ${DOM_ID_ATTR}="2">
+      </body>
+    </html>`, props => {
+      props.root.children && (props.root.children[1].values = {
+        style_backgroundColor: { val: null, fn: function() { return null; } }
+      });
+    });
+    page.refresh();
+    assert.equal(
+      normalizeText(page.getMarkup()),
+      normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>
+      <body ${DOM_ID_ATTR}="2">
+      </body>
+      </html>`)
+    );
+    const body = page.root.children[1];
+    body.proxy['style_backgroundColor'] = 'blue';
+    assert.equal(
+      normalizeText(page.getMarkup()),
+      normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>
+      <body ${DOM_ID_ATTR}="2" style="background-color: blue;">
+      </body>
+      </html>`)
+    );
+  });
+
+  it('should support style attributes 2', () => {
+    const page = baseApp(`<html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>
+      <body ${DOM_ID_ATTR}="2" style="background-color: blue;">
+      </body>
+    </html>`, props => {
+      props.root.children && (props.root.children[1].values = {
+        style_backgroundColor: { val: null, fn: function() { return 'blue'; } }
+      });
+    });
+    page.refresh();
+    assert.equal(
+      normalizeText(page.getMarkup()),
+      normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>
+      <body ${DOM_ID_ATTR}="2" style="background-color: blue;">
+      </body>
+      </html>`)
+    );
+    const body = page.root.children[1];
+    body.proxy['style_backgroundColor'] = null;
+    assert.equal(
+      normalizeText(page.getMarkup()),
+      normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>
+      <body ${DOM_ID_ATTR}="2">
+      </body>
+      </html>`)
+    );
+  });
+
   // ---------------------------------------------------------------------------
   // cloning
   // ---------------------------------------------------------------------------
