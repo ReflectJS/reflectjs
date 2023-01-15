@@ -225,9 +225,9 @@ describe(`compiler: page-samples`, () => {
   it(`sample 1 - "Augmented HTML" from aremel.org`, async () => {
     const page = (await loadTestPage(rootPath, 'sample.html', `<html>
       <body :v=[[10]]>
-        <button :on_click=[[() => v--]]>-</button>
+        <button :on-click=[[() => v--]]>-</button>
         [[v]]
-        <button :on_click=[[() => v++]]>+</button>
+        <button :on-click=[[() => v++]]>+</button>
       </body>
     </html>`)).page as Page;
     page.refresh();

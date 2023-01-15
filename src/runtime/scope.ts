@@ -224,10 +224,10 @@ export class Scope {
       val: this.dom,
       passive: true,
     }, this);
-    // ret[pg.DOMINDEX_VALUE] = new vl.Value(pg.DOMINDEX_VALUE, {
-    //   val: NaN,
-    //   fn: function() { return that.elementIndex(); },
-    // }, this);
+    ret[pg.ELEMENTINDEX_VALUE] = new vl.Value(pg.ELEMENTINDEX_VALUE, {
+      val: function(e: Element) { return that.elementIndex(e); },
+      passive: true,
+    }, this);
     return ret;
   }
 

@@ -109,8 +109,10 @@ function loadValues(e: HtmlElement, ret: Map<string, ValueProps>, errors: PageEr
 function loadValue(
   key: string, attr: HtmlAttribute, ret: Map<string, ValueProps>, errors: PageError[]
 ) {
+  let domKey = null;
   if (key.startsWith(page.EVENT_ATTR_PREFIX)) {
-    key = page.EVENT_ATTR_PREFIX + hyphenToCamel(key.substring(page.EVENT_ATTR_PREFIX.length));
+    domKey = key.substring(page.EVENT_ATTR_PREFIX.length);
+    key = page.EVENT_VALUE_PREFIX + hyphenToCamel(domKey);
   } else if (key.startsWith(page.HANDLER_ATTR_PREFIX)) {
     key = page.HANDLER_VALUE_PREFIX + hyphenToCamel(key.substring(page.HANDLER_ATTR_PREFIX.length));
   } else if (key.startsWith(page.CLASS_ATTR_PREFIX)) {
@@ -120,9 +122,11 @@ function loadValue(
   } else {
     key = hyphenToCamel(key);
   }
-  ret.set(key, {
+  const props: ValueProps = {
     val: attr.quote === '[' ? `[[${attr.value}]]` : attr.value
-  });
+  };
+  domKey && (props.domKey = domKey);
+  ret.set(key, props);
 }
 
 function loadTexts(t: HtmlText, ret: Map<string, ValueProps>, errors: PageError[]) {
@@ -169,7 +173,7 @@ function loadText(t: HtmlText, ret: Map<string, ValueProps>, errors: PageError[]
 }
 
 export function hyphenToCamel(s: string) {
-  return regexMap(/(-.)/g, s, match => {
+  return regexMap(/([\-\.].)/g, s, match => {
     return s.substring(match.index + 1, match.index + 2).toUpperCase();
   });
 }

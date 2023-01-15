@@ -40,6 +40,10 @@ describe('runtime: scope', () => {
     assert.equal(text?.nodeValue, '');
   });
 
+  // ---------------------------------------------------------------------------
+  // class attributes
+  // ---------------------------------------------------------------------------
+
   it('should support class attributes 1', () => {
     const page = baseApp(`<html ${DOM_ID_ATTR}="0">
       <head ${DOM_ID_ATTR}="1"></head>
@@ -102,6 +106,10 @@ describe('runtime: scope', () => {
     );
   });
 
+  // ---------------------------------------------------------------------------
+  // style attributes
+  // ---------------------------------------------------------------------------
+
   it('should support style attributes 1', () => {
     const page = baseApp(`<html ${DOM_ID_ATTR}="0">
       <head ${DOM_ID_ATTR}="1"></head>
@@ -162,6 +170,23 @@ describe('runtime: scope', () => {
       </body>
       </html>`)
     );
+  });
+
+  // ---------------------------------------------------------------------------
+  // event attributes
+  // ---------------------------------------------------------------------------
+
+  it('should support event attributes', () => {
+    let clickCount = 0;
+    const page = baseApp(null, props => {
+      props.root.children && (props.root.children[1].values = {
+        on_click: { val: function() { clickCount++; }, domKey: 'click' }
+      });
+    });
+    page.refresh();
+    assert.equal(clickCount, 0);
+    page.doc.body.click();
+    assert.equal(clickCount, 1);
   });
 
   // ---------------------------------------------------------------------------

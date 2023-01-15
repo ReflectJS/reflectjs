@@ -104,6 +104,9 @@ function compileValue(key: string, value: ValueProps, errors: PageError[]) {
   } else {
     dst.push(makeProperty("val", { type: "Literal", value: value.val }));
   }
+  if (value.domKey) {
+    dst.push(makeProperty("domKey", { type: "Literal", value: value.domKey }));
+  }
   return {
     type: 'ObjectExpression',
     properties: dst

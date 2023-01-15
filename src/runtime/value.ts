@@ -5,6 +5,7 @@ import { Scope } from "./scope";
 export interface ValueProps {
   val: any;
   _origVal?: any;
+  domKey?: string;
   passive?: boolean;
   fn?: (() => any) | string;
   cycle?: number;
@@ -37,12 +38,8 @@ export class Value {
         this.dom = scope.dom;
         this.cb = attrCB;
       } else if (key.startsWith(pg.EVENT_VALUE_PREFIX)) {
-        this.key = key.substring(pg.EVENT_VALUE_PREFIX.length);
+        this.key = props.domKey as string;
         this.dom = scope.dom;
-        //TODO:
-        // 1) value keys are passed through hyphenToCamel()
-        // 2) events may use both hypenized and camelized names
-        // 3) we need to add ValueProps.key w/ uncamelized name
         this.dom.addEventListener(this.key, (ev) => props.val(ev));
       } else if (key.startsWith(pg.CLASS_VALUE_PREFIX)) {
         this.key = camelToHyphen(key.substring(pg.CLASS_VALUE_PREFIX.length));

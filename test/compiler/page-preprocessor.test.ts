@@ -351,5 +351,6 @@ describe("compiler: page-preprocessor", () => {
     assert.equal(hyphenToCamel('data-dummy'), 'dataDummy');
     assert.equal(hyphenToCamel('attr_data-dummy'), 'attr_dataDummy');
     assert.equal(hyphenToCamel('attr_data-dummy-data'), 'attr_dataDummyData');
+    assert.equal(hyphenToCamel('attr_data.dummy-data'), 'attr_dataDummyData');
   });
 });
