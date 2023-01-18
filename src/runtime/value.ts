@@ -55,6 +55,8 @@ export class Value {
         this.cb = textCB;
       } else if (key === pg.DATA_VALUE) {
         this.cb = Scope.dataCB;
+      } else if (key === pg.DATA_OFFSET_VALUE || key === pg.DATA_LENGTH_VALUE) {
+        this.cb = Scope.dataWindowCB;
       } else if (key === pg.NESTFOR_VALUE) {
         this.cb = Scope.nestForCB;
       }

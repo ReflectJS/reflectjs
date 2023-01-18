@@ -123,6 +123,11 @@ export class Scope {
     return this.proxy[key];
   }
 
+  trigger(key: string) {
+    const value = this.values[key];
+    value && this.proxyHandler.trigger(value);
+  }
+
   // ---------------------------------------------------------------------------
   // dom
   // ---------------------------------------------------------------------------
@@ -425,7 +430,23 @@ export class Scope {
       return;
     }
     const vv: any[] = v.props.val;
-    const offset = 0, length = vv.length;
+
+    let offset = 0, length = vv.length;
+    try {
+      if (that.values[pg.DATA_OFFSET_VALUE]) {
+        offset = that.proxy[pg.DATA_OFFSET_VALUE] - 0;
+      }
+    } catch (ignored: any) {}
+    try {
+      if (that.values[pg.DATA_LENGTH_VALUE]) {
+        length = that.proxy[pg.DATA_LENGTH_VALUE] - 0;
+      }
+    } catch (ignored: any) {}
+    offset < 0 && (offset = 0);
+    offset > vv.length && (offset = vv.length);
+    length < 0 && (length = vv.length);
+    (offset + length) >= vv.length && (length = vv.length - offset);
+
     let ci = 0, di = offset;
     !that.clones && (that.clones = []);
     // create/update clones
@@ -445,6 +466,8 @@ export class Scope {
     // refine data for the original scope
     if (di < (offset + length)) {
       v.props.val = vv[di];
+    } else {
+      v.props.val = null;
     }
   }
 
@@ -454,6 +477,11 @@ export class Scope {
         this.clones.pop()?.dispose();
       }
     }
+  }
+
+  // called by DATA_OFFSET_VALUE and DATA_LENGTH_VALUE
+  static dataWindowCB(v: vl.Value) {
+    v.scope?.trigger(pg.DATA_VALUE);
   }
 
   // ---------------------------------------------------------------------------
@@ -545,6 +573,11 @@ class ScopeProxyHandler implements ProxyHandler<any> {
 
   apply(target: any, thisArg: any, argumentsList: any[]) {
     return target.apply(this.scope.proxy, argumentsList);
+  }
+
+  trigger(value: vl.Value) {
+    value.cb && value.cb(value);
+    this.propagate(value);
   }
 
   private update(value: vl.Value) {

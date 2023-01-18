@@ -294,6 +294,7 @@ describe('runtime: scope', () => {
   // ---------------------------------------------------------------------------
   // replication
   // ---------------------------------------------------------------------------
+  //TODO: tests for DATA_OFFSET_VALUE, DATA_LENGTH_VALUE
 
   it('should replicate', () => {
     const page = baseApp(`<html ${DOM_ID_ATTR}="0">

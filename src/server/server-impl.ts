@@ -66,6 +66,10 @@ export default class ServerImpl {
 		exitHook(() => {
 			this.log('info', 'WILL EXIT');
 		});
+
+		process.on('uncaughtException', (err) => {
+			this.log('error', err.stack ? err.stack : `${err}`);
+		});
   }
 
 	close() {
