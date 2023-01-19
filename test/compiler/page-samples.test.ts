@@ -78,6 +78,68 @@ describe(`compiler: page-samples`, () => {
     );
   });
 
+  it(`indirectly dependent value 1`, async () => {
+    const html = `<html lang=[[body.v]]><body :v="en"></body></html>`;
+    const page = (await loadTestPage(rootPath, 'sample1.html', html)).page as Page;
+
+    assert.exists(page);
+    page.doc.head.remove();
+    page.doc.body.remove();
+    assert.equal(
+      cleanTestPage(page.getMarkup()),
+      cleanTestPage(`<html></html>`)
+    );
+
+    page.refresh();
+    assert.equal(
+      cleanTestPage(page.getMarkup()),
+      cleanTestPage(`<html lang="en"></html>`)
+    );
+
+    page.root.children[1].proxy['v'] = 'es';
+    assert.equal(
+      cleanTestPage(page.getMarkup()),
+      cleanTestPage(`<html lang="es"></html>`)
+    );
+
+    page.root.children[1].proxy['v'] = null;
+    assert.equal(
+      cleanTestPage(page.getMarkup()),
+      cleanTestPage(`<html></html>`)
+    );
+  });
+
+  it(`indirectly dependent value 2`, async () => {
+    const html = `<html lang=[[body.div.v]]><body><div :aka="div" :v="en"></div></body></html>`;
+    const page = (await loadTestPage(rootPath, 'sample1.html', html)).page as Page;
+
+    assert.exists(page);
+    page.doc.head.remove();
+    page.doc.body.remove();
+    assert.equal(
+      cleanTestPage(page.getMarkup()),
+      cleanTestPage(`<html></html>`)
+    );
+
+    page.refresh();
+    assert.equal(
+      cleanTestPage(page.getMarkup()),
+      cleanTestPage(`<html lang="en"></html>`)
+    );
+
+    page.root.children[1].children[0].proxy['v'] = 'es';
+    assert.equal(
+      cleanTestPage(page.getMarkup()),
+      cleanTestPage(`<html lang="es"></html>`)
+    );
+
+    page.root.children[1].children[0].proxy['v'] = null;
+    assert.equal(
+      cleanTestPage(page.getMarkup()),
+      cleanTestPage(`<html></html>`)
+    );
+  });
+
   it(`function value 1`, async () => {
     const html = `<html lang=[[v()]] :v=[[() => 'en']]></html>`;
     const page = (await loadTestPage(rootPath, 'sample1.html', html)).page as Page;

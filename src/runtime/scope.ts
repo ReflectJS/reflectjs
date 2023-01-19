@@ -55,6 +55,7 @@ export class Scope {
       if (props.name && !cloned) {
         parent.values[props.name] = new vl.Value(props.name, {
           val: this.proxy,
+          _origVal: this,
           passive: true
         }, parent);
       }
@@ -250,6 +251,35 @@ export class Scope {
     return ret;
   }
 
+  lookupRef(ref: string, key: string): vl.Value | undefined {
+    const parts = ref.split('.');
+    let id = parts.shift();
+    let scope: Scope | null = (id === key ? this.parent : this);
+    let ret = id ? scope?.lookupValue(id) : undefined;
+    while (
+      parts.length > 0 &&
+      ret &&
+      ret.props._origVal &&
+      typeof ret.props._origVal === 'object' &&
+      ret.props._origVal instanceof Scope
+    ) {
+      scope = ret.props._origVal;
+      const target = scope.values;
+      id = parts.shift();
+      const v = id ? Reflect.get(target, id, target) : undefined;
+      v && (ret = v);
+    }
+    if (
+      ret &&
+      ret.props._origVal &&
+      typeof ret.props._origVal === 'object' &&
+      ret.props._origVal instanceof Scope
+    ) {
+      return undefined;
+    }
+    return ret;
+  }
+
   unlinkValues() {
     for (const [key, value] of Object.entries(this.values)) {
       this.unlinkValue(value);
@@ -264,18 +294,18 @@ export class Scope {
     }
   }
 
-  relinkValues() {
+  linkValues() {
     for (const [key, value] of Object.entries(this.values)) {
       value.scope = this;
       value.props.refs?.forEach(id => {
-        const other = this.lookupValue(id, id === key);
+        const other = this.lookupRef(id, key);
         if (other && !other.props.passive) {
           (value.src ?? (value.src = new Set())).add(other);
           (other.dst ?? (other.dst = new Set())).add(value);
         }
       });
     }
-    this.children.forEach(s => s.relinkValues());
+    this.children.forEach(s => s.linkValues());
   }
 
   updateValues() {
@@ -387,7 +417,7 @@ export class Scope {
       const nr = parseInt(id.substring(preflen));
       const clone = this.clone(nr, e);
       clone.unlinkValues();
-      clone.relinkValues();
+      clone.linkValues();
       e = e.previousElementSibling;
     }
   }
@@ -405,7 +435,7 @@ export class Scope {
           const nr = parseInt(id.substring(preflen));
           const nesting = this.nest(nr, this, e);
           nesting.unlinkValues();
-          nesting.relinkValues();
+          nesting.linkValues();
         }
       });
     }
