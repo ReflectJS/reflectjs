@@ -167,6 +167,50 @@ describe("compiler: page-compiler", () => {
     );
   });
 
+  it(`indirect dependency`, async () => {
+    const doc = await getDoc(pre, `<html>
+      <body :v2=[[scope1.scope2.v1]]>
+        <div :aka="scope1">
+          <div :aka="scope2" :v1=[[1]]></div>
+        </div>
+      </body>
+    </html>`);
+    const { js, errors } = compileDoc(doc);
+    assert.equal(errors.length, 0);
+    assert.equal(
+      normalizeSpace(doc.toString()),
+      normalizeSpace(`<html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>` +
+      `<body ${DOM_ID_ATTR}="2">
+        <div ${DOM_ID_ATTR}="3">
+          <div ${DOM_ID_ATTR}="4"></div>
+        </div>
+      </body>
+      </html>`)
+    );
+    assert.equal(
+      normalizeSpace(js),
+      normalizeSpace(`{ root: {
+        id: '0', name: 'page',
+        children: [
+          { id: '1', name: 'head' },
+          { id: '2', name: 'body', values: {
+              v2: {
+                fn: function () { return this.scope1.scope2.v1; },
+                val: null,
+                refs: [ 'scope1', 'scope1.scope2', 'scope1.scope2.v1' ]
+              }
+            }, children: [{ id: '3', name: 'scope1', children: [{ id: '4', name: 'scope2', values: {
+                v1: {
+                  fn: function () { return 1; },
+                  val: null
+                }
+            } }]
+          }] }
+        ]
+      } }`)
+    );
+  });
 });
 
 // =============================================================================

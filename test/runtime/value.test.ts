@@ -108,6 +108,67 @@ describe('runtime: value', () => {
     assert.equal(v2.props.val, 100);
   });
 
+  it('should update indirectly dependent value 1', () => {
+    const page = baseApp(null, props => {
+      const body = itemAt(1, props.root.children) as ScopeProps;
+      body.values = {
+        v2: {
+          val: null,
+          fn: function() { return this.scope1.v1; },
+          refs: ['scope1.v1']
+        }
+      };
+      addScope(props, [1], {
+        id: '3',
+        name: 'scope1',
+        markup: `<div></div>`,
+        values: {
+          v1: { val: 1 }
+        }
+      });
+    });
+    const body = page.root.children[1];
+    const v2 = body.values['v2'];
+    const div = body.children[0];
+    page.refresh();
+    assert.equal(v2.props.val, 1);
+    div.proxy['v1'] = 2;
+    assert.equal(v2.props.val, 2);
+  });
+
+  it('should update indirectly dependent value 2', () => {
+    const page = baseApp(null, props => {
+      const body = itemAt(1, props.root.children) as ScopeProps;
+      body.values = {
+        v2: {
+          val: null,
+          fn: function() { return this.scope1.scope2.v1; },
+          refs: ['scope1.scope2.v1']
+        }
+      };
+      addScope(props, [1], {
+        id: '3',
+        name: 'scope1',
+        markup: `<div></div>`,
+      });
+      addScope(props, [1, 0], {
+        id: '4',
+        name: 'scope2',
+        markup: `<div></div>`,
+        values: {
+          v1: { val: 1 }
+        }
+      });
+    });
+    const body = page.root.children[1];
+    const v2 = body.values['v2'];
+    const div = body.children[0].children[0];
+    page.refresh();
+    assert.equal(v2.props.val, 1);
+    div.proxy['v1'] = 2;
+    assert.equal(v2.props.val, 2);
+  });
+
   it(`camelToHyphen()`, () => {
     assert.equal(camelToHyphen('dataDummy'), 'data-dummy');
     assert.equal(camelToHyphen('attr_dataDummy'), 'attr_data-dummy');

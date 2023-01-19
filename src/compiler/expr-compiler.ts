@@ -118,6 +118,27 @@ function qualifyIdentifiers(
     return false;
   }
 
+  function addPotentialReference(node: es.Node) {
+    const parts = [];
+    while (node && node.type === 'MemberExpression') {
+      if (
+        node.property.type !== 'Identifier' ||
+        node.property.name.startsWith(RESERVED_PASSIVE_PREFIX)
+      ) {
+        return;
+      }
+      parts.unshift(node.property.name);
+      node = node.object;
+    }
+    if (node.type === 'ThisExpression' && parts.length > 1) {
+      const last = parts.pop();
+      if (references.has(parts.join('.'))) {
+        parts.push(last);
+        references.add(parts.join('.'));
+      }
+    }
+  }
+
   // https://github.com/estools/estraverse
   const stack: es.Node[] = [];
   const ret = estraverse.replace(body, {
@@ -127,10 +148,11 @@ function qualifyIdentifiers(
       stack.push(node);
 
       if (node.type === 'Identifier') {
-        if (
-          (parent?.type === 'MemberExpression' && node === parent.property) ||
-          isLocalId(node.name)
-        ) {
+        if (parent?.type === 'MemberExpression' && node === parent.property) {
+          addPotentialReference(parent);
+          return;
+        }
+        if (isLocalId(node.name)) {
           return;
         }
         if (parent?.type === 'VariableDeclarator') {

@@ -98,7 +98,7 @@ export interface PageProps {
         : this.props.cycle = 1;
       scope || (scope = this.root);
       scope.unlinkValues();
-      scope.relinkValues();
+      scope.linkValues();
       noupdate ? null : scope.updateValues();
     } catch (ignored: any) {}
     this.refreshLevel--;
