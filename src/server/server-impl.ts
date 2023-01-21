@@ -10,6 +10,8 @@ import Preprocessor from "../preprocessor/preprocessor";
 import { Page, PROPS_SCRIPT_ID, RUNTIME_SCRIPT_ID, RUNTIME_URL } from "../runtime/page";
 import exitHook from "./exit-hook";
 
+const SERVER_PAGE_TIMEOUT = 2000;
+
 export interface ServerProps {
 	port?: number,
 	rootPath: string,
@@ -20,6 +22,7 @@ export interface ServerProps {
 	logger?: (type: string, msg: string) => void,
 	mute?: boolean,
 	clientJsFilePath?: string,
+	serverPageTimeout?: number,
 }
 
 export interface TrafficLimit {
@@ -27,13 +30,16 @@ export interface TrafficLimit {
 	maxRequests: number,
 }
 
+// https://expressjs.com/en/advanced/best-practice-performance.html
 export default class ServerImpl {
   props: ServerProps;
+	serverPageTimeout: number;
 	server: http.Server;
 	clientJs?: string;
 
   constructor(props: ServerProps, cb?: (port: number) => void) {
     this.props = props;
+		this.serverPageTimeout = props.serverPageTimeout ?? SERVER_PAGE_TIMEOUT;
 		const app = express();
 
     app.use(express.json());
@@ -210,6 +216,14 @@ export default class ServerImpl {
 					enableFileSystemHttpRequests: false
 				}
 			} as any);
+
+			// server side we don't support delays longer than zero
+			const origSetTimeout = win.setTimeout;
+			win.setTimeout = (callback, delay) => {
+				return (delay ?? 0) < 1 ? origSetTimeout(callback, 0) : {} as NodeJS.Timeout;
+			};
+			win.setInterval = (callback, delay) => ({} as NodeJS.Timeout);
+
       win.document.write(doc.toString());
       const root = win.document.documentElement as unknown as Element;
       const page = new Page(win as any, root, props);
@@ -226,8 +240,18 @@ export default class ServerImpl {
 			runtimeScript.setAttribute('src', RUNTIME_URL);
 			win.document.body.appendChild(runtimeScript);
 
+		  await Promise.race([
+				win.happyDOM.whenAsyncComplete(),
+				new Promise<void>(resolve => {
+					setTimeout(() => {
+						win.happyDOM.cancelAsync();
+						resolve();
+					}, this.serverPageTimeout);
+				})
+			])
+
+			await new Promise(resolve => setTimeout(resolve, 0));
 			ret.html = `<!DOCTYPE html>\n` + win.document.documentElement.outerHTML;
-			win.happyDOM.cancelAsync();
 		} catch (err: any) {
 			if (Array.isArray(err)) {
 				ret.errors = err;
