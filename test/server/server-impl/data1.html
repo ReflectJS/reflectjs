@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <span id="msg" :url="data1.json" :data=[[]]
+      :handle-url=[[
+        url && window.fetch(url)
+          .then(v => v.json())
+          .then(v => data = v)
+      ]]>[[data && data.msg]]</span>
+  </body>
+</html>

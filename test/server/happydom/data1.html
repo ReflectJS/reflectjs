@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <span id="msg"></span>
+    <script>
+      fetch('data1.json')
+        .then(v => v.json())
+        .then(v => document.getElementById('msg').innerText = v.msg);
+    </script>
+  </body>
+</html>

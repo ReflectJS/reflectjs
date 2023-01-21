@@ -1,4 +1,5 @@
 import { assert } from "chai";
+import * as happy from 'happy-dom';
 import { Window } from 'happy-dom';
 import { PROPS_SCRIPT_ID } from "../../src/runtime/page";
 import Server from "../../src/server/server-impl";
@@ -57,4 +58,18 @@ describe("server: server-impl", () => {
     assert.equal(doc.querySelector('span')?.textContent, '10');
   })
 
+  it(`should serve data`, async () => {
+    const win = new happy.Window();
+    const res = await win.fetch(`http://localhost:${port}/data1.json`);
+    const contentType = res.headers.get('content-type');
+    assert.equal(contentType, 'application/json; charset=UTF-8')
+    const json = await res.json();
+    assert.deepEqual(json, { msg: 'OK' });
+  });
+
+  it(`should dynamically load data`, async () => {
+    const doc = await loadPage(`http://localhost:${port}/data1.html`);
+    const span = doc.getElementById('msg');
+    assert.equal(span?.textContent, 'OK');
+  });
 });
