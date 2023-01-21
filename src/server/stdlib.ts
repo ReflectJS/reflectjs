@@ -1,5 +1,6 @@
 export const STDLIB = `<lib>
 
+<!--- https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch -->
 <:define tag=":data-source:script"
     :url=""
     :method="get"
