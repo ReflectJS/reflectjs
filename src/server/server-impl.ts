@@ -9,6 +9,7 @@ import { HtmlDocument } from "../preprocessor/htmldom";
 import Preprocessor from "../preprocessor/preprocessor";
 import { Page, PROPS_SCRIPT_ID, RUNTIME_SCRIPT_ID, RUNTIME_URL } from "../runtime/page";
 import exitHook from "./exit-hook";
+import { STDLIB } from "./stdlib";
 
 const SERVER_PAGE_TIMEOUT = 2000;
 
@@ -197,7 +198,7 @@ export default class ServerImpl {
 		try {
 			const pathname = decodeURIComponent(url.pathname);
 			const pre = new Preprocessor(this.props.rootPath);
-			const doc = await pre.read(pathname) as HtmlDocument;
+			const doc = await pre.read(pathname, STDLIB) as HtmlDocument;
 			if (!doc) {
 				throw `failed to load page "${pathname}"`;
 			}
