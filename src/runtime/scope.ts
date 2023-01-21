@@ -137,7 +137,9 @@ export class Scope {
     const ret = this.props.markup
       ? this.initDomFromMarkup(this.props.markup)
       : this.initDomFromDomId(this.props.id);
-    ret.setAttribute(pg.DOM_ID_ATTR, this.props.id);
+    if (ret) {
+      ret.setAttribute(pg.DOM_ID_ATTR, this.props.id);
+    }
     return ret;
   }
 
