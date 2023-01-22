@@ -24,6 +24,7 @@ export interface ServerProps {
 	mute?: boolean,
 	clientJsFilePath?: string,
 	serverPageTimeout?: number,
+	normalizeText?: boolean,
 }
 
 export interface TrafficLimit {
@@ -35,11 +36,13 @@ export interface TrafficLimit {
 export default class ServerImpl {
   props: ServerProps;
 	serverPageTimeout: number;
+	normalizeText: boolean;
 	server: http.Server;
 	clientJs?: string;
 
   constructor(props: ServerProps, cb?: (port: number) => void) {
     this.props = props;
+		this.normalizeText = props.normalizeText !== undefined ? props.normalizeText : true;
 		this.serverPageTimeout = props.serverPageTimeout ?? SERVER_PAGE_TIMEOUT;
 		const app = express();
 
@@ -225,7 +228,7 @@ export default class ServerImpl {
 			};
 			win.setInterval = (callback, delay) => ({} as NodeJS.Timeout);
 
-      win.document.write(doc.toString());
+      win.document.write(doc.toString(false, false, this.normalizeText));
       const root = win.document.documentElement as unknown as Element;
       const page = new Page(win as any, root, props);
 			page.refresh();

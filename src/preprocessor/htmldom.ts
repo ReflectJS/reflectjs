@@ -1,6 +1,8 @@
 import * as dom from "./dom";
-import { StringBuf } from "./util";
+import { normalizeText, StringBuf } from "./util";
 import HtmlParser from "./htmlparser";
+
+const NON_NORMALIZED_TAGS = { PRE: true };
 
 export interface HtmlPos {
   origin: number,
@@ -56,13 +58,13 @@ export class HtmlNode implements dom.DomNode {
     );
   }
 
-  toString(sort = false, plain = false) {
+  toString(sort = false, plain = false, normalize = false) {
     var sb = new StringBuf();
-    this.output(sb, sort, plain);
+    this.output(sb, sort, plain, normalize);
     return sb.toString();
   }
 
-  output(sb: StringBuf, sort: boolean, plain: boolean): StringBuf {
+  output(sb: StringBuf, sort: boolean, plain: boolean, normalize: boolean): StringBuf {
     return sb;
   }
 }
@@ -282,7 +284,7 @@ export class HtmlElement extends HtmlNode implements dom.DomElement {
   get innerHTML() {
     var sb = new StringBuf();
     for (var i in this.children) {
-      this.children[i].output(sb, false, true);
+      this.children[i].output(sb, false, true, false);
     }
     return sb.toString();
   }
@@ -311,7 +313,7 @@ export class HtmlElement extends HtmlNode implements dom.DomElement {
 
   get outerHTML() {
     var sb = new StringBuf();
-    this.output(sb, false, true);
+    this.output(sb, false, true, false);
     return sb.toString();
   }
 
@@ -334,7 +336,9 @@ export class HtmlElement extends HtmlNode implements dom.DomElement {
     return ret;
   }
 
-  override output(sb: StringBuf, sort: boolean, plain: boolean): StringBuf {
+  override output(
+    sb: StringBuf, sort: boolean, plain: boolean, normalize: boolean
+  ): StringBuf {
     var name = this.tagName.toLowerCase();
     sb.add('<'); sb.add(name);
 
@@ -345,7 +349,10 @@ export class HtmlElement extends HtmlNode implements dom.DomElement {
     } else {
       sb.add('>');
       for (var i in this.children) {
-        this.children[i].output(sb, sort, plain);
+        this.children[i].output(
+          sb, sort, plain,
+          normalize && !Reflect.has(NON_NORMALIZED_TAGS, this.tagName)
+        );
       }
       sb.add('</'); sb.add(name); sb.add('>');
     }
@@ -441,9 +448,11 @@ export class HtmlDocument extends HtmlElement implements dom.DomDocument {
     return ret;
   }
 
-  override output(sb: StringBuf, sort: boolean, plain: boolean): StringBuf {
+  override output(
+    sb: StringBuf, sort: boolean, plain: boolean, normalize: boolean
+  ): StringBuf {
     for (var i in this.children) {
-      this.children[i].output(sb, sort, plain);
+      this.children[i].output(sb, sort, plain, normalize);
     }
     return sb;
   }
@@ -474,11 +483,14 @@ export class HtmlText extends HtmlNode implements dom.DomTextNode {
     return ret;
   }
 
-  override output(sb: StringBuf, sort: boolean, plain: boolean): StringBuf {
+  override output(
+    sb: StringBuf, sort: boolean, plain: boolean, normalize: boolean
+  ): StringBuf {
     if (this.nodeValue != null) {
-      sb.add(this.nodeValue
+      const s = this.nodeValue
         ? (this.escape ? htmlEscape2(this.nodeValue) : this.nodeValue)
-        : '');
+        : '';
+      sb.add(normalize && s ? normalizeText(s) as string : s);
     }
     return sb;
   }
@@ -529,7 +541,9 @@ export class HtmlComment extends HtmlNode implements dom.DomComment {
     );
   }
 
-  override output(sb: StringBuf, sort: boolean, plain: boolean): StringBuf {
+  override output(
+    sb: StringBuf, sort: boolean, plain: boolean, normalize: boolean
+  ): StringBuf {
     sb.add('<!--');
     if (this.nodeValue) {
       sb.add(this.nodeValue);

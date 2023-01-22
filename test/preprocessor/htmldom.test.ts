@@ -240,4 +240,101 @@ describe('preprocessor: htmldom', () => {
     );
   });
 
+  it('normalized text', () => {
+    const doc = HtmlParser.parse(`<html>
+      <body>
+        <section id="text">
+          <header><h1>Text</h1></header>
+          <article id="text__headings">
+            <header>
+              <h2>Headings</h2>
+            </header>
+            <pre>
+              <!-- headings -->
+              <h1>Heading 1</h1>
+              <h2>Heading 2</h2>
+              <h3>Heading 3</h3>
+              <h4>Heading 4</h4>
+              <h5>Heading 5</h5>
+              <h6>Heading 6</h6>
+            </pre>
+            <footer><p><a href="#top">[Top]</a></p></footer>
+          </article>
+        </section>
+      </body>
+    </html>`);
+    assert.equal(
+      doc.toString(false, false, true), '<html>\n' +
+      '<body>\n' +
+      '<section id="text">\n' +
+      '<header><h1>Text</h1></header>\n' +
+      '<article id="text__headings">\n' +
+      '<header>\n' +
+      '<h2>Headings</h2>\n' +
+      '</header>\n' +
+      `<pre>
+              <!-- headings -->
+              <h1>Heading 1</h1>
+              <h2>Heading 2</h2>
+              <h3>Heading 3</h3>
+              <h4>Heading 4</h4>
+              <h5>Heading 5</h5>
+              <h6>Heading 6</h6>
+            </pre>\n` +
+      '<footer><p><a href="#top">[Top]</a></p></footer>\n' +
+      '</article>\n' +
+      '</section>\n' +
+      '</body>\n' +
+      '</html>'
+    );
+  })
+
+  it('non normalized text', () => {
+    const doc = HtmlParser.parse(`<html>
+      <body>
+        <section id="text">
+          <header><h1>Text</h1></header>
+          <article id="text__headings">
+            <header>
+              <h2>Headings</h2>
+            </header>
+            <pre>
+              <!-- headings -->
+              <h1>Heading 1</h1>
+              <h2>Heading 2</h2>
+              <h3>Heading 3</h3>
+              <h4>Heading 4</h4>
+              <h5>Heading 5</h5>
+              <h6>Heading 6</h6>
+            </pre>
+            <footer><p><a href="#top">[Top]</a></p></footer>
+          </article>
+        </section>
+      </body>
+    </html>`);
+    assert.equal(
+      doc.toString(false, false, false), `<html>
+      <body>
+        <section id="text">
+          <header><h1>Text</h1></header>
+          <article id="text__headings">
+            <header>
+              <h2>Headings</h2>
+            </header>
+            <pre>
+              <!-- headings -->
+              <h1>Heading 1</h1>
+              <h2>Heading 2</h2>
+              <h3>Heading 3</h3>
+              <h4>Heading 4</h4>
+              <h5>Heading 5</h5>
+              <h6>Heading 6</h6>
+            </pre>
+            <footer><p><a href="#top">[Top]</a></p></footer>
+          </article>
+        </section>
+      </body>
+    </html>`);
+  })
+
 });
