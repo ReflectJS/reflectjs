@@ -236,13 +236,15 @@ export default class ServerImpl {
 			const propsScript = win.document.createElement('script');
 			propsScript.id = PROPS_SCRIPT_ID;
 			propsScript.setAttribute('type', 'text/json');
-			propsScript.appendChild(win.document.createTextNode(js));
+			propsScript.appendChild(win.document.createTextNode(`\n${js}\n`));
 			win.document.body.appendChild(propsScript);
+			win.document.body.appendChild(win.document.createTextNode('\n'));
 
 			const runtimeScript = win.document.createElement('script');
 			runtimeScript.id = RUNTIME_SCRIPT_ID;
 			runtimeScript.setAttribute('src', RUNTIME_URL);
 			win.document.body.appendChild(runtimeScript);
+			win.document.body.appendChild(win.document.createTextNode('\n'));
 
 		  await Promise.race([
 				win.happyDOM.whenAsyncComplete(),
