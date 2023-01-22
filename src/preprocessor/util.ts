@@ -35,3 +35,7 @@ export function regexMap(
   s.length > i && sb.add(s.substring(i));
   return sb.toString();
 }
+
+export function peek(a: any[]): any {
+  return (a.length > 0 ? a[a.length - 1] : undefined);
+}

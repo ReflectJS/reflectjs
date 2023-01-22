@@ -1,8 +1,8 @@
 import * as dom from "./dom";
-import { normalizeText, StringBuf } from "./util";
+import { normalizeText, peek, StringBuf } from "./util";
 import HtmlParser from "./htmlparser";
 
-const NON_NORMALIZED_TAGS = { PRE: true };
+const NON_NORMALIZED_TAGS = { PRE: true, SCRIPT: true };
 
 export interface HtmlPos {
   origin: number,
@@ -348,11 +348,16 @@ export class HtmlElement extends HtmlNode implements dom.DomElement {
       sb.add(' />');
     } else {
       sb.add('>');
+      if (normalize && Reflect.has(NON_NORMALIZED_TAGS, this.tagName)) {
+        const last: HtmlText = peek(this.children);
+        if (last && last.nodeType === dom.TEXT_NODE) {
+          const res = /\n\s+$/.exec(last.nodeValue);
+          res && (last.nodeValue = last.nodeValue.substring(0, res.index + 1));
+        }
+      }
+      const flag = normalize && !Reflect.has(NON_NORMALIZED_TAGS, this.tagName);
       for (var i in this.children) {
-        this.children[i].output(
-          sb, sort, plain,
-          normalize && !Reflect.has(NON_NORMALIZED_TAGS, this.tagName)
-        );
+        this.children[i].output(sb, sort, plain, flag);
       }
       sb.add('</'); sb.add(name); sb.add('>');
     }
