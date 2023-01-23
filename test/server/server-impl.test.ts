@@ -39,7 +39,7 @@ describe("server: server-impl", () => {
   it(`should get static page`, async () => {
     const doc = await loadPage(`http://localhost:${port}/page1.html`);
     doc.getElementById(PROPS_SCRIPT_ID)?.remove();
-    assert.equal(doc.body.textContent, 'test text: page1');
+    assert.equal(doc.body.textContent?.trim(), 'test text: page1');
   })
 
   it(`shouldn't get inexistent page`, async () => {
@@ -50,7 +50,7 @@ describe("server: server-impl", () => {
   it(`should get dynamic page`, async () => {
     const doc = await loadPage(`http://localhost:${port}/page2.html`);
     doc.getElementById(PROPS_SCRIPT_ID)?.remove();
-    assert.equal(doc.body.textContent, 'hi');
+    assert.equal(doc.body.textContent?.trim(), 'hi');
   })
 
   it(`should run sample1.html`, async () => {

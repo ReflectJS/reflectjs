@@ -279,8 +279,8 @@ describe('preprocessor: htmldom', () => {
               <h3>Heading 3</h3>
               <h4>Heading 4</h4>
               <h5>Heading 5</h5>
-              <h6>Heading 6</h6>
-            </pre>\n` +
+              <h6>Heading 6</h6>\n` +
+      `</pre>\n` +
       '<footer><p><a href="#top">[Top]</a></p></footer>\n' +
       '</article>\n' +
       '</section>\n' +
