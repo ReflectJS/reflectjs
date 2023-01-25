@@ -36,6 +36,7 @@ export const STYLE_ATTR_PREFIX = 'style-';
 export const ID_VALUE = RESERVED_PREFIX + 'id';
 export const DOM_VALUE = RESERVED_PREFIX + 'dom';
 export const ELEMENTINDEX_VALUE = RESERVED_PREFIX + 'elementIndex';
+export const HIDDEN_VALUE = 'hidden';
 export const DATA_VALUE = 'data';
 export const DATA_OFFSET_VALUE = 'dataOffset';
 export const DATA_LENGTH_VALUE = 'dataLength';
@@ -45,6 +46,9 @@ export const TEXT_VALUE_PREFIX = RESERVED_PREFIX + 't';
 
 export const TEXT_MARKER1_PREFIX = '-t';
 export const TEXT_MARKER2 = '-/';
+
+export const RESERVED_CSS_CLASS_PREFIX = 'refjs-';
+export const HIDDEN_CLASS = RESERVED_CSS_CLASS_PREFIX + 'hidden';
 
 export const NOTNULL_FN = RESERVED_PASSIVE_PREFIX + 'nn';
 
