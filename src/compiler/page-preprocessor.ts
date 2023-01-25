@@ -7,6 +7,8 @@ import { ValueProps } from "../runtime/value";
 import { EXPR_MARKER1, EXPR_MARKER2, isDynamic } from "./expr-preprocessor";
 import { PageError } from "./page-compiler";
 
+const WHOLE_TEXT_TAGS: any = { STYLE: true, TITLE: true };
+
 export function loadPage(doc: HtmlDocument) {
   const root = doc.firstElementChild as HtmlElement;
   let count = 0;
@@ -76,11 +78,11 @@ function loadScope(e: HtmlElement, errors: PageError[]): ScopeProps {
         }
       } else if (n.nodeType === TEXT_NODE) {
         if (isDynamic((n as HtmlText).nodeValue)) {
-          if (p.tagName !== 'STYLE') {
-            loadTexts(n as HtmlText, values, errors);
-          } else {
+          if (WHOLE_TEXT_TAGS[p.tagName]) {
             const textId = loadText(n as HtmlText, values, errors);
             p.setAttribute(page.DOM_TEXTID_ATTR, `${textId}`);
+          } else {
+            loadTexts(n as HtmlText, values, errors);
           }
         }
       }

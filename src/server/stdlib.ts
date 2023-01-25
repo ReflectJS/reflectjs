@@ -1,4 +1,12 @@
+import { HIDDEN_CLASS } from "../runtime/page";
+
 export const STDLIB = `<lib>
+
+<style>
+  .${HIDDEN_CLASS} {
+    display: none !important;
+  }
+</style>
 
 <!--- https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch -->
 <:define tag=":data-source:script"

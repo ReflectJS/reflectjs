@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import { DOM_ID_ATTR, TEXT_VALUE_PREFIX } from "../../src/runtime/page";
+import { DOM_ID_ATTR, HIDDEN_CLASS, HIDDEN_VALUE, TEXT_VALUE_PREFIX } from "../../src/runtime/page";
 import { ScopeProps } from "../../src/runtime/scope";
 import { attrCB, camelToHyphen, textCB, Value } from "../../src/runtime/value";
 import { addScope, baseApp, itemAt } from "./page.test";
@@ -167,6 +167,32 @@ describe('runtime: value', () => {
     assert.equal(v2.props.val, 1);
     div.proxy['v1'] = 2;
     assert.equal(v2.props.val, 2);
+  });
+
+  it('should support the :hidden value', () => {
+    const page = baseApp(null, props => {
+      const body = itemAt(1, props.root.children) as ScopeProps;
+      body.values = {
+        hidden: { val: true }
+      };
+    });
+    page.refresh();
+    assert.equal(
+      page.getMarkup(),
+      `<!DOCTYPE html><html ${DOM_ID_ATTR}="0">` +
+      `<head ${DOM_ID_ATTR}="1"></head>` +
+      `<body ${DOM_ID_ATTR}="2" class="${HIDDEN_CLASS}">` +
+      `</body></html>`
+    );
+    const body = page.root.children[1];
+    body.proxy[HIDDEN_VALUE] = false;
+    assert.equal(
+      page.getMarkup(),
+      `<!DOCTYPE html><html ${DOM_ID_ATTR}="0">` +
+      `<head ${DOM_ID_ATTR}="1"></head>` +
+      `<body ${DOM_ID_ATTR}="2" class="">` +
+      `</body></html>`
+    );
   });
 
   it(`camelToHyphen()`, () => {
