@@ -15,7 +15,7 @@
                   :lang="html"
                   :source='[[
 `<:data-source :aka="cat"
-              :url="https://catfact.ninja/fact"/>
+              :url="/cat-facts"/>
 <div class="cat-fact">
   <span>[`+`[cat.content.fact]`+`]</span>
   <button :on-click="[`+`[() => cat.trigger()]`+`]">
@@ -26,7 +26,7 @@
     ]]'/>
 -->
 <pre class="highlight-js" style="margin-bottom: 0;"><code>&lt;:data-source :aka="cat"
-              :url="https://catfact.ninja/fact"/&gt;
+              :url="/cat-facts"/&gt;
 <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"cat-fact"</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>[['[[']]cat.content.fact]]<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
   <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">:on-click</span>=<span class="hljs-string">"[['[[']]() =&gt; cat.trigger()]]"</span>&gt;</span>
@@ -41,7 +41,7 @@
     -->
     <:data-source :aka="cat"
                   :autoGet=[[true]]
-                  :url="https://catfact.ninja/fact" />
+                  :url="/cat-facts" />
     <div :slot="footer" class="cat-fact">
       <span>[[cat.content && cat.content.fact]]</span>
       <bs-button :on-click="[[() => cat.trigger()]]">Next</bs-button>
