@@ -1,15 +1,14 @@
 <lib>
-  <div :aka="jumbotron" class="jumbotron">
+  <div class="jumbotron">
     <bs-container>
-      <br/>
-      <p/>
       <h1>
         Reflect.js
-        <a href="https://github.com/fcapolini/reflectjs/releases" target="_blank">
+        <a href="https://github.com/ReflectJS/reflectjs/releases"
+           target="_blank">
           <bs-badge :pill="true"
                     :type="warning"
-                    style="font-size: 1rem; margin-left: .5em; vertical-align: 33%;">
-            v.0.1.0&nbsp;&nbsp;<bs-icon :icon="github"/>
+                    :class-release-badge="[[true]]">
+            v.0.1.0 <bs-icon :icon="github"/>
           </bs-badge>
         </a>
       </h1>
@@ -20,7 +19,6 @@
         for creating dynamic web apps, made of
         <a href="#">reusable components</a>, that are still
         <a href="#">fully indexable</a> out of the box.</p>
-      <br/>
     </bs-container>
   </div>
 </lib>
