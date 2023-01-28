@@ -10,6 +10,8 @@
     to reflect results in the page.
   </p>
   <bs-card :class-code-card="[[true]]" :mutedFooter="[[false]]" :footer=" ">
+
+<!---
     <highlight-js style="margin-bottom: 0"
                   :lang="html"
                   :source='[[
@@ -20,6 +22,15 @@
   Seconds: [`+`[count]`+`]
 </div>`
     ]]'/>
+-->
+
+<pre class="highlight-js" style="margin-bottom: 0;"><code><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">:count</span>=<span class="hljs-string">"[['[[']]0]]"</span>
+     <span class="hljs-attr">:did-init</span>=<span class="hljs-string">"[['[[']]
+       setInterval(() =&gt; count++, 1000)
+     ]]"</span>&gt;</span>
+  Seconds: [['[[']]count]]
+<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></code></pre>
+
     <div :slot="footer" :count="[[0]]"
           :handle-count="[[
             window.setTimeout(() => count++, 1000)

@@ -9,6 +9,7 @@
     turn them into full blown components collected in <a href="#">kits</a>.
   </p>
   <bs-card :class-code-card="[[true]]" :mutedFooter="[[false]]" :footer=" ">
+<!---
     <highlight-js style="margin-bottom: 0"
                   :lang="html"
                   :source='[[
@@ -21,6 +22,16 @@
 <app-product :name="Gadget" :price="1$"/>
 <app-product :name="Widget" :price="2$"/>`
     ]]'/>
+-->
+<pre class="highlight-js" style="margin-bottom: 0;"><code>&lt;:define tag="app-product" class="app-product"
+         :name=""
+         :price=""&gt;
+  [['[[']]name]] <span class="hljs-symbol">&amp;mdash;</span> <span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>[['[[']]price]]<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+&lt;/:define&gt;
+
+<span class="hljs-tag">&lt;<span class="hljs-name">app-product</span> <span class="hljs-attr">:name</span>=<span class="hljs-string">"Gadget"</span> <span class="hljs-attr">:price</span>=<span class="hljs-string">"1$"</span>/&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">app-product</span> <span class="hljs-attr">:name</span>=<span class="hljs-string">"Widget"</span> <span class="hljs-attr">:price</span>=<span class="hljs-string">"2$"</span>/&gt;</span></code></pre>
+
     <:define tag="app-product" class="app-product"
             :name="" :price="">
       [[name]] &mdash; <span>[[price]]</span>
