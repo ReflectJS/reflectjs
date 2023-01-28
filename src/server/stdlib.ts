@@ -16,6 +16,12 @@ export const STDLIB = `<lib>
     :headers=[[null]]
     :autoGet=[[true]]
     :content=[[null]]
+    :trigger=[[() => {
+      if (url) {
+        _lastUrl = url;
+        doRequest(url);
+      }
+    }]]
 
     :_lastUrl=""
 

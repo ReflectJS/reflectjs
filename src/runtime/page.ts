@@ -1,3 +1,4 @@
+import { mixColors } from "./color";
 import { Scope, ScopeCloning, ScopeProps } from "./scope";
 import { Value } from "./value";
 
@@ -36,6 +37,8 @@ export const STYLE_ATTR_PREFIX = 'style-';
 export const ID_VALUE = RESERVED_PREFIX + 'id';
 export const DOM_VALUE = RESERVED_PREFIX + 'dom';
 export const ELEMENTINDEX_VALUE = RESERVED_PREFIX + 'elementIndex';
+export const ISLASTELEMENT_VALUE = RESERVED_PREFIX + 'isLastElement';
+export const MIXCOLORS_VALUE = RESERVED_PREFIX + 'mixColors';
 export const HIDDEN_VALUE = 'hidden';
 export const DATA_VALUE = 'data';
 export const DATA_OFFSET_VALUE = 'dataOffset';
@@ -79,6 +82,7 @@ export interface PageProps {
     this.setGlobal(NOTNULL_FN, (v: any) => v != null ? `${v}` : '');
     this.setGlobal('window', win);
     this.setGlobal('document', this.doc);
+    this.setGlobal(MIXCOLORS_VALUE, mixColors);
     this.root = this.load(null, props.root);
     this.root.values[ROOT_SCOPE_NAME] = new Value(ROOT_SCOPE_NAME, {
       val: this.root.proxy

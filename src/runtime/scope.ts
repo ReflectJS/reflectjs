@@ -236,6 +236,15 @@ export class Scope {
       val: function(e: Element) { return that.elementIndex(e); },
       passive: true,
     }, this);
+    ret[pg.ISLASTELEMENT_VALUE] = new vl.Value(pg.ISLASTELEMENT_VALUE, {
+      val: (e: Element) => {
+        e || (e = this.dom);
+        return e.parentElement
+          ? that.elementIndex(e) >= (e.parentElement.childElementCount - 1)
+          : true
+      },
+      passive: true,
+    }, this);
     return ret;
   }
 
