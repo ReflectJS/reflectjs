@@ -1,0 +1,49 @@
+<lib>
+  <:import src="../base.htm"/>
+
+  <!---
+  https://getbootstrap.com/docs/5.2/components/card/
+  -->
+	<style data-name="bs-card">
+		.bs-card-actions {
+			display: inline-flex;
+			flex-wrap: wrap;
+			gap: .5em;
+		}
+		.card-text > a {
+			margin-right: 1em;
+		}
+		.card-text > button {
+			margin-right: .5em;
+		}
+	</style>
+
+	<!--- align: ""|"start"|"center"|"end" -->
+	<:define tag="bs-card" class="card[[align ? ' text-' + align : '']]"
+		:align=""
+		:header=""
+		:imgSrc=""
+		:imgAlt=""
+		:title=""
+		:subtitle=""
+		:footer=""
+		:mutedFooter=[[true]]
+	>
+		<div class="card-header" :hidden=[[!header]]>[[header]]</div>
+		<img src=[[imgSrc]] class="card-img-top" alt=[[imgAlt]]
+			:hidden=[[!imgSrc]]
+		/>
+		<div class="card-body">
+			<h5 class="card-title" :hidden=[[!title]]>[[title]]</h5>
+			<h6 class="card-subtitle mb-2 text-muted"
+				:hidden=[[!subtitle]]>[[subtitle]]</h6>
+			<div class="card-text"><:slot name="default"/></div>
+		</div>
+		<div class="card-footer" :hidden=[[!footer]]>
+			<small :class-textMuted=[[mutedFooter]]><:slot name="footer"/>[[footer]]</small>
+		</div>
+	</:define>
+
+	<:define tag="bs-card-group" class="card-group"/>
+  
+</lib>

@@ -1,0 +1,28 @@
+<lib>
+  <:import src="../base.htm"/>
+
+	<!--- https://getbootstrap.com/docs/5.2/components/breadcrumb/ -->
+	<style data-name="breadcrumb">
+		.breadcrumb-item.active > a {
+			color: inherit;
+			pointer-events: none;
+			text-decoration: none;
+		}
+	</style>
+
+	<:define tag="bs-breadcrumb:nav" aria-label="breadcrumb"
+		:divider="/"
+
+		style="--bs-breadcrumb-divider: '[[divider]]'"
+	>
+		<ol class="breadcrumb">
+			<:slot name="default"/>
+		</ol>
+	</:define>
+
+	<:define tag="bs-breadcrumb-item:li" class="breadcrumb-item"
+		:active="[[__isLastElement()]]"
+		:class-active=[[active]]
+		aria-current=[[active ? 'page' : null]]
+	></:define>
+</lib>

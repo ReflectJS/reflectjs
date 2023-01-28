@@ -1,0 +1,19 @@
+<lib>
+  <bs-navbar :breakpoint="sm" :dark=[[true]]>
+    <span :slot="brand">
+      <img class="brand-icon" src="res/reflectjs-logo.svg"/>
+    </span>
+    <bs-nav-item :text="Home"/>
+    <bs-nav-item :text="Examples" :disabled="[[true]]"/>
+    <bs-nav-item :text="Kits" :disabled="[[true]]"/>
+    <bs-nav-item :text="Docs" :disabled="[[true]]"/>
+    <bs-nav-item :text="DevTools" :disabled="[[true]]"/>
+    <a :slot="extra"
+        class="navbar-brand"
+        style="margin-right: 0"
+        href="https://github.com/ReflectJS/reflectjs"
+        target="_blank">
+      <bs-icon :icon="github" style="font-size: 110%"/>
+    </a>
+  </bs-navbar>
+</lib>

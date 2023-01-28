@@ -1,0 +1,44 @@
+<lib>
+
+  <style data-name="text-for-size">
+    .text-for-size { display: none; }
+    .text-for-size.xs { display: inline; }
+    @media (min-width: [[k_bs_smPx]]px) {
+      .text-for-size.xs { display: none; }
+      .text-for-size.sm { display: inline; }
+    }
+    @media (min-width: [[k_bs_mdPx]]px) {
+      .text-for-size.sm { display: none; }
+      .text-for-size.md { display: inline; }
+    }
+    @media (min-width: [[k_bs_lgPx]]px) {
+      .text-for-size.md { display: none; }
+      .text-for-size.lg { display: inline; }
+    }
+    @media (min-width: [[k_bs_xlPx]]px) {
+      .text-for-size.lg { display: none; }
+      .text-for-size.xl { display: inline; }
+    }
+    @media (min-width: [[k_bs_xxlPx]]px) {
+      .text-for-size.xl { display: none; }
+      .text-for-size.xxl { display: inline; }
+    }
+  </style>
+
+  <:define tag="text-for-size:span"
+           :size="xs"
+           :handle-size="[[
+              const bp = head.k_bs_breakpoints;
+              const v = size ? size : bp[0] + '-';
+              const p = v.split('-');
+              if (p.length < 2) p.push(p[0]);
+              else if (!p[0]) p[0] = bp[0];
+              else if (!p[1]) p[1] = bp[bp.length - 1];
+              let i1 = bp.indexOf(p[0]);
+              let i2 = bp.indexOf(p[1]);
+              const a = ['text-for-size'];
+              while (i1 <= i2) a.push(bp[i1++]);
+              __dom.setAttribute('class', a.join(' '));
+           ]]"/>
+
+</lib>

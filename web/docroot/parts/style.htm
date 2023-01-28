@@ -1,0 +1,138 @@
+<lib>
+  <style>
+    .jumbotron {
+      background: rgb(210,226,255);
+      background: linear-gradient(160deg, rgb(208, 233, 244) 0%, rgba(217,243,255,1) 10%, rgb(195, 215, 251) 100%);
+    }
+    .jumbotron p {
+      font-weight: 300;
+      letter-spacing: .25px;
+    }
+    .jumbotron .nav-tabs,
+    .jumbotron .nav-link.active,
+    .jumbotron .nav-link:hover {
+      border-color: transparent;
+    }
+    .jumbotron .nav-link:not(.active) {
+      background: rgba(255,255,255,.25);
+    }
+    .jumbotron .nav-link.active {
+      color: var(--bs-body-color)
+    }
+    .app-footer {
+      color: var(--bs-gray-700);
+      background: rgb(210,226,255);
+      background: linear-gradient(180deg, rgb(202, 228, 240) 0%, rgb(195, 215, 251) 100%);
+      padding-top: 2em;
+      padding-bottom: 1em;
+    }
+    .card.code-card {
+      margin-top: 1.3em;
+    }
+    .card.code-card > .card-body {
+      color: #fff;
+      background: rgb(6, 27, 76);
+      border: 1px solid rgb(6, 27, 76);
+      border-top-left-radius: var(--bs-card-border-radius);
+      border-top-right-radius: var(--bs-card-border-radius);
+      margin: -1px;
+    }
+    .home-col {
+      padding-top: 2.5em;
+    }
+    @media (prefers-color-scheme: dark) {
+      nav.navbar.bg-dark {
+        background: #111 !important;
+      }
+      .jumbotron {
+        color: #fff;
+        background-color: #3c505b;
+        background: linear-gradient(180deg, #112a47 0%, #112a47 10%, #0e4a65 100%);
+      }
+      .jumbotron p {
+        font-weight: 200;
+        letter-spacing: .5px;
+      }
+      .jumbotron .nav-link:not(.active) {
+        background: rgba(255,255,255,.05);
+      }
+      .jumbotron .nav-link:not(.active),
+      a {
+        color: #8ebbff;
+      }
+      .app-footer {
+        color: rgb(225, 223, 223);
+        background-color: #3c505b;
+        background: linear-gradient(0deg, #102b47 0%, #0c4057 100%);
+      }
+      .jumbotron a {
+        font-weight: 300;
+        letter-spacing: .25px;
+      }
+      .card.code-card > .card-body {
+        background: #091523;
+        border: 0;
+        margin: 0;
+      }
+      :root {
+        --bs-primary: #567596;
+      }
+    }
+    .lead {
+      font-size: 1.18rem;
+    }
+    @media (min-width: [[k_bs_smPx]]px) {
+      .lead {
+        font-size: 1.25rem;
+      }
+    }
+    @media (min-width: [[k_bs_lgPx]]px) {
+      .lead {
+        font-size: 1.35rem;
+      }
+    }
+    .brand-icon {
+      width: 1.5em;
+      height: 1.5em;
+      vertical-align: -26%;
+    }
+    a {
+      text-decoration: none;
+    }
+    h4 > i.bi {
+      margin-right: .15em;
+    }
+  </style>
+  <!--- fix for glitch in dark mode -->
+  <style :_init="[[
+    window.setTimeout(() => {
+      this.__dom.firstChild.nodeValue = `.nav-link {
+        transition: color .15s ease-in-out,
+                    background-color .15s ease-in-out,
+                    border-color .15s ease-in-out;
+      }`;
+    }, 100);
+  ]]">
+    .nav-link { transition: color 0s; }
+  </style>
+
+  <style>
+    .app-product {
+      max-width: 8em;
+      padding: .2em 0;
+    }
+    .app-product > span {
+      font-weight: bold;
+      color: var(--bs-primary);
+    }
+    .cat-fact {
+      display: flex;
+      align-items: center;
+      gap: 1em;
+      width: 100%;
+    }
+    .cat-fact > span {
+      flex: 1;
+    }
+  </style>
+</lib>

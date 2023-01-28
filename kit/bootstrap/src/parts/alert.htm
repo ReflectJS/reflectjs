@@ -1,0 +1,31 @@
+<lib>
+  <:import src="../base.htm"/>
+
+	<!--- https://getbootstrap.com/docs/5.2/components/alerts/ -->
+	<!--- TODO: light/dark mode? maybe keeping them light improves visibility -->
+	<!--- TODO: closeable -->
+	<style data-name='alert'>
+		.alert a {
+			font-weight: 700;
+		}
+	</style>
+
+	<style :data=[[k_bs_theme_colors]] data-name='alert-[[data.name]]'>
+		.alert-[[data.name]] {
+			color: [[k_shiftColor(data.color, .4)]];
+			background-color: [[k_shiftColor(data.color, -.8)]];
+			border-color: [[k_shiftColor(data.color, -.7)]];
+		}
+		.alert-[[data.name]] a {
+			color: [[k_shiftColor(data.color, .516)]];
+		}
+	</style>
+
+	<:define tag="bs-alert"
+		:type="primary"
+
+		class="alert alert-[[type]]"
+		role="alert"
+	/>
+
+</lib>

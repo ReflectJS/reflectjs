@@ -1,0 +1,15 @@
+<lib>
+	
+	<!--- https://getbootstrap.com/docs/5.2/layout/containers/ -->
+	<!--- size: ''|sm|md|lg|xl|xxl|fluid -->
+	<:define tag="bs-container"
+					 class="container[[size ? '-' + size : '']]"
+					 :size=""/>
+
+	<!--- https://getbootstrap.com/docs/5.2/layout/grid/ -->
+	<:define tag="bs-row" class="row"/>
+	<:define tag="bs-col"
+					 class="col[[size ? '-' + size : '']]"
+					 :size=""/>
+
+</lib>

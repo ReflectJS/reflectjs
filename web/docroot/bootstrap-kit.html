@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Reflect.js</title>
+    <link rel="icon" href="favicon.svg">
+    <:import src="/.kit/bootstrap/all.htm"/>
+    <:import src="/.kit/bootstrap/icons.htm"/>
+    <:import src="parts/style.htm"/>
+  </head>
+  <body>
+    <bs-container>
+      <h1>Bootstrap Kit</h1>
+      <br/>
+
+      <bs-nav :mode="tabs" :selection=[[0]]>
+        <bs-nav-item :link="#">Active</bs-nav-item>
+        <bs-nav-item :link="#">Link</bs-nav-item>
+        <bs-nav-item :link="#">Link</bs-nav-item>
+        <bs-nav-item :link="#" :disabled=[[true]]>Disabled</bs-nav-item>
+      </bs-nav>
+      <br/>
+
+      <div>
+        <button type="button"
+                class="btn btn-primary"
+                :on-click=[[(_)=> exampleModal.show(
+                  (res) => window.console.log('modal result: ' + res),
+                  [ { markup: 'Cancel', type: 'secondary' }, { markup: 'Save' } ],
+                  'Example <b>text</b>',
+                  'Modal example'
+                )]]>
+          Open modal
+        </button>
+        <bs-modal :aka="exampleModal" :size="sm"/>
+      </div>
+      <br/>
+
+      <bs-list>
+        <bs-item :disabled=[[true]]>A disabled item</bs-item>
+        <bs-item :badge="1" :badgeType="danger">A second item</bs-item>
+        <bs-item :type="primary">A third item</bs-item>
+        <bs-item>A fourth item</bs-item>
+        <bs-item>And a fifth one</bs-item>
+        <bs-checkbox-item :badge="3">A checkbox</bs-checkbox-item>
+        <bs-checkbox-item :radio=[[true]]>And a radio button</bs-checkbox-item>
+      </bs-list>
+      <br/>
+
+      <div>
+        <bs-dropdown :label="Dropdown button">
+          <bs-dropdown-item :label="Item 1"/>
+          <bs-dropdown-item :label="Item 2" :active=[[true]]/>
+          <bs-dropdown-divider/>
+          <bs-dropdown-header :label="Disabled option"/>
+          <bs-dropdown-item :label="Item 3" :disabled=[[true]]/>
+        </bs-dropdown>
+        <bs-split-dropdown :label="Dropdown split button" :dark=[[true]]>
+          <bs-dropdown-item :label="Item 1"/>
+          <bs-dropdown-item :label="Item 2" :active=[[true]]/>
+          <bs-dropdown-divider/>
+          <bs-dropdown-header :label="Disabled option"/>
+          <bs-dropdown-item :label="Item 3" :disabled=[[true]]/>
+        </bs-split-dropdown>
+      </div>
+      <br/>
+
+      <div>
+        <bs-collapse-trigger :targetId="collapseExample">
+          Toggle
+        </bs-collapse-trigger>
+        <bs-collapse id="collapseExample">
+          <p/>
+          <bs-card>
+            Hola
+          </bs-card>
+        </bs-collapse>
+      </div>
+      <br/>
+
+      <div>
+        <bs-buttongroup>
+          <bs-button>Button 1</bs-button>
+          <bs-button>Button 2</bs-button>
+        </bs-buttongroup>
+      </div>
+      <br/>
+
+      <bs-breadcrumb>
+        <bs-breadcrumb-item>path1</bs-breadcrumb-item>
+        <bs-breadcrumb-item>path2</bs-breadcrumb-item>
+      </bs-breadcrumb>
+
+      <div>
+        <bs-badge>A badge</bs-badge>
+        <bs-badge :pill=[[true]]>A round badge</bs-badge>
+        <bs-badge :type="warning" :pill=[[true]]>A round warning badge</bs-badge>
+      </div>
+      <br/>
+
+      <bs-alert>
+        A simple primary alert with <a href="#">an example link</a>. Give it a click if you like.
+      </bs-alert>
+      <br/>
+
+      <bs-card :title="Example" :footer="Last update: 5 mins ago">
+        <p>
+          Some quick example text to build on the card title and make up the
+          bulk of the card's content.
+        </p>
+        <bs-button>Go somewhere</bs-button>
+        <bs-button>Go somewhere else</bs-button>
+      </bs-card>
+      <br/>
+      <bs-card :title="Example"
+               :footer="Last update: 5 mins ago"
+               :imgSrc="https://plchldr.co/i/500x250?bg=868e96">
+        <p>
+          Some quick example text to build on the card title and make up the
+          bulk of the card's content.
+        </p>
+        <a href="#">A link</a>
+        <a href="#">Another link</a>
+      </bs-card>
+      <p/>
+      <bs-card>
+        Some quick example text to build on the card title and make up the
+        bulk of the card's content.
+      </bs-card>
+      <br/>
+
+      <bs-accordion>
+        <bs-accordion-item :header="Item 1">
+          Cip
+        </bs-accordion-item>
+        <bs-accordion-item :header="Item 2">
+          Ciop
+        </bs-accordion-item>
+      </bs-accordion>
+      <br/>
+
+      <bs-carousel :autoPlay="[[true]]">
+        <bs-carousel-item>
+          <div style="padding:5em;text-align:center;"><h1>Hi there</h1></div>
+        </bs-carousel-item>
+        <bs-carousel-item>
+          <div style="padding:5em;text-align:center;"><h1>Second slide</h1></div>
+        </bs-carousel-item>
+      </bs-carousel>
+      <br/>
+    </bs-container>
+  </body>
+</html>

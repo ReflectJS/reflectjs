@@ -1,0 +1,31 @@
+<lib>
+  <h4>
+    <bs-icon :icon="code-square"/>
+    Reactive HTML
+  </h4>
+  <hr/>
+  <p>
+    You can add <a href="#">logic values</a> to any tag and use
+    <a href="#">expressions</a> anywhere in text and attributes
+    to reflect results in the page.
+  </p>
+  <bs-card :class-code-card="[[true]]" :mutedFooter="[[false]]" :footer=" ">
+    <highlight-js style="margin-bottom: 0"
+                  :lang="html"
+                  :source='[[
+`<div :count="[`+`[0]`+`]"
+     :did-init="[`+`[
+       setInterval(() => count++, 1000)
+     ]`+`]">
+  Seconds: [`+`[count]`+`]
+</div>`
+    ]]'/>
+    <div :slot="footer" :count="[[0]]"
+          :handle-count="[[
+            window.setTimeout(() => count++, 1000)
+          ]]">
+      Seconds: [[count]]
+    </div>
+  </bs-card>
+  <!--- <br/><a href="#">More on Reactivity</a><br/> -->
+</lib>

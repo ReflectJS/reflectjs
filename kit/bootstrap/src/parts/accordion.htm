@@ -1,0 +1,46 @@
+<lib>
+  <:import src="../base.htm"/>
+
+  <!---
+	https://getbootstrap.com/docs/5.2/components/accordion/
+	-->
+	<:define tag="bs-accordion" class="accordion"
+					 :flush=[[false]]
+					 :mutex=[[true]]
+					 :selection=[[0]]
+					 :accordionId="[[__id]]"
+					 id="accordion-[[accordionId]]"
+					 :class-accordionFlush=[[flush]]/>
+
+	<:define tag="bs-accordion-item" class="accordion-item"
+					 :header=""
+					 :itemId="[[__id]]"
+					 :itemIndex="[[__elementIndex()]]"
+					 :handle-data="[[itemIndex = __elementIndex()]]"
+					 :selected="[[false]]"
+					 :on-selection="[[mutex ? selected = (selection === itemIndex) : null]]"
+					 :on-hidden.bs.collapse="[[() => {
+							return mutex && selection === itemIndex
+									? selection = -1
+									: null;
+					 }]]"
+					 :on-shown.bs.collapse="[[() => mutex ? selection = itemIndex : null]]">
+		<h2 class="accordion-header" id="heading-[[itemId]]">
+			<button type="button"
+						  class="accordion-button" :class-collapsed=[[!selected]]
+							data-bs-toggle="collapse" data-bs-target="#collapse-[[itemId]]"
+							aria-expanded=[[selected]] aria-controls="collapse-[[itemId]]">
+				[[header]]<:slot name="header"/>
+			</button>
+		</h2>
+		<div id="collapse-[[itemId]]"
+				 class="accordion-collapse collapse" :class-show="[[selected]]"
+				 data-bs-parent="[[mutex ? '#accordion-' + accordionId : null]]"
+				 aria-labelledby="heading-[[itemId]]">
+			<div class="accordion-body">
+				<:slot name="default"/>
+			</div>
+		</div>
+	</:define>
+
+</lib>

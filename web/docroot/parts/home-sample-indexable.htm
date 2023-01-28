@@ -1,0 +1,37 @@
+<lib>
+  <h4>
+    <bs-icon :icon="body-text"/>
+    Indexable pages
+  </h4>
+  <hr/>
+  <p>
+    Pages are <a href="#">rendered in the server</a> with their dynamic content,
+    and are then <a href="#">updated in the client</a> as needed.
+  </p>
+  <bs-card :class-code-card="[[true]]" :mutedFooter="[[false]]" :footer=" ">
+    <highlight-js style="margin-bottom: 0"
+                  :lang="html"
+                  :source='[[
+`<:data-source :aka="cat"
+              :url="https://catfact.ninja/fact"/>
+<div class="cat-fact">
+  <span>[`+`[cat.content.fact]`+`]</span>
+  <button :on-click="[`+`[() => cat.trigger()]`+`]">
+    Next
+  </button>
+</div>
+`
+    ]]'/>
+    <!---
+    TODO: [REF-31] avoid server + client data request at start,
+    reuse server-side data or skip client-side refresh
+    -->
+    <:data-source :aka="cat"
+                  :url="https://catfact.ninja/fact"/>
+    <div :slot="footer" class="cat-fact">
+      <span>[[cat.content && cat.content.fact]]</span>
+      <bs-button :on-click="[[() => cat.trigger()]]">Next</bs-button>
+    </div>
+  </bs-card>
+  <!--- <br/><a href="#">More on Indexability</a><br/> -->
+</lib>
