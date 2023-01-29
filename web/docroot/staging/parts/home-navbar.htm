@@ -1,13 +1,28 @@
 <lib>
-  <bs-navbar :breakpoint="sm" :dark=[[true]]>
+  <bs-navbar :breakpoint="sm"
+             :dark=[[true]]
+             :did-init="[[
+               const p = window.location.pathname;
+               if (/\/examples\//.test(p)) {
+                 selection = 1;
+               } else if (/\/kits\//.test(p)) {
+                 selection = 2;
+               } else if (/\/docs\//.test(p)) {
+                 selection = 3;
+               } else if (/\/devtools\//.test(p)) {
+                 selection = 4;
+               } else {
+                 selection = 0;
+               }
+             ]]">
     <span :slot="brand">
-      <img class="brand-icon" src="res/reflectjs-logo.svg"/>
+      <img class="brand-icon" src="[[homePath]]res/reflectjs-logo.svg"/>
     </span>
-    <bs-nav-item :text="Home"/>
-    <bs-nav-item :text="Examples" :disabled="[[true]]"/>
-    <bs-nav-item :text="Kits" :disabled="[[true]]"/>
-    <bs-nav-item :text="Docs" :disabled="[[true]]"/>
-    <bs-nav-item :text="DevTools" :disabled="[[true]]"/>
+    <bs-nav-item :text="Home" :href="[[homePath]]index"/>
+    <bs-nav-item :text="Examples" :href="[[homePath]]examples/index" :disabled="[[true]]"/>
+    <bs-nav-item :text="Kits" :href="[[homePath]]kits/index" :disabled="[[true]]"/>
+    <bs-nav-item :text="Docs" :href="[[homePath]]docs/index"/>
+    <bs-nav-item :text="DevTools" :href="[[homePath]]devtools/index" :disabled="[[true]]"/>
     <a :slot="extra"
         class="navbar-brand"
         style="margin-right: 0"

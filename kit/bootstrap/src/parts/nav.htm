@@ -26,13 +26,13 @@
   <:define tag="bs-nav-item:li"
            class="nav-item"
            :text=""
-           :link="[[null]]"
+           :href="[[null]]"
            :disabled="[[false]]"
            :itemIndex="[[__elementIndex(__dom)]]"
            :handle-data="[[itemIndex = __elementIndex(__dom)]]"
            :selected="[[selection === itemIndex]]">
     <a class="nav-link"
-       href=[[link]]
+       href=[[href]]
        :class-active=[[selected]]
        :class-disabled=[[disabled]]
        :handle-selected="[[

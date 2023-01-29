@@ -9,16 +9,19 @@
     <:import src="/.kit/bootstrap/icons.htm"/>
     <:import src="parts/style.htm"/>
   </head>
-  <body>
+  <body :homePath="">
     <:include src="parts/home-navbar.htm"/>
     <:include src="parts/home-jambotron.htm"/>
 
     <bs-container :fluid="[[true]]">
       <div class="row gx-5">
         <bs-col :size="lg-7">
-          <br><br><:include src="parts/home-sample-reactive.htm"/>
-          <br><br><:include src="parts/home-sample-reusable.htm"/>
-          <br><br><:include src="parts/home-sample-indexable.htm"/>
+          <br><br id="reactivity">
+          <:include src="parts/home-sample-reactive.htm"/>
+          <br><br id="reusability">
+          <:include src="parts/home-sample-reusable.htm"/>
+          <br><br id="indexability">
+          <:include src="parts/home-sample-indexable.htm"/>
         </bs-col>
         <bs-col :size="lg-5">
           <br/>
