@@ -232,7 +232,6 @@ export default class ServerImpl {
         throw errors;
       }
       ret.js = js;
-      ret.props = eval(`(${js})`);
     } catch (err: any) {
       if (Array.isArray(err)) {
         ret.errors = err;
@@ -264,7 +263,6 @@ export default class ServerImpl {
     const ret: ExecutedPage = { compiledPage: compiledPage };
     const doc = compiledPage.doc as HtmlDocument;
     const js = compiledPage.js as string;
-    const props = compiledPage.props as any;
     try {
       const win = new Window({
         url: url.toString(),
@@ -286,6 +284,7 @@ export default class ServerImpl {
 
       win.document.write(doc.toString(false, false, this.normalizeText));
       const root = win.document.documentElement as unknown as Element;
+      const props = eval(`(${js})`);
       const page = new Page(win as any, root, props);
       page.refresh();
 
@@ -331,7 +330,6 @@ type CompiledPage = {
   html: string,
   doc: HtmlDocument,
   js: string,
-  props: any,
   errors?: PageError[]
 }
 
@@ -340,42 +338,3 @@ type ExecutedPage = {
   output?: string,
   errors?: PageError[]
 }
-
-/**
- * CachedPage
- */
-// class CachedPage {
-// 	tstamp: number;
-// 	sources: string[];
-
-// 	constructor(tstamp: number, sources: Array<string>) {
-// 		this.tstamp = tstamp;
-// 		this.sources = sources;
-// 		while (this.sources.length > 0) {
-// 			if (this.sources[this.sources.length - 1] === 'embedded') {
-// 				this.sources.pop();
-// 			} else {
-// 				break;
-// 			}
-// 		}
-// 	}
-
-// 	//TODO: no two actual checks within the same second
-// 	async isUpToDate(): Promise<boolean> {
-//     let ret = true;
-
-//     for (const source of this.sources) {
-//       try {
-//         const stat = await fs.promises.stat(source);
-//         if (stat.mtime.valueOf() > this.tstamp) {
-//           throw '';
-//         }
-//       } catch (err: any) {
-//         ret = false;
-//         break;
-//       }
-//     }
-
-//     return ret;
-// 	}
-// }
