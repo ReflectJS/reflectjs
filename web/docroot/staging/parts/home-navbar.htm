@@ -1,6 +1,7 @@
 <lib>
   <bs-navbar :breakpoint="sm"
              :dark=[[true]]
+             :brandLink="[[homePath]]index"
              :did-init="[[
                const p = window.location.pathname;
                if (/\/examples\//.test(p)) {
@@ -20,7 +21,7 @@
     </span>
     <bs-nav-item :text="Home" :href="[[homePath]]index"/>
     <bs-nav-item :text="Examples" :href="[[homePath]]examples/index" :disabled="[[true]]"/>
-    <bs-nav-item :text="Kits" :href="[[homePath]]kits/index" :disabled="[[true]]"/>
+    <bs-nav-item :text="Kits" :href="[[homePath]]kits/index"/>
     <bs-nav-item :text="Docs" :href="[[homePath]]docs/index"/>
     <bs-nav-item :text="DevTools" :href="[[homePath]]devtools/index" :disabled="[[true]]"/>
     <a :slot="extra"
