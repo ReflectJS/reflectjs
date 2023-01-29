@@ -5,6 +5,8 @@ import { ELEMENT_NODE, TEXT_NODE } from "./dom";
 import { HtmlDocument, HtmlElement, HtmlNode, HtmlPos, HtmlText } from "./htmldom";
 import HtmlParser, { HtmlException } from "./htmlparser";
 
+export const EMBEDDED_INCLUDE_FNAME = ':embedded:';
+
 const INCLUDE_TAG = ':INCLUDE';
 const IMPORT_TAG = ':IMPORT';
 const INCLUDE_ARG = 'src';
@@ -83,7 +85,7 @@ export default class Preprocessor {
         domEnsureHeadAndBody(ret);
         var head = domGetTop(ret, 'HEAD');
         if (head) {
-          var inc = this.parser.parseDoc(embeddedInclude, 'embedded');
+          var inc = this.parser.parseDoc(embeddedInclude, EMBEDDED_INCLUDE_FNAME);
           if (inc.firstElementChild) {
             this.include(inc.firstElementChild as HtmlElement, head as HtmlElement, undefined);
           }

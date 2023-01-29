@@ -6,7 +6,7 @@ import * as http from 'http';
 import path from "path";
 import { compileDoc, PageError } from "../compiler/page-compiler";
 import { HtmlDocument } from "../preprocessor/htmldom";
-import Preprocessor from "../preprocessor/preprocessor";
+import Preprocessor, { EMBEDDED_INCLUDE_FNAME } from "../preprocessor/preprocessor";
 import { Page, PROPS_SCRIPT_ID, RUNTIME_SCRIPT_ID, RUNTIME_URL } from "../runtime/page";
 import exitHook from "./exit-hook";
 import { STDLIB } from "./stdlib";
@@ -197,6 +197,7 @@ export default class ServerImpl {
 		if (compiledPage.errors && compiledPage.errors.length > 0) {
 			return {
 				compiledPage: compiledPage,
+				output: '',
 				errors: compiledPage.errors.slice()
 			}
 		}
@@ -205,18 +206,19 @@ export default class ServerImpl {
 
 	async getCompiledPage(url: URL): Promise<CompiledPage> {
 		const cachedPage = this.compiledPages.get(url.pathname);
-		if (cachedPage) {
-			// console.log('cache hit for "' + url.pathname + '"');//tempdebug
+		if (cachedPage && await this.isCompiledPageFresh(cachedPage)) {
 			return cachedPage;
 		}
-		// console.log('cache miss for "' + url.pathname + '"');//tempdebug
+		console.log('cache miss for "' + url.pathname + '"');//tempdebug
 		const ret = await this.compilePage(url);
 		this.compiledPages.set(url.pathname, ret);
 		return ret;
 	}
 
   async compilePage(url: URL): Promise<CompiledPage> {
-		const ret: CompiledPage = {};
+		const ret: any = {
+			tstamp: Date.now()
+		};
 		try {
 			const pathname = decodeURIComponent(url.pathname);
 			const pre = new Preprocessor(this.props.rootPath);
@@ -224,6 +226,7 @@ export default class ServerImpl {
 			if (!ret.doc) {
 				throw `failed to load page "${pathname}"`;
 			}
+			ret.files = pre.parser.origins;
 			const { js, errors } = compileDoc(ret.doc);
 			if (errors.length > 0) {
 				throw errors;
@@ -240,11 +243,21 @@ export default class ServerImpl {
     return ret;
   }
 
-	async isCompiledPageOutdated(compiledPage?: CompiledPage): Promise<boolean> {
-		if (!compiledPage) {
-			return true;
-		}
-		return false; //tempdebug
+	async isCompiledPageFresh(compiledPage: CompiledPage): Promise<boolean> {
+    for (const file of compiledPage.files) {
+			if (file === EMBEDDED_INCLUDE_FNAME) {
+				continue;
+			}
+      try {
+        const stat = await fs.promises.stat(file);
+        if (stat.mtime.valueOf() > compiledPage.tstamp) {
+					return false;
+        }
+      } catch (err: any) {
+				return false;
+      }
+    }
+		return true;
 	}
 
 	async executePage(url: URL, compiledPage: CompiledPage): Promise<ExecutedPage> {
@@ -313,10 +326,12 @@ export default class ServerImpl {
 }
 
 type CompiledPage = {
-	html?: string,
-	doc?: HtmlDocument,
-	js?: string,
-	props?: any,
+	tstamp: number,
+	files: string[],
+	html: string,
+	doc: HtmlDocument,
+	js: string,
+	props: any,
 	errors?: PageError[]
 }
 
