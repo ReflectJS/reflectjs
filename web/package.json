@@ -7,6 +7,7 @@
     "start": "node index.js",
     "pm2 start": "pm2 start index.js",
     "pm2 restart": "pm2 restart index",
+    "pm2 status": "pm2 status",
     "pm2 delete": "pm2 delete index"
   },
   "keywords": [],
