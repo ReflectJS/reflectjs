@@ -6,7 +6,7 @@ import * as http from 'http';
 import path from "path";
 import { compileDoc, PageError } from "../compiler/page-compiler";
 import { HtmlDocument } from "../preprocessor/htmldom";
-import Preprocessor from "../preprocessor/preprocessor";
+import Preprocessor, { EMBEDDED_INCLUDE_FNAME } from "../preprocessor/preprocessor";
 import { Page, PROPS_SCRIPT_ID, RUNTIME_SCRIPT_ID, RUNTIME_URL } from "../runtime/page";
 import exitHook from "./exit-hook";
 import { STDLIB } from "./stdlib";
@@ -35,6 +35,7 @@ export interface TrafficLimit {
 // https://expressjs.com/en/advanced/best-practice-performance.html
 export default class ServerImpl {
   props: ServerProps;
+	compiledPages: Map<string, CompiledPage>;
 	serverPageTimeout: number;
 	normalizeText: boolean;
 	server: http.Server;
@@ -42,6 +43,7 @@ export default class ServerImpl {
 
   constructor(props: ServerProps, cb?: (port: number) => void) {
     this.props = props;
+		this.compiledPages = new Map();
 		this.normalizeText = props.normalizeText !== undefined ? props.normalizeText : true;
 		this.serverPageTimeout = props.serverPageTimeout ?? SERVER_PAGE_TIMEOUT;
 		const app = express();
@@ -175,7 +177,7 @@ export default class ServerImpl {
 					throw page.errors.map(pe => `${pe.type}: ${pe.msg}`).join('\n');
 				}
 				res.header("Content-Type",'text/html');
-				res.send(page.html ?? '');
+				res.send(page.output ?? '');
       } catch (err: any) {
 				res.header("Content-Type",'text/plain');
 				res.send(`${err}`);
@@ -190,26 +192,80 @@ export default class ServerImpl {
 		}
   }
 
-  async getPage(url: URL): Promise<CompiledPage> {
-		const pathname = decodeURIComponent(url.pathname);
-		// const filePath = path.normalize(path.join(this.props.rootPath, pathname) + '_');
-    return this.getFromSources(url);
+  async getPage(url: URL): Promise<ExecutedPage> {
+    const compiledPage = await this.getCompiledPage(url);
+		if (compiledPage.errors && compiledPage.errors.length > 0) {
+			return {
+				compiledPage: compiledPage,
+				output: '',
+				errors: compiledPage.errors.slice()
+			}
+		}
+		return this.executePage(url, compiledPage);
   }
 
-  async getFromSources(url: URL): Promise<CompiledPage> {
-		const ret: CompiledPage = {};
+	async getCompiledPage(url: URL): Promise<CompiledPage> {
+		const cachedPage = this.compiledPages.get(url.pathname);
+		if (cachedPage && await this.isCompiledPageFresh(cachedPage)) {
+			return cachedPage;
+		}
+		console.log('cache miss for "' + url.pathname + '"');//tempdebug
+		const ret = await this.compilePage(url);
+		this.compiledPages.set(url.pathname, ret);
+		return ret;
+	}
+
+  async compilePage(url: URL): Promise<CompiledPage> {
+		const ret: any = {
+			tstamp: Date.now()
+		};
 		try {
 			const pathname = decodeURIComponent(url.pathname);
 			const pre = new Preprocessor(this.props.rootPath);
-			const doc = await pre.read(pathname, STDLIB) as HtmlDocument;
-			if (!doc) {
+			ret.doc = await pre.read(pathname, STDLIB) as HtmlDocument;
+			if (!ret.doc) {
 				throw `failed to load page "${pathname}"`;
 			}
-			const { js, errors } = compileDoc(doc);
+			ret.files = pre.parser.origins;
+			const { js, errors } = compileDoc(ret.doc);
 			if (errors.length > 0) {
 				throw errors;
 			}
-      const props = eval(`(${js})`);
+			ret.js = js;
+      ret.props = eval(`(${js})`);
+		} catch (err: any) {
+			if (Array.isArray(err)) {
+				ret.errors = err;
+			} else {
+				ret.errors = [{ type: 'error', msg: `${err}` }];
+			}
+		}
+    return ret;
+  }
+
+	async isCompiledPageFresh(compiledPage: CompiledPage): Promise<boolean> {
+    for (const file of compiledPage.files) {
+			if (file === EMBEDDED_INCLUDE_FNAME) {
+				continue;
+			}
+      try {
+        const stat = await fs.promises.stat(file);
+        if (stat.mtime.valueOf() > compiledPage.tstamp) {
+					return false;
+        }
+      } catch (err: any) {
+				return false;
+      }
+    }
+		return true;
+	}
+
+	async executePage(url: URL, compiledPage: CompiledPage): Promise<ExecutedPage> {
+		const ret: ExecutedPage = { compiledPage: compiledPage };
+		const doc = compiledPage.doc as HtmlDocument;
+		const js = compiledPage.js as string;
+		const props = compiledPage.props as any;
+		try {
       const win = new Window({
 				url: url.toString(),
 				// https://github.com/capricorn86/happy-dom/tree/master/packages/happy-dom#settings
@@ -257,7 +313,7 @@ export default class ServerImpl {
 			])
 
 			await new Promise(resolve => setTimeout(resolve, 0));
-			ret.html = `<!DOCTYPE html>\n` + win.document.documentElement.outerHTML;
+			ret.output = `<!DOCTYPE html>\n` + win.document.documentElement.outerHTML;
 		} catch (err: any) {
 			if (Array.isArray(err)) {
 				ret.errors = err;
@@ -265,12 +321,23 @@ export default class ServerImpl {
 				ret.errors = [{ type: 'error', msg: `${err}` }];
 			}
 		}
-    return ret;
-  }
+		return ret;
+	}
 }
 
 type CompiledPage = {
-	html?: string,
+	tstamp: number,
+	files: string[],
+	html: string,
+	doc: HtmlDocument,
+	js: string,
+	props: any,
+	errors?: PageError[]
+}
+
+type ExecutedPage = {
+	compiledPage: CompiledPage,
+	output?: string,
 	errors?: PageError[]
 }
 
