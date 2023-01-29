@@ -35,6 +35,7 @@ export interface TrafficLimit {
 // https://expressjs.com/en/advanced/best-practice-performance.html
 export default class ServerImpl {
   props: ServerProps;
+	compiledPages: Map<string, CompiledPage>;
 	serverPageTimeout: number;
 	normalizeText: boolean;
 	server: http.Server;
@@ -42,6 +43,7 @@ export default class ServerImpl {
 
   constructor(props: ServerProps, cb?: (port: number) => void) {
     this.props = props;
+		this.compiledPages = new Map();
 		this.normalizeText = props.normalizeText !== undefined ? props.normalizeText : true;
 		this.serverPageTimeout = props.serverPageTimeout ?? SERVER_PAGE_TIMEOUT;
 		const app = express();
@@ -191,9 +193,7 @@ export default class ServerImpl {
   }
 
   async getPage(url: URL): Promise<ExecutedPage> {
-		const pathname = decodeURIComponent(url.pathname);
-		// const filePath = path.normalize(path.join(this.props.rootPath, pathname) + '_');
-    const compiledPage = await this.compilePage(url);
+    const compiledPage = await this.getCompiledPage(url);
 		if (compiledPage.errors && compiledPage.errors.length > 0) {
 			return {
 				compiledPage: compiledPage,
@@ -202,6 +202,18 @@ export default class ServerImpl {
 		}
 		return this.executePage(url, compiledPage);
   }
+
+	async getCompiledPage(url: URL): Promise<CompiledPage> {
+		const cachedPage = this.compiledPages.get(url.pathname);
+		if (cachedPage) {
+			// console.log('cache hit for "' + url.pathname + '"');//tempdebug
+			return cachedPage;
+		}
+		// console.log('cache miss for "' + url.pathname + '"');//tempdebug
+		const ret = await this.compilePage(url);
+		this.compiledPages.set(url.pathname, ret);
+		return ret;
+	}
 
   async compilePage(url: URL): Promise<CompiledPage> {
 		const ret: CompiledPage = {};
@@ -227,6 +239,13 @@ export default class ServerImpl {
 		}
     return ret;
   }
+
+	async isCompiledPageOutdated(compiledPage?: CompiledPage): Promise<boolean> {
+		if (!compiledPage) {
+			return true;
+		}
+		return false; //tempdebug
+	}
 
 	async executePage(url: URL, compiledPage: CompiledPage): Promise<ExecutedPage> {
 		const ret: ExecutedPage = { compiledPage: compiledPage };
