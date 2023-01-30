@@ -261,7 +261,7 @@ export default class ServerImpl {
 
   async executePage(url: URL, compiledPage: CompiledPage): Promise<ExecutedPage> {
     const ret: ExecutedPage = { compiledPage: compiledPage };
-    const doc = compiledPage.doc as HtmlDocument;
+    const indoc = compiledPage.doc as HtmlDocument;
     const js = compiledPage.js as string;
     try {
       const win = new Window({
@@ -282,37 +282,40 @@ export default class ServerImpl {
       };
       win.setInterval = (callback, delay) => ({} as NodeJS.Timeout);
 
-      win.document.write(doc.toString(false, false, this.normalizeText));
-      const root = win.document.documentElement as unknown as Element;
+      const outdoc = win.document;
+      outdoc.write(indoc.toString(false, false, this.normalizeText));
+      const root = outdoc.documentElement as unknown as Element;
       const props = eval(`(${js})`);
       const page = new Page(win as any, root, props);
       page.refresh();
 
-      const propsScript = win.document.createElement('script');
+      const propsScript = outdoc.createElement('script');
       propsScript.id = PROPS_SCRIPT_ID;
       propsScript.setAttribute('type', 'text/json');
-      propsScript.appendChild(win.document.createTextNode(`\n${js}\n`));
-      win.document.body.appendChild(propsScript);
-      win.document.body.appendChild(win.document.createTextNode('\n'));
+      propsScript.appendChild(outdoc.createTextNode(`\n${js}\n`));
+      outdoc.body.appendChild(propsScript);
+      outdoc.body.appendChild(outdoc.createTextNode('\n'));
 
-      const runtimeScript = win.document.createElement('script');
+      const runtimeScript = outdoc.createElement('script');
       runtimeScript.id = RUNTIME_SCRIPT_ID;
       runtimeScript.setAttribute('src', RUNTIME_URL);
-      win.document.body.appendChild(runtimeScript);
-      win.document.body.appendChild(win.document.createTextNode('\n'));
+      outdoc.body.appendChild(runtimeScript);
+      outdoc.body.appendChild(outdoc.createTextNode('\n'));
 
+      let tmp: Window | null = win;
       await Promise.race([
         win.happyDOM.whenAsyncComplete(),
         new Promise<void>(resolve => {
           setTimeout(() => {
-            win.happyDOM.cancelAsync();
+            tmp?.happyDOM.cancelAsync();
             resolve();
           }, this.serverPageTimeout);
         })
-      ])
+      ]);
+      tmp = null;
 
       await new Promise(resolve => setTimeout(resolve, 0));
-      ret.output = `<!DOCTYPE html>\n` + win.document.documentElement.outerHTML;
+      ret.output = `<!DOCTYPE html>\n` + outdoc.documentElement.outerHTML;
     } catch (err: any) {
       if (Array.isArray(err)) {
         ret.errors = err;
