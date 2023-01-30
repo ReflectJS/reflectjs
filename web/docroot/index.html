@@ -17,25 +17,34 @@
         width: 100%;
         text-align: center;
       }
-      @media (prefers-color-scheme: dark) {
-        a {
-          color: #8ebbff;
-        }
-      }
       h1 {
         display: inline-block;
         color: #8ebbff;
         background: #222;
-        padding: 1em 1.3em .95em 1.2em;
+        padding: 1em 1.3em 1em 1.2em;
         border-radius: 2em;
         margin-bottom: .75em;
         border: 1px solid rgba(255,255,255,.1);
+      }
+      svg > path {
+        fill: #8ebbff;
+        stroke: #8ebbff;
+      }
+      @media (prefers-color-scheme: dark) {
+        h1 {
+          color: #8ebbff;
+          background: #222;
+          border: 1px solid rgba(255,255,255,.1);
+        }
+        a {
+          color: #8ebbff;
+        }
       }
       .brand-icon {
         width: 1.5em;
         height: 1.5em;
         vertical-align: -33%;
-        margin-right: 10px;
+        margin-right: 7px;
       }
       h1 > a {
         color: white;
@@ -48,15 +57,25 @@
         color: var(--bs-orange);
         padding-bottom: 2em;
       }
+      svg > path {
+        fill: currentColor;
+        stroke: currentColor;
+      }
     </style>
   </head>
   <body>
     <div>
       <a href="https://github.com/ReflectJS/reflectjs">
       <h1>
-        <img class="brand-icon" src="reflectjs-logo.svg">
+        <svg class="brand-icon" width="188" height="180" viewBox="0 0 188 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M13.3836 87.9603L56.3265 54.4097" stroke="#8ebbff" stroke-width="18" stroke-linecap="round"/>
+          <path d="M87.4461 30.7608L35.9903 37.9924L67.981 78.9387L87.4461 30.7608ZM16.4792 91.9168L58.3021 59.2411L52.7612 52.149L10.9383 84.8247L16.4792 91.9168Z" fill="#8ebbff"/>
+          <path d="M13.71 88.37L70.5721 132.796" stroke="#8ebbff" stroke-width="18" stroke-linecap="round"/>
+          <path d="M174.736 88.4256L128 124" stroke="#8ebbff" stroke-width="18" stroke-linecap="round"/>
+          <path d="M101 146.035L152.456 138.803L120.465 97.8569L101 146.035ZM171.967 84.8788L130.144 117.554L135.685 124.647L177.508 91.9709L171.967 84.8788Z" fill="#8ebbff"/>
+          <path d="M174.736 88.4256L117.874 44" stroke="#8ebbff" stroke-width="18" stroke-linecap="round"/>
+        </svg>
         Reflect.js
-        <!-- <a href="https://github.com/ReflectJS/reflectjs"><bs-icon :icon="github" style="font-size: 100%"/></a> -->
       </h1>
       </a>
       <p class="lead">
