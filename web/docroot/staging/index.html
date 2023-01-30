@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" :homePath="" :pageTitle="Reflect.js">
   <head>
     <title>Reflect.js</title>
     <link rel="icon" href="/favicon.svg">
@@ -9,18 +9,18 @@
     <:import src="/.kit/bootstrap/icons.htm"/>
     <:import src="parts/style.htm"/>
   </head>
-  <body :homePath="">
+  <body>
     <:include src="parts/home-navbar.htm"/>
     <:include src="parts/home-jambotron.htm"/>
 
     <bs-container :fluid="[[true]]">
       <div class="row gx-5">
         <bs-col :size="lg-7">
-          <br><br id="reactivity">
+          <br><div id="reactivity"><br></div>
           <:include src="parts/home-sample-reactive.htm"/>
-          <br><br id="reusability">
+          <br><div id="reusability"><br></div>
           <:include src="parts/home-sample-reusable.htm"/>
-          <br><br id="indexability">
+          <br><div id="indexability"><br></div>
           <:include src="parts/home-sample-indexable.htm"/>
         </bs-col>
         <bs-col :size="lg-5">
