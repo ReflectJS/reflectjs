@@ -1,15 +1,70 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title>Reflect.js</title>
     <link rel="icon" href="favicon.svg">
-  <meta name="color-scheme" content="light dark" />
-  <style>
-    body {
-      font-family: sans-serif;
-    }
-  </style>
-</head>
-<body>
-</body>
+    <:import src="/.kit/bootstrap/all.htm"/>
+    <:import src="/.kit/bootstrap/icons.htm"/>
+    <style>
+      body {
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        width: 100%;
+      }
+      body > div {
+        text-align: center;
+        translate: 0 -40%;
+      }
+      @media (prefers-color-scheme: dark) {
+        a {
+          color: #8ebbff;
+        }
+      }
+      h1 {
+        display: inline-block;
+        color: #8ebbff;
+        background: #222;
+        padding: 1em 1.3em .95em 1.2em;
+        border-radius: 2em;
+        margin-bottom: .75em;
+        border: 1px solid rgba(255,255,255,.1);
+      }
+      .brand-icon {
+        width: 1.5em;
+        height: 1.5em;
+        vertical-align: -33%;
+        margin-right: 10px;
+      }
+      h1 > a {
+        color: white;
+        margin-left: 10px;
+      }
+      .lead > a {
+        text-decoration: none;
+      }
+      h2{
+        color: var(--bs-orange);
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <a href="https://github.com/ReflectJS/reflectjs">
+      <h1>
+        <img class="brand-icon" src="reflectjs-logo.svg">
+        Reflect.js
+        <!-- <a href="https://github.com/ReflectJS/reflectjs"><bs-icon :icon="github" style="font-size: 100%"/></a> -->
+      </h1>
+      </a>
+      <p class="lead">
+        The simplest reactive web framework<br/>
+        for <a href="https://nodejs.org/en/">Node.js</a> and the browser.
+      </p>
+      <h2>Coming Soon</h2>
+    </div>
+  </body>
 </html>
