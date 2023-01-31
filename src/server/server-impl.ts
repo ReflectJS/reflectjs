@@ -12,7 +12,7 @@ import exitHook from "./exit-hook";
 import { STDLIB } from "./stdlib";
 
 const SERVER_PAGE_TIMEOUT = 2000;
-const SERVER_NOJS_PARAM = '__nojs';
+const SERVER_NOCLIENT_PARAM = '__noclient';
 
 export interface ServerProps {
   port?: number,
@@ -290,7 +290,7 @@ export default class ServerImpl {
       const page = new Page(win as any, root, props);
       page.refresh();
 
-      if (!url.searchParams.has(SERVER_NOJS_PARAM)) {
+      if (!url.searchParams.has(SERVER_NOCLIENT_PARAM)) {
         const propsScript = outdoc.createElement('script');
         propsScript.id = PROPS_SCRIPT_ID;
         propsScript.setAttribute('type', 'text/json');
