@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" :homePath="../">
+  <head>
+    <title>Reflect.js • Examples</title>
+    <link rel="icon" href="/favicon.svg">
+    <:import src="/.kit/bootstrap/all.htm"/>
+    <:import src="/.kit/bootstrap/opt/marked-js.htm"/>
+    <:import src="/.kit/bootstrap/opt/highlight-js.htm"/>
+    <:import src="/.kit/bootstrap/icons.htm"/>
+    <:import src="../parts/style.htm"/>
+  </head>
+  <body>
+    <:include src="../parts/home-navbar.htm"/>
+
+    <bs-container :fluid="[[true]]">
+      <div class="row gx-5">
+        <bs-col :size="xl-5">
+          <br><div id="reactivity"><br></div>
+          <:include src="../parts/home-sample-reactive.htm"/>
+        </bs-col>
+        <bs-col :size="xl-7">
+          <br/>
+          <br><:include src="parts/home-reactive-how.htm"/>
+        </bs-col>
+      </div>
+    </bs-container>
+  </body>
+</html>
