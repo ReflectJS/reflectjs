@@ -12,6 +12,7 @@ import exitHook from "./exit-hook";
 import { STDLIB } from "./stdlib";
 
 const SERVER_PAGE_TIMEOUT = 2000;
+const SERVER_NOJS_PARAM = '__nojs';
 
 export interface ServerProps {
   port?: number,
@@ -289,18 +290,20 @@ export default class ServerImpl {
       const page = new Page(win as any, root, props);
       page.refresh();
 
-      const propsScript = outdoc.createElement('script');
-      propsScript.id = PROPS_SCRIPT_ID;
-      propsScript.setAttribute('type', 'text/json');
-      propsScript.appendChild(outdoc.createTextNode(`\n${js}\n`));
-      outdoc.body.appendChild(propsScript);
-      outdoc.body.appendChild(outdoc.createTextNode('\n'));
+      if (!url.searchParams.has(SERVER_NOJS_PARAM)) {
+        const propsScript = outdoc.createElement('script');
+        propsScript.id = PROPS_SCRIPT_ID;
+        propsScript.setAttribute('type', 'text/json');
+        propsScript.appendChild(outdoc.createTextNode(`\n${js}\n`));
+        outdoc.body.appendChild(propsScript);
+        outdoc.body.appendChild(outdoc.createTextNode('\n'));
 
-      const runtimeScript = outdoc.createElement('script');
-      runtimeScript.id = RUNTIME_SCRIPT_ID;
-      runtimeScript.setAttribute('src', RUNTIME_URL);
-      outdoc.body.appendChild(runtimeScript);
-      outdoc.body.appendChild(outdoc.createTextNode('\n'));
+        const runtimeScript = outdoc.createElement('script');
+        runtimeScript.id = RUNTIME_SCRIPT_ID;
+        runtimeScript.setAttribute('src', RUNTIME_URL);
+        outdoc.body.appendChild(runtimeScript);
+        outdoc.body.appendChild(outdoc.createTextNode('\n'));
+      }
 
       let tmp: Window | null = win;
       await Promise.race([
