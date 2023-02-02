@@ -212,7 +212,9 @@ export default class ServerImpl {
     }
     console.log('cache miss for "' + url.pathname + '"');//tempdebug
     const ret = await this.compilePage(url);
-    this.compiledPages.set(url.pathname, ret);
+    if (!ret.errors || !ret.errors.length) {
+      this.compiledPages.set(url.pathname, ret);
+    }
     return ret;
   }
 
