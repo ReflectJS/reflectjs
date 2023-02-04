@@ -16,7 +16,6 @@ export const PROPS_JS_ID = 'reflectjs_props';
 export const PAGE_JS_ID = 'reflectjs_page';
 export const PAGE_READY_CB = 'onReflectJsReady';
 export const RUNTIME_SCRIPT_ID = 'reflectjs-runtime';
-export const RUNTIME_URL = '/.reflectjs/client.js';
 
 export const ROOT_SCOPE_NAME = 'page';
 export const HEAD_SCOPE_NAME = 'head';

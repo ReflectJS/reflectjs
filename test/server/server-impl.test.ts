@@ -1,7 +1,7 @@
 import { assert } from "chai";
 import * as happy from 'happy-dom';
 import { Window } from 'happy-dom';
-import { PROPS_SCRIPT_ID } from "../../src/runtime/page";
+import { PROPS_SCRIPT_ID, RUNTIME_SCRIPT_ID } from "../../src/runtime/page";
 import Server from "../../src/server/server-impl";
 import { loadPage } from "./jsdom.test";
 
@@ -13,6 +13,7 @@ describe("server: server-impl", () => {
   before((done) => {
     server = new Server({
       rootPath: process.cwd() + '/test/server/server-impl',
+      clientJsFilePath: process.cwd() + '/dist/client.js',
       mute: true
     }, (portNr) => {
       port = portNr;
@@ -39,6 +40,7 @@ describe("server: server-impl", () => {
   it(`should get static page`, async () => {
     const doc = await loadPage(`http://localhost:${port}/page1.html`);
     doc.getElementById(PROPS_SCRIPT_ID)?.remove();
+    doc.getElementById(RUNTIME_SCRIPT_ID)?.remove();
     assert.equal(doc.body.textContent?.trim(), 'test text: page1');
   })
 
@@ -50,6 +52,7 @@ describe("server: server-impl", () => {
   it(`should get dynamic page`, async () => {
     const doc = await loadPage(`http://localhost:${port}/page2.html`);
     doc.getElementById(PROPS_SCRIPT_ID)?.remove();
+    doc.getElementById(RUNTIME_SCRIPT_ID)?.remove();
     assert.equal(doc.body.textContent?.trim(), 'hi');
   })
 

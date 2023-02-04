@@ -10,6 +10,7 @@ describe("server: stdlib", () => {
   before((done) => {
     server = new Server({
       rootPath: process.cwd() + '/test/server/stdlib',
+      clientJsFilePath: process.cwd() + '/dist/client.js',
       mute: false
     }, (portNr) => {
       baseUrl = `http://localhost:${portNr}`;

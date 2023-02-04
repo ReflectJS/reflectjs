@@ -7,11 +7,12 @@ import path from "path";
 import { compileDoc, PageError } from "../compiler/page-compiler";
 import { HtmlDocument } from "../preprocessor/htmldom";
 import Preprocessor, { EMBEDDED_INCLUDE_FNAME } from "../preprocessor/preprocessor";
-import { Page, PROPS_SCRIPT_ID, RUNTIME_SCRIPT_ID, RUNTIME_URL } from "../runtime/page";
+import { Page, PROPS_SCRIPT_ID, RUNTIME_SCRIPT_ID } from "../runtime/page";
 import exitHook from "./exit-hook";
 import { STDLIB } from "./stdlib";
 
 const SERVER_PAGE_TIMEOUT = 2000;
+const CLIENT_JS_FILE = 'client.js';
 const SERVER_NOCLIENT_PARAM = '__noclient';
 
 export interface ServerProps {
@@ -188,9 +189,8 @@ export default class ServerImpl {
     });
 
     // load client runtime
-    if (props.clientJsFilePath) {
-      this.clientJs = fs.readFileSync(props.clientJsFilePath, { encoding: 'utf8'});
-    }
+    const p = props.clientJsFilePath ?? path.resolve(__dirname, CLIENT_JS_FILE);
+    this.clientJs = '\n' + fs.readFileSync(p, { encoding: 'utf8'});
   }
 
   async getPage(url: URL): Promise<ExecutedPage> {
@@ -210,7 +210,6 @@ export default class ServerImpl {
     if (cachedPage && await this.isCompiledPageFresh(cachedPage)) {
       return cachedPage;
     }
-    console.log('cache miss for "' + url.pathname + '"');//tempdebug
     const ret = await this.compilePage(url);
     if (!ret.errors || !ret.errors.length) {
       this.compiledPages.set(url.pathname, ret);
@@ -302,7 +301,7 @@ export default class ServerImpl {
 
         const runtimeScript = outdoc.createElement('script');
         runtimeScript.id = RUNTIME_SCRIPT_ID;
-        runtimeScript.setAttribute('src', RUNTIME_URL);
+        runtimeScript.appendChild(outdoc.createTextNode(this.clientJs));
         outdoc.body.appendChild(runtimeScript);
         outdoc.body.appendChild(outdoc.createTextNode('\n'));
       }

@@ -1,9 +1,10 @@
 import { assert } from "chai";
-import Server from "../../src/server/server-impl";
 import fs from 'fs';
-import path from 'path';
+import * as happy from 'happy-dom';
 import { JSDOM } from 'jsdom';
-import { PAGE_JS_ID, PAGE_READY_CB, Page } from "../../src/runtime/page";
+import path from 'path';
+import { Page, PAGE_JS_ID } from "../../src/runtime/page";
+import Server from "../../src/server/server-impl";
 
 const rootPath = process.cwd() + '/test/client/roundtrip';
 
@@ -15,8 +16,8 @@ describe('client: roundtrip', async () => {
   before((done) => {
     server = new Server({
       rootPath: process.cwd() + '/test/client/roundtrip',
+      clientJsFilePath: process.cwd() + '/dist/client.js',
       mute: true,
-      clientJsFilePath: process.cwd() + '/dist/client.js'
     }, (portNr) => {
       port = portNr;
       done();
@@ -42,7 +43,7 @@ describe('client: roundtrip', async () => {
           ) {
 
             it(file.replace(/(\.html)$/, ''), async () => {
-              const dom = await loadPage(dir, file);
+              const dom = await loadPage(`http://localhost:${port}/${dir}/${file}`);
               try {
                 // console.log(dom.serialize())
                 const page: Page = dom.window[PAGE_JS_ID];
@@ -65,15 +66,11 @@ describe('client: roundtrip', async () => {
 
 });
 
-async function loadPage(dir: string, file: string): Promise<JSDOM> {
-  dir = encodeURIComponent(dir);
-  file = encodeURIComponent(file);
-  // https://github.com/jsdom/jsdom/blob/master/README.md
-  const url = `http://localhost:${port}/${dir}/${file}`
-  const dom = await JSDOM.fromURL(url, {
-    resources: 'usable',
-    runScripts: 'dangerously'
-  });
-  await new Promise<void>(resolve => dom.window[PAGE_READY_CB] = resolve);
+export async function loadPage(url: string) {
+  // we're using happy-dom for its `fetch` implementation
+  const win = new happy.Window();
+  const text = await (await win.fetch(url)).text();
+  // but we're returning a jsdom document because it does execute page scripts
+  const dom = new JSDOM(text, { runScripts: "dangerously" });
   return dom;
 }

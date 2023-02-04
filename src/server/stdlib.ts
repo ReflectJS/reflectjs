@@ -35,7 +35,7 @@ export const STDLIB = `<lib>
     :doRequest=[[(url, options, resCB, errCB) => {
         url || (url = this.url);
         resCB || (resCB = (res) => res.json());
-        window.fetch(url, options)
+        window.fetch && window.fetch(url, options)
           .then(resCB)
           .then(v => content = v)
           .catch(e => {
