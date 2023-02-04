@@ -61,6 +61,7 @@ new ServerImpl({
   rootPath: process.cwd() + '/docroot',
   trustProxy: false,
   assumeHttps: false,
+  clientJsFilePath: '../dist/client.js',
   pageLimit: {
     windowMs: 5000,
     maxRequests: 50
