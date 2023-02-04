@@ -1,13 +1,13 @@
 <lib>
   <bs-container :size="md" style="padding: 0">
-  <bs-row>
+  <bs-row :class-sample-points="[[true]]">
   <bs-col :size="md">
-    <!--- <h4>The example</h4> -->
+    <bs-card style="height: 100%">
     <ul class="sample">
     <li>
-      A <code>count</code> value is added to the <code>&lt;div></code>,
-      initialized to zero. The value is declared with a <code>:</code>-prefixed
-      attribute, and is initialized with a <code>[['[[']]...[[']'+']']]</code>
+      A <code>count</code> value is added to the <code>&lt;div></code> and
+      initialized to zero. It's declared with a <code>:</code>-prefixed
+      attribute, and initialized with a <code>[['[[']]...[[']'+']']]</code>
       JavaScript expression.
     </li>
     <li>
@@ -15,52 +15,37 @@
       after the <code>&lt;div></code> is initialized
       and starts a timer to increment <code>count</code> every second.
     </li>
-    <li>
-      A <code>[['[[']]count[[']'+']']]</code> reactive expression is used
+    <li style="margin-bottom: 0;">
+      A <code>[['[[']]count[[']'+']']]</code> expression is used
       in the text to reflect the current value of <code>count</code>.
+      Thanks to reactivity, the DOM is automatically updated
+      whenever <code>count</code> changes.
     </li>
     </ul>
+    </bs-card>
   </bs-col>
   <bs-col :size="md">
-    <!--- <h4>How it works</h4> -->
-    <ul class="sample">
-    <li>
-      The logic runs in both the server and the client.
-    </li>
-    <li>
-      The server
-      initializes <code>count</code> and reflects it in the text,
-      but ignores the <code>setInterval()</code> call since everything in the
-      future is left to the client.
-    </li>
-    <li>
-      The client finds <code>count</code>
-      already initialized and reflected in page text,
-      plus it's able to actually call <code>setInterval()</code>
-      to start the timer and keep the count going.
-    </li>
-    <!--- <li>
-      Reflect.js is both a Node.js server and a reactive framework for web apps.
-    </li>
-    <li>
-      As a server, it processes pages on the fly to give them additional capabilities.
-      It removes logic values and expressions declarations from the DOM and turns them into
-      page-specific, reactive JavaScript code which is added to the page.
-    </li>
-    <li>
-      As a framework it executes that code once in the server itself and then
-      it delivers the resulting page to the client. This way the output page is
-      complete with its dynamic parts.
-    </li>
-    <li>
-      The browser can display the
-      page immediately and, in the meantime, uses the injected JavaScript code
-      to restore application state and pick up execution from where the server left it.
-    </li> -->
-    </ul>
-    <br/>
+    <bs-card style="height: 100%">
+      <div class="sample-note">
+        <span><bs-icon :icon="hand-index" style="transform: rotate(90deg); display: inline-block;"/></span>
+        <span>By default, logic runs in both the server and the client</span>
+      </div>
+      <ul class="sample">
+      <li>
+        The server
+        initializes <code>count</code> and reflects it in the text,
+        but ignores the <code>setInterval()</code> call since everything in the
+        future is left to the client.
+      </li>
+      <li style="margin-bottom: 0;">
+        The client finds <code>count</code>
+        already initialized and reflected in page text,
+        plus it's able to actually call <code>setInterval()</code>
+        to start the timer and keep the count going.
+      </li>
+      </ul>
+    </bs-card>
   </bs-col>
   </bs-row>
-  <!--- <p><a href="docs/compiler">More on Reactivity</a></p> -->
   </bs-container>
 </lib>
