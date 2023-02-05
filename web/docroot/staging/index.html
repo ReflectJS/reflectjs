@@ -7,11 +7,32 @@
     <:import src="/.kit/bootstrap/opt/marked-js.htm"/>
     <:import src="/.kit/bootstrap/opt/highlight-js.htm"/>
     <:import src="/.kit/bootstrap/icons.htm"/>
-    <:import src="_index/style.htm"/>
+    <:import src="_all/style.htm"/>
   </head>
   <body>
-    <:include src="_index/home-navbar.htm"/>
-    <:include src="_index/home-jambotron.htm"/>
+    <:include src="_all/navbar.htm"/>
+    <:include src="_all/jambotron.htm"/>
+    <app-jumbotron>
+      <span :slot="header">
+        Reflect.js
+        <a href="https://github.com/ReflectJS/reflectjs/releases"
+           target="_blank">
+          <bs-badge :pill="true"
+                    :type="warning"
+                    :class-release-badge="[[true]]">
+            v.0.1.0 <bs-icon :icon="github"/>
+          </bs-badge>
+        </a>
+      </span>
+      <span :slot="lead">
+        The simplest reactive web framework
+        for Node.js and the browser.
+        It turns HTML into a <a href="#reactivity">reactive language</a>
+        for creating dynamic web sites and web apps, made of
+        <a href="#reusability">reusable components</a>, that are still
+        <a href="#indexability">fully indexable</a> out of the box.
+      </span>
+    </app-jumbotron>
 
     <!---<bs-container :fluid="[[true]]">
       <bs-row>
@@ -38,7 +59,7 @@
       </bs-row>
     </bs-container>-->
 
-    <bs-container :fluid="[[true]]">
+    <bs-container :fluid="[[true]]" style="flex: 1;">
       <div class="row gx-5">
         <bs-col :size="lg-7">
           <br><div id="reactivity"><br></div>
@@ -62,6 +83,6 @@
     </bs-container>
 
     <br/>
-    <:import src="_index/footer.htm"/>
+    <:import src="_all/footer.htm"/>
   </body>
 </html>

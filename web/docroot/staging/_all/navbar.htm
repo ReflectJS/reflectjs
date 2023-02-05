@@ -1,17 +1,19 @@
 <lib>
-  <bs-navbar :breakpoint="sm"
+  <bs-navbar :breakpoint="md"
              :dark=[[true]]
              :brandLink="[[homePath]]index"
              :did-init="[[
                const p = window.location.pathname;
-               if (/\/examples\//.test(p)) {
+               if (/\/examples/.test(p)) {
                  selection = 1;
-               } else if (/\/kits\//.test(p)) {
+               } else if (/\/kits/.test(p)) {
                  selection = 2;
-               } else if (/\/docs\//.test(p)) {
+               } else if (/\/docs/.test(p)) {
                  selection = 3;
-               } else if (/\/devtools\//.test(p)) {
+               } else if (/\/devtools/.test(p)) {
                  selection = 4;
+               } else if (/\/playground/.test(p)) {
+                 selection = 5;
                } else {
                  selection = 0;
                }
@@ -25,6 +27,7 @@
     <bs-nav-item :text="Kits" :href="[[homePath]]kits"/>
     <bs-nav-item :text="Docs" :href="[[homePath]]docs"/>
     <bs-nav-item :text="DevTools" :href="[[homePath]]devtools" :disabled="[[true]]"/>
+    <bs-nav-item :text="Playground" :href="[[homePath]]playground"/>
     <a :slot="extra"
         class="navbar-brand"
         style="margin-right: 0"

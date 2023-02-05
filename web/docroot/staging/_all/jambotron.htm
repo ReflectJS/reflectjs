@@ -1,0 +1,15 @@
+<lib>
+  <:define tag="app-jumbotron" class="jumbotron"
+           :hideHeader="[[false]]"
+           :hideLead="[[false]]">
+    <bs-container>
+      <h1 :hidden="[[hideHeader]]">
+        <:slot name="header"/>
+      </h1>
+      <br :hidden="[[false]]"/>
+      <p class="lead" :hidden="[[hideLead]]">
+        <:slot name="lead"/>
+      </p>
+    </bs-container>
+  </:define>
+</lib>

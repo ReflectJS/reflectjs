@@ -7,31 +7,58 @@
     <:import src="/.kit/bootstrap/opt/marked-js.htm"/>
     <:import src="/.kit/bootstrap/opt/highlight-js.htm"/>
     <:import src="/.kit/bootstrap/icons.htm"/>
-    <:import src="_index/style.htm"/>
+    <:import src="_all/style.htm"/>
     <:import src="_examples/style.htm"/>
   </head>
   <body>
-    <:include src="_index/home-navbar.htm"/>
+    <:include src="_all/navbar.htm"/>
+    <:include src="_all/jambotron.htm"/>
+    <app-jumbotron>
+      <span :slot="header">Code examples</span>
 
-    <bs-container :fluid="[[true]]">
+      <span :slot="lead">
+        A step by step introduction to Reflect.js
+        in byte-sized examples.
+        Each example can be opened in the
+        <a href="playground">Playground</a>
+        for experimentation.
+      </span>
+
+      <bs-nav :aka="tabs"
+              :mode="tabs"
+              :selection=[[0]]
+              :align="center"
+              :gap="[[1]]"
+              style="width: 100%; margin-top: -.75em;"
+              :handle-selection="[[
+                //const a = ['reactive', 'reusable', 'indexable'];
+                //window.location.hash = a[this.selection];
+              ]]">
+        <bs-nav-tab :link="#reactive">Reactivity</bs-nav-tab>
+        <bs-nav-tab :link="#reusable">Reusability</bs-nav-tab>
+        <bs-nav-tab :link="#indexable">Indexability</bs-nav-tab>
+      </bs-nav>
+    </app-jumbotron>
+
+    <bs-container :fluid="[[true]]" style="flex: 1;">
       <br/>
       <div class="row gx-5">
         <bs-col :size="xl-5">
           <div id="reactivity"><br></div>
           <:include src="_index/home-sample-reactive.htm"/>
-          <sample-reactive-1 :title="Reactivity — A seconds counter"/>
+          <sample-reactive-1 :title="Seconds counter"/>
         </bs-col>
         <bs-col :size="xl-7">
           <br><:include src="_examples/home-reactive-how.htm"/>
         </bs-col>
       </div>
 
-      <hr class="sample-hr"/>
+      <!-- <hr class="sample-hr"/>
       <div class="row gx-5">
         <bs-col :size="xl-5">
           <div id="reactivity"><br></div>
           <:include src="_index/home-sample-reusable.htm"/>
-          <sample-reusable-1 :title="Reusability — A custom tag"/>
+          <sample-reusable-1 :title="Custom tag"/>
         </bs-col>
         <bs-col :size="xl-7">
           <br><:include src="_examples/home-reusable-how.htm"/>
@@ -43,14 +70,14 @@
         <bs-col :size="xl-5">
           <div id="reactivity"><br></div>
           <:include src="_index/home-sample-indexable.htm"/>
-          <sample-indexable-1 :title="Indexability — A data request"/>
+          <sample-indexable-1 :title="Data request"/>
         </bs-col>
         <bs-col :size="xl-7">
           <br><:include src="_examples/home-indexable-how.htm"/>
         </bs-col>
-      </div>
+      </div> -->
     </bs-container>
 
-    <:include src="_index/footer.htm"/>
+    <:include src="_all/footer.htm"/>
   </body>
 </html>

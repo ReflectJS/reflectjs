@@ -7,14 +7,43 @@
     <:import src="/.kit/bootstrap/opt/marked-js.htm"/>
     <:import src="/.kit/bootstrap/opt/highlight-js.htm"/>
     <:import src="/.kit/bootstrap/icons.htm"/>
-    <:import src="_index/style.htm"/>
+    <:import src="_all/style.htm"/>
   </head>
   <body>
-    <:include src="_index/home-navbar.htm"/>
+    <:include src="_all/navbar.htm"/>
+    <:include src="_all/jambotron.htm"/>
+    <app-jumbotron>
+      <span :slot="header">Component kits</span>
 
-    <bs-container :fluid="[[true]]">
+      <span :slot="lead">
+        <a href="docs#custom-tags">Custom tags</a> are ideal for building
+        kits of page components. A <a href="#bootstrap">Bootstrap kit</a>
+        is included &mdash; you can compare our examples with its
+        <a href="https://getbootstrap.com/docs/5.3/getting-started/introduction/" target="_blank">original docs</a>.
+      </span>
+
+      <bs-nav :aka="tabs"
+              :mode="tabs"
+              :selection=[[0]]
+              :align="center"
+              :gap="[[1]]"
+              style="width: 100%; margin-top: -.75em;"
+              :handle-selection="[[
+                //const a = ['reactive', 'reusable', 'indexable'];
+                //window.location.hash = a[this.selection];
+              ]]">
+        <bs-nav-tab :link="#reusable">Introduction</bs-nav-tab>
+        <bs-nav-tab :link="#reusable">
+          <bs-icon :icon="bootstrap"/>
+          Bootstrap
+        </bs-nav-tab>
+        <!-- <bs-nav-tab :link="#indexable" :disabled="[[true]]">Ionic</bs-nav-tab> -->
+      </bs-nav>
+    </app-jumbotron>
+
+    <bs-container :fluid="[[true]]" style="flex: 1;">
     </bs-container>
 
-    <:include src="_index/footer.htm"/>
+    <:include src="_all/footer.htm"/>
   </body>
 </html>
