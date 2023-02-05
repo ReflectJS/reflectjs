@@ -1,7 +1,12 @@
 <lib>
+  <:define tag="app-product" class="app-product"
+          :name="" :price="">
+    [[name]] &mdash; <span>[[price]]</span>
+  </:define>
+  <:define tag="sample-reusable-1" :title="Reusable components">
   <h4>
     <bs-icon :icon="puzzle"/>
-    Reusable components
+    [[title]]
   </h4>
   <title-spacer/>
   <p>
@@ -33,14 +38,11 @@
 <span class="hljs-tag">&lt;<span class="hljs-name">app-product</span> <span class="hljs-attr">:name</span>=<span class="hljs-string">"Gadget"</span> <span class="hljs-attr">:price</span>=<span class="hljs-string">"1$"</span>/&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">app-product</span> <span class="hljs-attr">:name</span>=<span class="hljs-string">"Widget"</span> <span class="hljs-attr">:price</span>=<span class="hljs-string">"2$"</span>/&gt;</span></code></pre>
 
-    <:define tag="app-product" class="app-product"
-            :name="" :price="">
-      [[name]] &mdash; <span>[[price]]</span>
-    </:define>
     <div :slot="footer">
     <app-product :name="Gadget" :price="1$"/>
     <app-product :name="Widget" :price="2$"/>
     </div>
   </bs-card>
   <!--- <br/><a href="docs/index#preprocessor">More on Reusability</a><br/> -->
+  </:define>
 </lib>

@@ -19,9 +19,34 @@
         <bs-col :size="xl-5">
           <div id="reactivity"><br></div>
           <:include src="../parts/home-sample-reactive.htm"/>
+          <sample-reactive-1 :title="Reactivity"/>
         </bs-col>
         <bs-col :size="xl-7">
           <br><:include src="parts/home-reactive-how.htm"/>
+        </bs-col>
+      </div>
+
+      <hr class="sample-hr"/>
+      <div class="row gx-5">
+        <bs-col :size="xl-5">
+          <div id="reactivity"><br></div>
+          <:include src="../parts/home-sample-reusable.htm"/>
+          <sample-reusable-1 :title="Reusability"/>
+        </bs-col>
+        <bs-col :size="xl-7">
+          <br><:include src="parts/home-reusable-how.htm"/>
+        </bs-col>
+      </div>
+
+      <hr class="sample-hr"/>
+      <div class="row gx-5">
+        <bs-col :size="xl-5">
+          <div id="reactivity"><br></div>
+          <:include src="../parts/home-sample-indexable.htm"/>
+          <sample-indexable-1 :title="Indexability"/>
+        </bs-col>
+        <bs-col :size="xl-7">
+          <br><:include src="parts/home-indexable-how.htm"/>
         </bs-col>
       </div>
     </bs-container>

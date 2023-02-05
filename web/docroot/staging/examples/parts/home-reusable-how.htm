@@ -1,0 +1,52 @@
+<lib>
+  <bs-container :size="md" style="padding: 0">
+  <bs-row :class-sample-points="[[true]]">
+  <bs-col :size="md">
+    <bs-card style="height: 100%">
+    <ul class="sample">
+    <li>
+      A custom tag <code>app-product</code> is declared using
+      the <a href="doc/index#define"><code>&lt;:define></code></a> directive.
+    </li>
+    <li>
+      Where it's used, it's replaced with its definition and initialized with
+      the provided values.
+    </li>
+    <li>
+      In the definition we put what's common to all products &mdash; there will be
+      a single place to edit for changing the visualization of all products.
+    </li>
+    <li style="margin-bottom: 0;">
+      In usages we only put what's specific to each product &mdash; the code
+      is short and uncluttered.
+    </li>
+    </ul>
+    </bs-card>
+  </bs-col>
+  <bs-col :size="md">
+    <bs-card style="height: 100%">
+      <div class="sample-note">
+        <span><bs-icon :icon="hand-index" style="transform: rotate(90deg); display: inline-block;"/></span>
+        <span>Custom tags are HTML macros</span>
+      </div>
+      <ul class="sample">
+      <li>
+        Only their usages are included in the output pages, not their definitions.
+      </li>
+      <li>
+        They're similar to
+        <a href="https://developer.mozilla.org/en-US/docs/Web/Web_Components" target="_blank">Web Components</a>,
+        but they support legacy browsers and are much simpler to use.
+      </li>
+      <li>
+        Their name must include a <code>-</code>.
+      </li>
+      <li style="margin-bottom: 0;">
+        They're replaced with <code>div</code> tags unless a different base tag is specified.
+      </li>
+      </ul>
+    </bs-card>
+  </bs-col>
+  </bs-row>
+  </bs-container>
+</lib>

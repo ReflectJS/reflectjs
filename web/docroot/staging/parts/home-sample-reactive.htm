@@ -1,13 +1,14 @@
 <lib>
+  <:define tag="sample-reactive-1" :title="Reactive HTML">
   <h4>
     <bs-icon :icon="code-square"/>
-    Reactive HTML
+    [[title]]
   </h4>
   <title-spacer/>
   <p>
     In Reflect.js pages you can add
     <a href="docs/compiler#values">logic values</a>
-    to any tag and use responsive JavaScript
+    to any tag and use reactive JavaScript
     <a href="docs/compiler#expressions">expressions</a>
     in any attribute or text to reflect results in the page.
   </p>
@@ -40,4 +41,5 @@
     </div>
   </bs-card>
   <!--- <br/><a href="#">More on Reactivity</a><br/> -->
+  </:define>
 </lib>

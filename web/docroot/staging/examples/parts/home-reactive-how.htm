@@ -17,8 +17,8 @@
     </li>
     <li style="margin-bottom: 0;">
       A <code>[['[[']]count[[']'+']']]</code> expression is used
-      in the text to reflect the current value of <code>count</code>.
-      Thanks to reactivity, the DOM is automatically updated
+      to reflect the current value of <code>count</code>
+      &mdash; thanks to reactivity, the DOM is automatically updated
       whenever <code>count</code> changes.
     </li>
     </ul>
@@ -32,16 +32,19 @@
       </div>
       <ul class="sample">
       <li>
+        Page logic starts in the server and continues in the client.
+      </li>
+      <li>
         The server
         initializes <code>count</code> and reflects it in the text,
-        but ignores the <code>setInterval()</code> call since everything in the
-        future is left to the client.
+        but <code>setInterval()</code> does nothing as 
+        future action is left to the client.
       </li>
       <li style="margin-bottom: 0;">
         The client finds <code>count</code>
         already initialized and reflected in page text,
-        plus it's able to actually call <code>setInterval()</code>
-        to start the timer and keep the count going.
+        plus its <code>setInterval()</code>
+        call actually starts a timer that keeps the count going.
       </li>
       </ul>
     </bs-card>

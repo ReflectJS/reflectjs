@@ -1,0 +1,46 @@
+<lib>
+  <bs-container :size="md" style="padding: 0">
+  <bs-row :class-sample-points="[[true]]">
+  <bs-col :size="md">
+    <bs-card style="height: 100%">
+    <ul class="sample">
+    <li>
+      A data source <code>cat</code> is declared using the
+      <a href="doc/index#data-source"><code>&lt;:data-source></code></a>
+      directive.
+    </li>
+    <li>
+      The data is provided in JSON format by a local service at address <code>/cat-facts</code> as
+      <code>{ "fact": "..." }</code>.
+    </li>
+    <li>
+      A <code>[['[[']]cat.content.fact]]</code> expression is used to reflect received data in the page.
+    </li>
+    <li style="margin-bottom: 0;">
+      A button is added to refresh the data with the <code>trigger()</code> method.
+    </li>
+    </ul>
+    </bs-card>
+  </bs-col>
+  <bs-col :size="md">
+    <bs-card style="height: 100%">
+      <div class="sample-note">
+        <span><bs-icon :icon="hand-index" style="transform: rotate(90deg); display: inline-block;"/></span>
+        <span><a href="https://www.debugbear.com/blog/server-side-rendering" target="_blank">Server Side Rendering</a> is active by default</span>
+      </div>
+      <ul class="sample">
+      <li>
+        The server performs a first request and includes received data in the output page.
+      </li>
+      <li>
+        The client finds the initial request was already made and doesn't touch the DOM.
+      </li>
+      <li style="margin-bottom: 0;">
+        When the button is clicked it performs another request to update page text.
+      </li>
+      </ul>
+    </bs-card>
+  </bs-col>
+  </bs-row>
+  </bs-container>
+</lib>
