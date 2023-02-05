@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" :homePath="../">
+<html lang="en" :homePath="">
   <head>
     <title>Reflect.js • Examples</title>
     <link rel="icon" href="/favicon.svg">
@@ -7,22 +7,22 @@
     <:import src="/.kit/bootstrap/opt/marked-js.htm"/>
     <:import src="/.kit/bootstrap/opt/highlight-js.htm"/>
     <:import src="/.kit/bootstrap/icons.htm"/>
-    <:import src="../parts/style.htm"/>
-    <:import src="parts/style.htm"/>
+    <:import src="_index/style.htm"/>
+    <:import src="_examples/style.htm"/>
   </head>
   <body>
-    <:include src="../parts/home-navbar.htm"/>
+    <:include src="_index/home-navbar.htm"/>
 
     <bs-container :fluid="[[true]]">
       <br/>
       <div class="row gx-5">
         <bs-col :size="xl-5">
           <div id="reactivity"><br></div>
-          <:include src="../parts/home-sample-reactive.htm"/>
+          <:include src="_index/home-sample-reactive.htm"/>
           <sample-reactive-1 :title="Reactivity — A seconds counter"/>
         </bs-col>
         <bs-col :size="xl-7">
-          <br><:include src="parts/home-reactive-how.htm"/>
+          <br><:include src="_examples/home-reactive-how.htm"/>
         </bs-col>
       </div>
 
@@ -30,11 +30,11 @@
       <div class="row gx-5">
         <bs-col :size="xl-5">
           <div id="reactivity"><br></div>
-          <:include src="../parts/home-sample-reusable.htm"/>
+          <:include src="_index/home-sample-reusable.htm"/>
           <sample-reusable-1 :title="Reusability — A custom tag"/>
         </bs-col>
         <bs-col :size="xl-7">
-          <br><:include src="parts/home-reusable-how.htm"/>
+          <br><:include src="_examples/home-reusable-how.htm"/>
         </bs-col>
       </div>
 
@@ -42,15 +42,15 @@
       <div class="row gx-5">
         <bs-col :size="xl-5">
           <div id="reactivity"><br></div>
-          <:include src="../parts/home-sample-indexable.htm"/>
+          <:include src="_index/home-sample-indexable.htm"/>
           <sample-indexable-1 :title="Indexability — A data request"/>
         </bs-col>
         <bs-col :size="xl-7">
-          <br><:include src="parts/home-indexable-how.htm"/>
+          <br><:include src="_examples/home-indexable-how.htm"/>
         </bs-col>
       </div>
     </bs-container>
 
-    <:include src="../parts/footer.htm"/>
+    <:include src="_index/footer.htm"/>
   </body>
 </html>
