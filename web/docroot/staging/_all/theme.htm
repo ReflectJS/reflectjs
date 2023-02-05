@@ -1,0 +1,45 @@
+<lib :appTheme="light">
+
+  <style>
+    .app-theme-switch > a {
+      color: #fafafa;
+      text-decoration: none;
+      padding: .5em 0;
+      margin: .25em 1em .25em 0;
+    }
+    .app-theme-switch > a:hover,
+    .app-theme-switch > a:focus {
+      color: #fafafa;
+    }
+  </style>
+
+  <:define tag="app-theme" class="nav-item dropdown app-theme-switch">
+    <a class="nav-link dropdown-toggle"
+       href=""
+       role="button"
+       data-bs-toggle="dropdown"
+       aria-expanded="false">
+      <bs-icon :slot="label"
+               :icon="[[
+                  head.appTheme === 'auto' ? 'circle-half' :
+                    head.appTheme === 'light' ? 'sun-fill' :
+                      'moon-stars-fill'
+               ]]" />
+    </a>
+    <ul class="dropdown-menu">
+      <li><a class="dropdown-item" href="">
+        <bs-icon :slot="label"
+                 :icon="sun-fill" />&nbsp; Light</a>
+      </li>
+      <li><a class="dropdown-item" href="">
+        <bs-icon :slot="label"
+                 :icon="moon-stars-fill" />&nbsp; Dark
+      </a></li>
+      <li><a class="dropdown-item" href="">
+        <bs-icon :slot="label"
+                 :icon="circle-half" />&nbsp; Auto
+      </a></li>
+    </ul>
+  </:define>
+  
+</lib>
