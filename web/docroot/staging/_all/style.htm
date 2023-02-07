@@ -48,7 +48,8 @@
       margin-bottom: 0;
     }
     .app-footer {
-      background: rgb(217,243,255);
+      /* background: rgb(217,243,255); */
+      background: [[__mixColors('rgb(217,243,255)', '#e4e4e4', .3)]];
       /* background: linear-gradient(180deg, rgb(202, 228, 240) 0%, rgb(195, 215, 251) 100%); */
       /* background: linear-gradient(180deg, rgb(210,226,255) 0%, rgb(202, 228, 240) 100%); */
       padding-top: 2em;
@@ -103,7 +104,8 @@
         color: #8ebbff;
       }
       .app-footer {
-        background-color: #114d7a;
+        /* background-color: #114d7a; */
+        background-color: [[__mixColors('#114d7a', '#444', .1)]];
         /* background: linear-gradient(0deg, #102b47 0%, #0c4057 100%); */
         /* background: linear-gradient(180deg, #1c4f89 0%, #104874 100%); */
       }
@@ -143,6 +145,18 @@
     }
     h4 > i.bi {
       margin-right: .15em;
+    }
+    h4 {
+      padding-top: .75em;
+      padding-bottom: .25em;
+    }
+    .home-row {
+      --bs-gutter-x: 3.5rem;
+    }
+    @media (min-width: [[k_bs_xlPx]]px) {
+      .home-row {
+        --bs-gutter-x: 5rem;
+      }
     }
   </style>
   <!--- fix for glitch in dark mode -->
