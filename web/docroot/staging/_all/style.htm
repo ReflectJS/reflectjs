@@ -16,8 +16,10 @@
       background: linear-gradient(160deg, rgb(208, 233, 244) 0%, rgba(217,243,255,1) 10%, rgb(205, 221, 250) 100%);
     }
     .jumbotron > .container {
-      padding-top: 2.2em;
-      padding-bottom: 1.55em;
+      /* padding-top: 2.2em;
+      padding-bottom: 1.55em; */
+      padding-top: 2.7em;
+      padding-bottom: 2.05em;
     }
     .jumbotron p {
       font-weight: 300;
@@ -49,7 +51,7 @@
     }
     .app-footer {
       /* background: rgb(217,243,255); */
-      background: [[__mixColors('rgb(217,243,255)', '#e4e4e4', .3)]];
+      background: [[__mixColors('#d5ecfd', '#eee', .3)]];
       /* background: linear-gradient(180deg, rgb(202, 228, 240) 0%, rgb(195, 215, 251) 100%); */
       /* background: linear-gradient(180deg, rgb(210,226,255) 0%, rgb(202, 228, 240) 100%); */
       padding-top: 2em;
@@ -105,7 +107,7 @@
       }
       .app-footer {
         /* background-color: #114d7a; */
-        background-color: [[__mixColors('#114d7a', '#444', .1)]];
+        background-color: [[__mixColors('#114d7a', '#246', .1)]];
         /* background: linear-gradient(0deg, #102b47 0%, #0c4057 100%); */
         /* background: linear-gradient(180deg, #1c4f89 0%, #104874 100%); */
       }
@@ -147,13 +149,17 @@
       margin-right: .15em;
     }
     h4 {
-      padding-top: .75em;
-      padding-bottom: .25em;
+      padding-top: .2em;
+      padding-bottom: 0em;
     }
     .home-row {
       --bs-gutter-x: 3.5rem;
     }
     @media (min-width: [[k_bs_xlPx]]px) {
+      h4 {
+        padding-top: .5em;
+        padding-bottom: .25em;
+      }
       .home-row {
         --bs-gutter-x: 5rem;
       }
