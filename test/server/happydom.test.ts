@@ -2,32 +2,18 @@ import { assert } from "chai";
 import express from 'express';
 import * as happy from 'happy-dom';
 import { Server } from 'http';
-import { JSDOM } from 'jsdom';
+import { resolve } from "path";
+import { Worker } from 'worker_threads';
 
 const rootPath = process.cwd() + '/test/server/happydom';
 
 describe('server: happydom', () => {
-  let server: Server;
-  let port: number;
+  let port = '4000';
 
-  before(async () => {
-    const app = express();
-    app.get("*.json", async (req, res, next) => {
-      const delay = parseInt(req.headers['x-test-delay'] as string);
-      await new Promise(resolve => setTimeout(resolve, delay));
-      next('route');
-    });
-    app.use(express.static(rootPath));
-    return new Promise(resolve => {
-      server = app.listen(() => {
-        port = (server.address() as any).port;
-        resolve();
-      });
-    });
-  });
-
-  after(() => {
-    server.close();
+  before((done) => {
+    const path = resolve(__dirname, 'happydom' , '_server.js');
+    const worker = new Worker(path, { workerData: port });
+    worker.on('message', () => done());
   });
 
   it(`should dynamically load data (no delay)`, async () => {
@@ -48,14 +34,19 @@ describe('server: happydom', () => {
     assert.equal(span.textContent, '');
   });
 
+  it(`should run external js`, async () => {
+    const doc = await loadPage(`http://localhost:${port}/exjs.html`, false);
+    const span = doc.getElementsByTagName('span')[0];
+    assert.equal(span.textContent, 'from exjs.js');
+  });
 });
 
-export async function loadPage(url: string) {
+export async function loadPage(url: string, dontLoadJs = true) {
   const win = new happy.Window({
     url: url.toString(),
     // https://github.com/capricorn86/happy-dom/tree/master/packages/happy-dom#settings
     settings: {
-      disableJavaScriptFileLoading: true,
+      disableJavaScriptFileLoading: dontLoadJs,
       disableJavaScriptEvaluation: false,
       disableCSSFileLoading: true,
       enableFileSystemHttpRequests: false
