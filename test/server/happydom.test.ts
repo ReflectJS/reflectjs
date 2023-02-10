@@ -42,6 +42,17 @@ describe('server: happydom', () => {
     const span = doc.getElementsByTagName('span')[0];
     assert.equal(span.textContent, 'from exjs.js');
   });
+
+  it(`should implement innerText setter`, () => {
+    const doc = new happy.Window().document;
+    doc.write(`<html><body><code id="code"></code></body></html>`);
+    const code = doc.getElementById('code') as happy.HTMLElement;
+    code.innerText = `<div>\n</div>`;
+    assert.equal(
+      doc.documentElement.outerHTML,
+      `<html><body><code id="code"><div><br></div></code></body></html>`
+    );
+  });
 });
 
 export async function loadPage(url: string, loadJS = false) {

@@ -9,7 +9,8 @@ export const EMBEDDED_INCLUDE_FNAME = ':embedded:';
 
 const INCLUDE_TAG = ':INCLUDE';
 const IMPORT_TAG = ':IMPORT';
-const INCLUDE_ARG = 'src';
+const INCLUDE_SRC = 'src';
+const INCLUDE_AS = 'as';
 
 const DEFINE_TAG = ':DEFINE';
 const DEFINE_ARG = 'tag';
@@ -213,9 +214,10 @@ export default class Preprocessor {
     // tags.add(IMPORT_TAG);
     var includes = lookupTags(doc, tags);
     for (var e of includes) {
-      var src = e.getAttribute(INCLUDE_ARG);
+      var src = e.getAttribute(INCLUDE_SRC);
       if (src && (src = src.trim()).length > 0) {
-        await this.processInclude(e, src, e.tagName === IMPORT_TAG, currPath, nesting);
+        var as = e.getAttribute(INCLUDE_AS);
+        await this.processInclude(e, src, e.tagName === IMPORT_TAG, currPath, nesting, as);
       } else {
         throw new HtmlException(
           'Missing "src" attribute', this.parser.origins[e.pos.origin],
@@ -226,7 +228,8 @@ export default class Preprocessor {
   }
 
   private async processInclude(
-    e: HtmlElement, src: string, once: boolean, currPath: string, nesting: number
+    e: HtmlElement, src: string, once: boolean, currPath: string, nesting: number,
+    as?: string
   ) {
     var parent = e.parentElement as HtmlElement;
     var before = undefined;
@@ -238,10 +241,38 @@ export default class Preprocessor {
       if (doc != null) {
         var root = doc.getFirstElementChild();
         if (root) {
-          this.include(root as HtmlElement, parent, before);
+          if (as) {
+            this.embed(root as HtmlElement, parent, before, as)
+          } else {
+            this.include(root as HtmlElement, parent, before);
+          }
         }
       }
       this.joinAdjacentTexts(parent);
+    }
+  }
+
+  private embed(root: HtmlElement, parent: HtmlElement, before: HtmlNode | undefined, as: string) {
+    const parts = as?.split(/\s+/) as string[];
+    if (parts.length > 0 && root.firstChild?.nodeType === TEXT_NODE) {
+      const t = root.firstChild.remove() as HtmlText;
+      const e = parent.ownerDocument?.createElement(parts[0]) as HtmlElement;
+      e.appendChild(t);
+      t.escape = false;
+      console.log(t.toString());//tempdebug
+      parent.addChild(e, before);
+      for (let i = 1; i < parts.length; i++) {
+        const attr = parts[i].split('=');
+        const key = attr[0].trim();
+        if (key.length > 0) {
+          let val = attr.length > 1 ? attr[1].trim() : '""';
+          if ((val.startsWith('"') && val.endsWith('"')) ||
+              (val.startsWith("'") && val.endsWith("'"))) {
+            val = val.substring(1, val.length - 1);
+          }
+          e.setAttribute(key, val);
+        }
+      }
     }
   }
 
