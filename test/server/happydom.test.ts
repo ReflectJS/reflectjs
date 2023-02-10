@@ -1,7 +1,5 @@
 import { assert } from "chai";
-import express from 'express';
 import * as happy from 'happy-dom';
-import { Server } from 'http';
 import { resolve } from "path";
 import { Worker } from 'worker_threads';
 
@@ -11,6 +9,11 @@ describe('server: happydom', () => {
   let port = '4000';
 
   before((done) => {
+    /**
+     * we have to run Express in another thread because
+     * HappyDom seems to load external JS in synchronous
+     * mode and they go in deadlock if in the same thread
+     */
     const path = resolve(__dirname, 'happydom' , '_server.js');
     const worker = new Worker(path, { workerData: port });
     worker.on('message', () => done());
@@ -35,18 +38,18 @@ describe('server: happydom', () => {
   });
 
   it(`should run external js`, async () => {
-    const doc = await loadPage(`http://localhost:${port}/exjs.html`, false);
+    const doc = await loadPage(`http://localhost:${port}/exjs.html`, true);
     const span = doc.getElementsByTagName('span')[0];
     assert.equal(span.textContent, 'from exjs.js');
   });
 });
 
-export async function loadPage(url: string, dontLoadJs = true) {
+export async function loadPage(url: string, loadJS = false) {
   const win = new happy.Window({
     url: url.toString(),
     // https://github.com/capricorn86/happy-dom/tree/master/packages/happy-dom#settings
     settings: {
-      disableJavaScriptFileLoading: dontLoadJs,
+      disableJavaScriptFileLoading: !loadJS,
       disableJavaScriptEvaluation: false,
       disableCSSFileLoading: true,
       enableFileSystemHttpRequests: false
@@ -54,7 +57,6 @@ export async function loadPage(url: string, dontLoadJs = true) {
   } as any);
   const text = await (await win.fetch(url)).text();
   win.document.write(text);
-  // await win.happyDOM.whenAsyncComplete();
   await Promise.race([
     win.happyDOM.whenAsyncComplete(),
     new Promise(resolve => setTimeout(resolve, 500))
