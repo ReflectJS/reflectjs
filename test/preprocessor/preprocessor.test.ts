@@ -85,10 +85,22 @@ describe("preprocessor: preprocessor", () => {
     assert.equal(head?.getAttribute(':attribute3'), '2');
   });
 
-  it("should accept textual includes", async () => {
-    const doc = await preprocessor.reset().read('testTextualInclude.html');
+  it("should accept textual includes (text)", async () => {
+    const doc = await preprocessor.reset().read('testTextualIncludeText.html');
     assert.isFalse(adjacentTextNodes(doc));
     assert.equal(doc?.toString(), '<html><head></head><body>This is a &quot;text&quot;</body></html>');
+  });
+
+  it("should accept textual includes (CSS)", async () => {
+    const doc = await preprocessor.reset().read('testTextualIncludeCSS.html');
+    assert.isFalse(adjacentTextNodes(doc));
+    assert.equal(doc?.toString(), '<html><head><style>body { color: red; }</style></head><body></body></html>');
+  });
+
+  it("should accept textual includes (JS)", async () => {
+    const doc = await preprocessor.reset().read('testTextualIncludeJS.html');
+    assert.isFalse(adjacentTextNodes(doc));
+    assert.equal(doc?.toString(), `<html><head><script type="text/javascript">console.log('hi')</script></head><body></body></html>`);
   });
 
   // =========================================================================

@@ -301,6 +301,8 @@ export class HtmlElement extends HtmlNode implements dom.DomElement {
   }
 
   set innerText(s: string) {
+    s = s.split('<').join('&lt;');
+    s = s.split('\n').join('<br />');
     if (this.children.length == 1 && this.children[0].nodeType == dom.TEXT_NODE) {
       (this.children[0] as HtmlText).nodeValue = s;
     } else {

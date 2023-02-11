@@ -252,3 +252,9 @@ npm remove -D @swc/cli
 ```
 npm i express-rate-limit
 ```
+
+### piscina (node thread pools)
+
+```
+npm i piscina
+```

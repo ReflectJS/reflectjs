@@ -1,33 +1,22 @@
 import { assert } from "chai";
-import express from 'express';
 import * as happy from 'happy-dom';
-import { Server } from 'http';
-import { JSDOM } from 'jsdom';
+import { resolve } from "path";
+import { Worker } from 'worker_threads';
 
 const rootPath = process.cwd() + '/test/server/happydom';
 
 describe('server: happydom', () => {
-  let server: Server;
-  let port: number;
+  let port = '4000';
 
-  before(async () => {
-    const app = express();
-    app.get("*.json", async (req, res, next) => {
-      const delay = parseInt(req.headers['x-test-delay'] as string);
-      await new Promise(resolve => setTimeout(resolve, delay));
-      next('route');
-    });
-    app.use(express.static(rootPath));
-    return new Promise(resolve => {
-      server = app.listen(() => {
-        port = (server.address() as any).port;
-        resolve();
-      });
-    });
-  });
-
-  after(() => {
-    server.close();
+  before((done) => {
+    /**
+     * we have to run Express in another thread because
+     * HappyDom seems to load external JS in synchronous
+     * mode and they go in deadlock if in the same thread
+     */
+    const path = resolve(__dirname, 'happydom' , '_server.js');
+    const worker = new Worker(path, { workerData: port });
+    worker.on('message', () => done());
   });
 
   it(`should dynamically load data (no delay)`, async () => {
@@ -48,14 +37,30 @@ describe('server: happydom', () => {
     assert.equal(span.textContent, '');
   });
 
+  it(`should run external js`, async () => {
+    const doc = await loadPage(`http://localhost:${port}/exjs.html`, true);
+    const span = doc.getElementsByTagName('span')[0];
+    assert.equal(span.textContent, 'from exjs.js');
+  });
+
+  it(`should implement innerText setter`, () => {
+    const doc = new happy.Window().document;
+    doc.write(`<html><body><code id="code"></code></body></html>`);
+    const code = doc.getElementById('code') as happy.HTMLElement;
+    code.innerText = `<div>\n</div>`;
+    assert.equal(
+      doc.documentElement.outerHTML,
+      `<html><body><code id="code"><div><br></div></code></body></html>`
+    );
+  });
 });
 
-export async function loadPage(url: string) {
+export async function loadPage(url: string, loadJS = false) {
   const win = new happy.Window({
     url: url.toString(),
     // https://github.com/capricorn86/happy-dom/tree/master/packages/happy-dom#settings
     settings: {
-      disableJavaScriptFileLoading: true,
+      disableJavaScriptFileLoading: !loadJS,
       disableJavaScriptEvaluation: false,
       disableCSSFileLoading: true,
       enableFileSystemHttpRequests: false
@@ -63,7 +68,6 @@ export async function loadPage(url: string) {
   } as any);
   const text = await (await win.fetch(url)).text();
   win.document.write(text);
-  // await win.happyDOM.whenAsyncComplete();
   await Promise.race([
     win.happyDOM.whenAsyncComplete(),
     new Promise(resolve => setTimeout(resolve, 500))

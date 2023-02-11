@@ -7,7 +7,7 @@ import path from "path";
 import { compileDoc, PageError } from "../compiler/page-compiler";
 import { HtmlDocument } from "../preprocessor/htmldom";
 import Preprocessor, { EMBEDDED_INCLUDE_FNAME } from "../preprocessor/preprocessor";
-import { Page, PROPS_SCRIPT_ID, RUNTIME_SCRIPT_ID } from "../runtime/page";
+import { PROPS_SCRIPT_ID, RUNTIME_SCRIPT_ID } from "../runtime/page";
 import exitHook from "./exit-hook";
 import { STDLIB } from "./stdlib";
 
@@ -271,7 +271,7 @@ export default class ServerImpl {
         // https://github.com/capricorn86/happy-dom/tree/master/packages/happy-dom#settings
         settings: {
           disableJavaScriptFileLoading: true,
-          disableJavaScriptEvaluation: true,
+          disableJavaScriptEvaluation: false,
           disableCSSFileLoading: true,
           enableFileSystemHttpRequests: false
         }
@@ -286,25 +286,19 @@ export default class ServerImpl {
 
       const outdoc = win.document;
       outdoc.write(indoc.toString(false, false, this.normalizeText));
-      const root = outdoc.documentElement as unknown as Element;
-      const props = eval(`(${js})`);
-      const page = new Page(win as any, root, props);
-      page.refresh();
 
-      if (!url.searchParams.has(SERVER_NOCLIENT_PARAM)) {
-        const propsScript = outdoc.createElement('script');
-        propsScript.id = PROPS_SCRIPT_ID;
-        propsScript.setAttribute('type', 'text/json');
-        propsScript.appendChild(outdoc.createTextNode(`\n${js}\n`));
-        outdoc.body.appendChild(propsScript);
-        outdoc.body.appendChild(outdoc.createTextNode('\n'));
+      const propsScript = outdoc.createElement('script');
+      propsScript.id = PROPS_SCRIPT_ID;
+      propsScript.setAttribute('type', 'text/json');
+      propsScript.appendChild(outdoc.createTextNode(`\n${js}\n`));
+      outdoc.body.appendChild(propsScript);
+      outdoc.body.appendChild(outdoc.createTextNode('\n'));
 
-        const runtimeScript = outdoc.createElement('script');
-        runtimeScript.id = RUNTIME_SCRIPT_ID;
-        runtimeScript.appendChild(outdoc.createTextNode(this.clientJs));
-        outdoc.body.appendChild(runtimeScript);
-        outdoc.body.appendChild(outdoc.createTextNode('\n'));
-      }
+      const runtimeScript = outdoc.createElement('script');
+      runtimeScript.id = RUNTIME_SCRIPT_ID;
+      runtimeScript.appendChild(outdoc.createTextNode(this.clientJs));
+      outdoc.body.appendChild(runtimeScript);
+      outdoc.body.appendChild(outdoc.createTextNode('\n'));
 
       let tmp: Window | null = win;
       await Promise.race([
@@ -319,6 +313,10 @@ export default class ServerImpl {
       tmp = null;
 
       await new Promise(resolve => setTimeout(resolve, 0));
+      if (url.searchParams.has(SERVER_NOCLIENT_PARAM)) {
+        outdoc.getElementById(RUNTIME_SCRIPT_ID).remove();
+        outdoc.getElementById(PROPS_SCRIPT_ID).remove();
+      }
       ret.output = `<!DOCTYPE html>\n` + outdoc.documentElement.outerHTML;
     } catch (err: any) {
       if (Array.isArray(err)) {
