@@ -1,0 +1,8 @@
+<html :test=[[() => {
+  const s = body.catFacts._dataCount + ' ' + body.catFacts._okCount + ' ' + body.catFacts.content.fact;
+  return (s === '1 0 Kittens are cute.' ? 'OK' : s);
+}]]>
+  <body>
+    <:data-source :aka="catFacts" :url="/data-source/data1.json"/>
+  </body>
+</html>

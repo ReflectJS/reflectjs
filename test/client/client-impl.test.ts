@@ -20,7 +20,7 @@ describe('client: client-impl', async () => {
     const html = await servePage(`<html lang=[['en']]></html>`);
     const win = new GlobalWindow();
     win.document.write(html);
-    const page = loadClientPage(win);
+    const page = loadClientPage(win) as Page;
     win.document.getElementById(PROPS_SCRIPT_ID).remove();
     assert.equal(
       page.getMarkup(),
@@ -52,7 +52,7 @@ describe('client: client-impl', async () => {
     </ul></body></html>`);
     const win = new GlobalWindow();
     win.document.write(html);
-    const page = loadClientPage(win);
+    const page = loadClientPage(win) as Page;
     assert.equal(
       page.doc.getElementById('content')?.innerHTML?.trim(),
       `<li data-reflectjs="4|0"><!---t0-->1<!---/--></li>` +
@@ -141,7 +141,7 @@ async function loadPage(html: string): Promise<Page> {
   e.appendChild(doc.createTextNode(runtimeJs));
   doc.body.appendChild(e);
   const page: Page = win[PAGE_JS_ID];
-  
+
   return page;
 }
 
