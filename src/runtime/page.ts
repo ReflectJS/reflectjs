@@ -81,6 +81,7 @@ export interface PageProps {
     this.setGlobal(NOTNULL_FN, (v: any) => v != null ? `${v}` : '');
     this.setGlobal('window', win);
     this.setGlobal('document', this.doc);
+    this.setGlobal('isServer', Reflect.has(win, 'happyDOM'));
     this.setGlobal(MIXCOLORS_VALUE, mixColors);
     this.root = this.load(null, props.root);
     this.root.values[ROOT_SCOPE_NAME] = new Value(ROOT_SCOPE_NAME, {

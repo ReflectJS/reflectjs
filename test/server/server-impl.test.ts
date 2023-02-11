@@ -96,4 +96,16 @@ describe("server: server-impl", () => {
     assert.equal(span?.textContent, 'test: index.html');
     assert.notExists(doc.getElementById(RUNTIME_SCRIPT_ID));
   });
+
+  it(`should support value 'isServer' (1)`, async () => {
+    const doc = await loadPage(`http://localhost:${port}/isServer.html?__noclient`);
+    const span = doc.getElementById('msg');
+    assert.equal(span?.textContent, 'true');
+  });
+
+  it(`should support value 'isServer' (2)`, async () => {
+    const doc = await loadPage(`http://localhost:${port}/isServer.html`);
+    const span = doc.getElementById('msg');
+    assert.equal(span?.textContent, 'false');
+  });
 });

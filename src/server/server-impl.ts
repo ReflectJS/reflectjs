@@ -314,8 +314,8 @@ export default class ServerImpl {
 
       await new Promise(resolve => setTimeout(resolve, 0));
       if (url.searchParams.has(SERVER_NOCLIENT_PARAM)) {
-        outdoc.getElementById(RUNTIME_SCRIPT_ID).remove();
-        outdoc.getElementById(PROPS_SCRIPT_ID).remove();
+        runtimeScript.remove();
+        propsScript.remove();
       }
       ret.output = `<!DOCTYPE html>\n` + outdoc.documentElement.outerHTML;
     } catch (err: any) {
