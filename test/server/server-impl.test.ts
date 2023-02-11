@@ -14,7 +14,8 @@ describe("server: server-impl", () => {
     server = new Server({
       rootPath: process.cwd() + '/test/server/server-impl',
       clientJsFilePath: process.cwd() + '/dist/client.js',
-      mute: true
+      mute: true,
+      pageLimit: { maxRequests: 1000, windowMs: 1000 }
     }, (portNr) => {
       port = portNr;
       done();
@@ -74,5 +75,25 @@ describe("server: server-impl", () => {
     const doc = await loadPage(`http://localhost:${port}/data1.html`);
     const span = doc.getElementById('msg');
     assert.equal(span?.textContent, 'OK');
+  });
+
+  it(`should redirect '/' to '/index.html'`, async () => {
+    const doc = await loadPage(`http://localhost:${port}`);
+    const span = doc.getElementById('msg');
+    assert.equal(span?.textContent, 'test: index.html');
+  });
+
+  it(`should redirect '/index' to '/index.html'`, async () => {
+    const doc = await loadPage(`http://localhost:${port}/index`);
+    const span = doc.getElementById('msg');
+    assert.equal(span?.textContent, 'test: index.html');
+    assert.exists(doc.getElementById(RUNTIME_SCRIPT_ID));
+  });
+
+  it(`shouldn't include client runtime w/ ?__noclient`, async () => {
+    const doc = await loadPage(`http://localhost:${port}/index.html?__noclient`);
+    const span = doc.getElementById('msg');
+    assert.equal(span?.textContent, 'test: index.html');
+    assert.notExists(doc.getElementById(RUNTIME_SCRIPT_ID));
   });
 });
