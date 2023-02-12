@@ -5,6 +5,7 @@ import { Window } from "happy-dom";
 import * as http from 'http';
 import path from "path";
 import { compileDoc, PageError } from "../compiler/page-compiler";
+import { DomElement } from "../preprocessor/dom";
 import { HtmlDocument } from "../preprocessor/htmldom";
 import Preprocessor, { EMBEDDED_INCLUDE_FNAME } from "../preprocessor/preprocessor";
 import { PROPS_SCRIPT_ID, RUNTIME_SCRIPT_ID } from "../runtime/page";
@@ -218,22 +219,32 @@ export default class ServerImpl {
   }
 
   async compilePage(url: URL): Promise<CompiledPage> {
-    const ret: any = {
-      tstamp: Date.now()
+    const ret: CompiledPage = {
+      tstamp: Date.now(),
+      files: [],
+      output: '<html></html>'
     };
     try {
       const pathname = decodeURIComponent(url.pathname);
       const pre = new Preprocessor(this.props.rootPath);
-      ret.doc = await pre.read(pathname, STDLIB) as HtmlDocument;
-      if (!ret.doc) {
+      const doc = await pre.read(pathname, STDLIB);
+      if (!doc) {
         throw `failed to load page "${pathname}"`;
       }
       ret.files = pre.parser.origins;
-      const { js, errors } = compileDoc(ret.doc);
+      const { js, errors } = compileDoc(doc);
       if (errors.length > 0) {
         throw errors;
       }
-      ret.js = js;
+
+      const propsScript: DomElement = doc.createElement('script');
+      propsScript.setAttribute('id', PROPS_SCRIPT_ID);
+      propsScript.setAttribute('type', 'text/json');
+      propsScript.appendChild(doc.createTextNode(`\n${js}\n`));
+      doc.body?.appendChild(propsScript);
+      doc.body?.appendChild(doc.createTextNode('\n'));
+
+      ret.output = doc.toString(false, false, this.normalizeText);
     } catch (err: any) {
       if (Array.isArray(err)) {
         ret.errors = err;
@@ -263,8 +274,6 @@ export default class ServerImpl {
 
   async executePage(url: URL, compiledPage: CompiledPage): Promise<ExecutedPage> {
     const ret: ExecutedPage = { compiledPage: compiledPage };
-    const indoc = compiledPage.doc as HtmlDocument;
-    const js = compiledPage.js as string;
     try {
       const win = new Window({
         url: url.toString(),
@@ -285,14 +294,7 @@ export default class ServerImpl {
       win.setInterval = (callback, delay) => ({} as NodeJS.Timeout);
 
       const outdoc = win.document;
-      outdoc.write(indoc.toString(false, false, this.normalizeText));
-
-      const propsScript = outdoc.createElement('script');
-      propsScript.id = PROPS_SCRIPT_ID;
-      propsScript.setAttribute('type', 'text/json');
-      propsScript.appendChild(outdoc.createTextNode(`\n${js}\n`));
-      outdoc.body.appendChild(propsScript);
-      outdoc.body.appendChild(outdoc.createTextNode('\n'));
+      outdoc.write(compiledPage.output);
 
       const runtimeScript = outdoc.createElement('script');
       runtimeScript.id = RUNTIME_SCRIPT_ID;
@@ -315,7 +317,7 @@ export default class ServerImpl {
       await new Promise(resolve => setTimeout(resolve, 0));
       if (url.searchParams.has(SERVER_NOCLIENT_PARAM)) {
         runtimeScript.remove();
-        propsScript.remove();
+        outdoc.getElementById(PROPS_SCRIPT_ID).remove();
       }
       ret.output = `<!DOCTYPE html>\n` + outdoc.documentElement.outerHTML;
     } catch (err: any) {
@@ -332,9 +334,7 @@ export default class ServerImpl {
 type CompiledPage = {
   tstamp: number,
   files: string[],
-  html: string,
-  doc: HtmlDocument,
-  js: string,
+  output: string,
   errors?: PageError[]
 }
 
