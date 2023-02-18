@@ -38,13 +38,25 @@ describe('server: jsdom', () => {
     );
   });
 
-  it(`should execute scripts`, () => {
+  it(`should execute script (1)`, () => {
     const dom = new JSDOM(`<p></p><script>
       document.querySelector("p").innerHTML = 'Hi there';
     </script>`, { runScripts: "dangerously" });
     assert.equal(
       dom.window?.document?.querySelector("p")?.textContent,
       'Hi there'
+    );
+  });
+
+  it(`should execute script (2)`, () => {
+    const dom = new JSDOM(`<p></p><script>
+      // same bug as in happydom??
+      var test = {className:"meta",begin:/<![a-z]/,end:/>/,contains:['a']};
+      document.querySelector("p").innerHTML = 'meta';//test.className;
+    </script>`, { runScripts: "dangerously" });
+    assert.equal(
+      dom.window?.document?.querySelector("p")?.textContent,
+      'meta'
     );
   });
 

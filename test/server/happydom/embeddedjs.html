@@ -1,0 +1,12 @@
+<html>
+  <head>
+  </head>
+  <body>
+    <span id="span"></span>
+    <script>
+      // happydom bug: "<![a-z]/,end:/>" below was considered a comment
+      var test = {className:"meta",begin:/<![a-z]/,end:/>/,contains:['a']};
+      document.getElementById('span').innerText = test.className;
+    </script>
+  </body>
+</html>

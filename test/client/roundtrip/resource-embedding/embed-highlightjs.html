@@ -1,0 +1,9 @@
+<html :test=[[() => {
+  const v = window.hljs;
+  if (!v) return '!window.hljs';
+  return 'OK';
+}]]>
+  <head>
+    <:import src="res/highlight.min.js" as="script"/>
+  </head>
+</html>

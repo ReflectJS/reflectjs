@@ -2,6 +2,7 @@ import * as dom from "./dom";
 import { normalizeText, peek, StringBuf } from "./util";
 import HtmlParser from "./htmlparser";
 
+export const SKIP_CONTENT_TAGS = new Set(['SCRIPT', 'STYLE']);
 const NON_NORMALIZED_TAGS = { PRE: true, SCRIPT: true };
 
 export interface HtmlPos {
@@ -394,7 +395,7 @@ export class HtmlElement extends HtmlNode implements dom.DomElement {
             return ret;
           }
         }
-      }      
+      }
     }
     return undefined;
   }
@@ -471,9 +472,16 @@ export class HtmlText extends HtmlNode implements dom.DomTextNode {
 
   constructor(
     doc: HtmlDocument | undefined, parent: HtmlElement | undefined,
-    text: string, i1: number, i2: number, origin: number, escape = true
+    text: string, i1: number, i2: number, origin: number, escape?: boolean
   ) {
     super(doc, parent, dom.TEXT_NODE, i1, i2, origin);
+    if (escape == undefined) {
+      if (parent && SKIP_CONTENT_TAGS.has(parent.tagName)) {
+        escape = false;
+      } else {
+        escape = true;
+      }
+    }
     this.escape = escape;
     this.nodeValue = (escape ? htmlUnescape(text) : text);
   }

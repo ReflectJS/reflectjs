@@ -43,6 +43,12 @@ describe('server: happydom', () => {
     assert.equal(span.textContent, 'from exjs.js');
   });
 
+  it(`should run embedded js`, async () => {
+    const doc = await loadPage(`http://localhost:${port}/embeddedjs.html`, true);
+    const span = doc.getElementsByTagName('span')[0];
+    assert.equal(span.textContent, 'meta');
+  });
+
   it(`should implement innerText setter`, () => {
     const doc = new happy.Window().document;
     doc.write(`<html><body><code id="code"></code></body></html>`);

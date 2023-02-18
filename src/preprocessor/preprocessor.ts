@@ -203,7 +203,7 @@ export default class Preprocessor {
       ret = new HtmlDocument(origin);
       var root = new HtmlElement(ret.ownerDocument as HtmlDocument, ret, 'lib',
           0, 0, origin);
-      new HtmlText(root.ownerDocument as HtmlDocument, root, text, 0, 0, origin);
+      new HtmlText(root.ownerDocument as HtmlDocument, root, text, 0, 0, origin, false);
     }
     return ret;
   }
@@ -259,7 +259,6 @@ export default class Preprocessor {
       const e = parent.ownerDocument?.createElement(parts[0]) as HtmlElement;
       e.appendChild(t);
       t.escape = false;
-      console.log(t.toString());//tempdebug
       parent.addChild(e, before);
       for (let i = 1; i < parts.length; i++) {
         const attr = parts[i].split('=');
@@ -528,7 +527,7 @@ export class PreprocessorError {
       : fname);
     this.pos = (pos ? pos : 0);
     this.row = row;
-    this.col = col;	
+    this.col = col;
   }
 
   toString() {

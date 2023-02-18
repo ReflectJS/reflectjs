@@ -1,7 +1,7 @@
 import { assert } from "chai";
 import { HtmlAttribute, HtmlDocument, HtmlElement } from "../../src/preprocessor/htmldom";
 import Preprocessor, { domGetTop } from "../../src/preprocessor/preprocessor";
-import { ELEMENT_NODE, TEXT_NODE } from "../../src/preprocessor/dom";
+import { DomTextNode, ELEMENT_NODE, TEXT_NODE } from "../../src/preprocessor/dom";
 import { normalizeText } from "../../src/preprocessor/util";
 
 const preprocessor = new Preprocessor(process.cwd() + '/test/preprocessor/preprocessor');
@@ -88,7 +88,7 @@ describe("preprocessor: preprocessor", () => {
   it("should accept textual includes (text)", async () => {
     const doc = await preprocessor.reset().read('testTextualIncludeText.html');
     assert.isFalse(adjacentTextNodes(doc));
-    assert.equal(doc?.toString(), '<html><head></head><body>This is a &quot;text&quot;</body></html>');
+    assert.equal(doc?.toString(), '<html><head></head><body>This is a "text"</body></html>');
   });
 
   it("should accept textual includes (CSS)", async () => {
@@ -100,7 +100,7 @@ describe("preprocessor: preprocessor", () => {
   it("should accept textual includes (JS)", async () => {
     const doc = await preprocessor.reset().read('testTextualIncludeJS.html');
     assert.isFalse(adjacentTextNodes(doc));
-    assert.equal(doc?.toString(), `<html><head><script type="text/javascript">console.log('hi')</script></head><body></body></html>`);
+    assert.equal(doc?.toString(), `<html><head><script type="text/javascript">console.log('hi'.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#x27;"))\n</script></head><body></body></html>`);
   });
 
   // =========================================================================
@@ -271,7 +271,7 @@ describe("preprocessor: preprocessor", () => {
   it("source position 1", async () => {
     var prepro = new Preprocessor(preprocessor.rootPath, [{
       fname: 'dummy.html',
-      content: 
+      content:
         '<!DOCTYPE html>\n' +
         '<html :v=[[\n' +
         "' * 2 ]]>\n" +

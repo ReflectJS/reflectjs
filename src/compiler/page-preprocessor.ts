@@ -8,6 +8,7 @@ import { EXPR_MARKER1, EXPR_MARKER2, isDynamic } from "./expr-preprocessor";
 import { PageError } from "./page-compiler";
 
 const WHOLE_TEXT_TAGS: any = { STYLE: true, TITLE: true };
+const STATIC_TEXT_TAGS: any = { SCRIPT: true };
 
 export function loadPage(doc: HtmlDocument) {
   const root = doc.firstElementChild as HtmlElement;
@@ -69,6 +70,7 @@ function loadScope(e: HtmlElement, errors: PageError[]): ScopeProps {
   e.removeAttribute(page.AKA_ATTR);
 
   function scan(p: HtmlElement) {
+    const staticText = STATIC_TEXT_TAGS[p.tagName];
     p.childNodes.forEach(n => {
       if (n.nodeType === ELEMENT_NODE) {
         if ((n as HtmlElement).getAttribute(page.DOM_ID_ATTR) != null) {
@@ -76,7 +78,7 @@ function loadScope(e: HtmlElement, errors: PageError[]): ScopeProps {
         } else {
           scan(n as HtmlElement);
         }
-      } else if (n.nodeType === TEXT_NODE) {
+      } else if (!staticText && n.nodeType === TEXT_NODE) {
         if (isDynamic((n as HtmlText).nodeValue)) {
           if (WHOLE_TEXT_TAGS[p.tagName]) {
             const textId = loadText(n as HtmlText, values, errors);
@@ -147,7 +149,7 @@ function loadTexts(t: HtmlText, ret: Map<string, ValueProps>, errors: PageError[
     while (s.indexOf(EXPR_MARKER2, i2a + 1) === i2a + 1) {
       i2a++;
     }
-    
+
     if (i1a > i2b) {
       p.insertBefore(d.createTextNode(s.substring(i2b, i1a)), t);
     }
@@ -160,7 +162,7 @@ function loadTexts(t: HtmlText, ret: Map<string, ValueProps>, errors: PageError[
       val: s.substring(i1a, i2b)
     });
   }
-  
+
   t.nodeValue = (i2b < s.length ? s.substring(i2b) : '');
 }
 

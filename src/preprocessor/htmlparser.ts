@@ -1,12 +1,11 @@
-import { HtmlAttribute, HtmlComment, HtmlDocument, HtmlElement, HtmlText, VOID_ELEMENTS } from "./htmldom";
+import { HtmlAttribute, HtmlComment, HtmlDocument, HtmlElement, HtmlText, SKIP_CONTENT_TAGS, VOID_ELEMENTS } from "./htmldom";
 
 const ORIGIN_LITERAL = 'literal';
-const SKIP_CONTENT_TAGS = new Set(['SCRIPT', 'STYLE']);
 const HTML_EXTENSIONS = true;
 
 export default class HtmlParser {
   origins: Array<string>;
-  
+
   static parse(s: string, stripTriComments = true): HtmlDocument {
     return new HtmlParser().parseDoc(s, undefined, stripTriComments);
   }

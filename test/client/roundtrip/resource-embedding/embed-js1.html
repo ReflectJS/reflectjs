@@ -1,0 +1,11 @@
+<html :test=[[() => {
+  const v = window.js1.sum(3, 5);
+  if (v !== 8) return v;
+  const s = window.js1.escape('&');
+  if (s !== '&amp;') return s;
+  return 'OK';
+}]]>
+  <head>
+    <:import src="res/js1.js" as="script"/>
+  </head>
+</html>

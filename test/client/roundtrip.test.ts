@@ -43,17 +43,17 @@ describe('client: roundtrip', async () => {
           ) {
 
             it(file.replace(/(\.html)$/, ''), async () => {
-              const dom = await loadPage(`http://localhost:${port}/${dir}/${file}`);
+              const jsdom = await loadPage(`http://localhost:${port}/${dir}/${file}`);
               try {
                 // console.log(dom.serialize())
-                const page: Page = dom.window[PAGE_JS_ID];
-                assert.exists(page);
+                const page: Page = jsdom.window[PAGE_JS_ID];
+                assert.exists(page, jsdom.window.document.documentElement.outerHTML);
                 assert.exists(page.root);
                 assert.exists(page.root.proxy['test']);
                 const res = page.root.proxy['test']();
                 assert.equal(res, 'OK');
               } finally {
-                dom.window.close();
+                jsdom.window.close();
               }
             });
 
