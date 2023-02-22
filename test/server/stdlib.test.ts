@@ -1,6 +1,7 @@
 import { assert } from "chai";
+import * as happy from 'happy-dom';
+import { JSDOM } from 'jsdom';
 import Server from "../../src/server/server-impl";
-import { loadPage } from "./jsdom.test";
 
 let server: Server;
 let baseUrl: string;
@@ -39,3 +40,10 @@ describe("server: stdlib", () => {
   });
 
 });
+
+async function loadPage(url: string) {
+  const win = new happy.Window();
+  const text = await (await win.fetch(url)).text();
+  const dom = new JSDOM(text, { runScripts: "dangerously" });
+  return dom.window.document;
+}

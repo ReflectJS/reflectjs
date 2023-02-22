@@ -78,11 +78,9 @@ describe('server: jsdom', () => {
 
 });
 
-export async function loadPage(url: string) {
-  // we're using happy-dom for its `fetch` implementation
+async function loadPage(url: string) {
   const win = new happy.Window();
   const text = await (await win.fetch(url)).text();
-  // but we're returning a jsdom document because it does execute page scripts
   const dom = new JSDOM(text, { runScripts: "dangerously" });
   return dom.window.document;
 }
