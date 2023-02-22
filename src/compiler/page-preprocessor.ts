@@ -123,6 +123,10 @@ function loadValue(
     key = page.CLASS_VALUE_PREFIX + hyphenToCamel(key.substring(page.CLASS_ATTR_PREFIX.length));
   } else if (key.startsWith(page.STYLE_ATTR_PREFIX)) {
     key = page.STYLE_VALUE_PREFIX + hyphenToCamel(key.substring(page.STYLE_ATTR_PREFIX.length));
+  } else if (key.startsWith(page.WILL_HANDLER_ATTR_PREFIX)) {
+    key = page.WILL_HANDLER_VALUE_PREFIX + hyphenToCamel(key.substring(page.WILL_HANDLER_ATTR_PREFIX.length));
+  } else if (key.startsWith(page.DID_HANDLER_ATTR_PREFIX)) {
+    key = page.DID_HANDLER_VALUE_PREFIX + hyphenToCamel(key.substring(page.DID_HANDLER_ATTR_PREFIX.length));
   } else {
     key = hyphenToCamel(key);
   }

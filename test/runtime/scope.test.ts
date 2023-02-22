@@ -878,13 +878,71 @@ describe('runtime: scope', () => {
       </html>`)
     );
   });
+
+  // ---------------------------------------------------------------------------
+  // delegate handlers
+  // ---------------------------------------------------------------------------
+
+  it('should call `did_init` (1)', () => {
+    let didInitCount = 0;
+    const page = baseApp(null, props => {
+      props.root.children && (props.root.children[1].values = {
+        did_init: { val: null, fn: function() { didInitCount++; }, passive: true }
+      });
+    });
+    page.refresh();
+    assert.equal(didInitCount, 1);
+    page.refresh();
+    assert.equal(didInitCount, 1);
+  });
+
+  it('should call `did_init` (2)', () => {
+    let didInitCount = 0;
+    const page = baseApp(null, props => {
+      props.root.children && (props.root.children[1].values = {
+        x: { val: null, fn: function() { return 10; } },
+        did_init: { val: null, fn: function() { didInitCount++; this.x++; }, passive: true }
+      });
+    });
+    page.refresh();
+    assert.equal(didInitCount, 1);
+    const body = page.root.children[1];
+    const x = body.values['x'];
+    assert.equal(x.props.val, 11);
+    page.refresh();
+    assert.equal(x.props.val, 11);
+    assert.equal(didInitCount, 1);
+  });
+
+  it('should call `did_init` (3)', () => {
+    let didInitCount = 0;
+    const page = baseApp(null, props => {
+      props.root.children && (props.root.children[1].values = {
+        y: { val: null, fn: function() { return this.x + 10; }, refs: ['x'] },
+        x: { val: null, fn: function() { return 10; } },
+        did_init: { val: null, fn: function() { didInitCount++; this.x++ }, passive: true }
+      });
+    });
+    page.refresh();
+    assert.equal(didInitCount, 1);
+    const body = page.root.children[1];
+    const x = body.values['x'];
+    const y = body.values['y'];
+    assert.equal(x.props.val, 11);
+    assert.equal(y.props.val, 21);
+    page.refresh();
+    assert.equal(didInitCount, 1);
+    assert.equal(x.props.val, 11);
+    assert.equal(y.props.val, 21);
+  });
+
 });
 
-  // ---------------------------------------------------------------------------
-  // util
-  // ---------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// util
+// -----------------------------------------------------------------------------
 
-  function countScopes(page: Page, filter?: (s: Scope) => boolean): number {
+function countScopes(page: Page, filter?: (s: Scope) => boolean): number {
   let ret = 0;
   function f(scope: Scope) {
     if (!filter || filter(scope)) {

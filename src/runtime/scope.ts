@@ -34,6 +34,7 @@ export class Scope {
   proxyHandler: ScopeProxyHandler;
   values: { [key: string]: vl.Value };
   proxy: any;
+  didInit: boolean;
   clones?: Scope[];
   nestings?: Scope[];
 
@@ -48,6 +49,7 @@ export class Scope {
     this.proxyHandler = new ScopeProxyHandler(page, this);
     this.values = this.initValues();
     this.proxy = new Proxy<any>(this.values, this.proxyHandler);
+    this.didInit = false;
     !cloned && this.collectClones();
     this.collectNestings();
     if (parent) {
@@ -122,6 +124,11 @@ export class Scope {
 
   get(key: string): any {
     return this.proxy[key];
+  }
+
+  eval(key: string) {
+    const value = this.values[key];
+    value && this.proxyHandler.eval(value);
   }
 
   trigger(key: string) {
@@ -212,7 +219,7 @@ export class Scope {
     }
     return NaN;
   }
-  
+
   // ---------------------------------------------------------------------------
   // reactivity
   // ---------------------------------------------------------------------------
@@ -324,6 +331,10 @@ export class Scope {
       const v = this.values[k];
       !v.props.passive && this.proxy[k];
     });
+    if (!this.didInit) {
+      this.didInit = true;
+      this.eval(pg.DID_INIT_HANDLER_VALUE);
+    }
     this.children.forEach(s => {
       // clones are only directly refreshed by the original scope
       // (in dataCB() create)
@@ -626,12 +637,7 @@ class ScopeProxyHandler implements ProxyHandler<any> {
       if (!value.props.cycle || value.props.cycle < (this.page.props.cycle ?? 0)) {
         value.props.cycle = this.page.props.cycle ?? 0;
         const old = value.props.val;
-        try {
-          value.props.val = value.fn.apply((value.scope as Scope).proxy);
-        } catch (ex: any) {
-          //TODO (+ use v.ValueProps.pos if available)
-          console.log(ex);
-        }
+        this.eval(value);
         if (old == null ? value.props.val != null : old !== value.props.val) {
           value.cb && value.cb(value);
           value.dst && this.page.refreshLevel < 1 && this.propagate(value);
@@ -640,6 +646,17 @@ class ScopeProxyHandler implements ProxyHandler<any> {
     } else if (value.props.cycle == null) {
       value.props.cycle = this.page.props.cycle ?? 0;
       value.cb && value.cb(value);
+    }
+  }
+
+  eval(value: vl.Value) {
+    try {
+      value.props.val = value.fn?.apply((value.scope as Scope).proxy);
+    } catch (ex: any) {
+      //TODO: filter errors due to `data` being null/undefined
+      //TODO: should we assume null / empty string as result?
+      //TODO: (+ use v.ValueProps.pos if available)
+      console.log(ex);
     }
   }
 

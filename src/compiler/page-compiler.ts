@@ -2,7 +2,7 @@ import { generate } from "escodegen";
 import { parseScript } from "esprima";
 import * as es from "estree";
 import { HtmlDocument } from "../preprocessor/htmldom";
-import { HANDLER_VALUE_PREFIX, PageProps } from "../runtime/page";
+import * as pg from "../runtime/page";
 import { ScopeProps } from "../runtime/scope";
 import { ValueProps } from "../runtime/value";
 import { checkFunctionKind, makeFunction, makeValueFunction } from "./expr-compiler";
@@ -25,7 +25,7 @@ export function compileDoc(doc: HtmlDocument) {
 /**
  * @see PageProps
  */
-function compilePage(page: PageProps, errors: PageError[]) {
+function compilePage(page: pg.PageProps, errors: PageError[]) {
   const props: es.Property[] = [];
   props.push(makeProperty('root', compileScope(page.root, errors)));
   return {
@@ -66,7 +66,7 @@ function compileValues(values: { [key: string]: ValueProps }, errors: PageError[
   Reflect.ownKeys(values).forEach(key => {
     if (typeof key === 'string') {
       const props: ValueProps = values[key];
-      key = key.replace('-', '_');  
+      key = key.replace('-', '_');
       dst.push(makeProperty(key, compileValue(key, props, errors)));
     }
   });
@@ -90,9 +90,15 @@ function compileValue(key: string, value: ValueProps, errors: PageError[]) {
     } else if (fn && kind === 'exp' ) {
       dst.push(makeProperty('fn', fn));
       dst.push(makeProperty("val", { type: "Literal", value: null }));
-      if (key.startsWith(HANDLER_VALUE_PREFIX)) {
+      if (key.startsWith(pg.HANDLER_VALUE_PREFIX)) {
         refs.clear();
-        refs.add(key.substring(HANDLER_VALUE_PREFIX.length));
+        refs.add(key.substring(pg.HANDLER_VALUE_PREFIX.length));
+      } else if (
+        key.startsWith(pg.WILL_HANDLER_VALUE_PREFIX) ||
+        key.startsWith(pg.DID_HANDLER_VALUE_PREFIX)
+      ) {
+        dst.push(makeProperty('passive', { type: "Literal", value: true }));
+        refs.clear();
       }
       if (refs.size > 0) {
         const ee: es.Literal[] = [];

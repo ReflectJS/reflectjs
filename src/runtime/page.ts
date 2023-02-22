@@ -25,15 +25,24 @@ export const BODY_SCOPE_NAME = 'body';
 export const RESERVED_PREFIX = '__';
 export const RESERVED_PASSIVE_PREFIX = RESERVED_PREFIX + '_';
 export const OUTER_PROPERTY = RESERVED_PREFIX + 'outer';
+
+export const EVENT_ATTR_PREFIX = 'on-';
+export const HANDLER_ATTR_PREFIX = 'handle-';
+export const CLASS_ATTR_PREFIX = 'class-';
+export const STYLE_ATTR_PREFIX = 'style-';
+export const WILL_HANDLER_ATTR_PREFIX = 'will-';
+export const DID_HANDLER_ATTR_PREFIX = 'did-';
+
 export const ATTR_VALUE_PREFIX = 'attr_';
 export const EVENT_VALUE_PREFIX = 'on_';
 export const HANDLER_VALUE_PREFIX = 'handle_';
 export const CLASS_VALUE_PREFIX = 'class_';
 export const STYLE_VALUE_PREFIX = 'style_';
-export const EVENT_ATTR_PREFIX = 'on-';
-export const HANDLER_ATTR_PREFIX = 'handle-';
-export const CLASS_ATTR_PREFIX = 'class-';
-export const STYLE_ATTR_PREFIX = 'style-';
+export const WILL_HANDLER_VALUE_PREFIX = 'will_';
+export const DID_HANDLER_VALUE_PREFIX = 'did_';
+
+export const DID_INIT_HANDLER_VALUE = DID_HANDLER_VALUE_PREFIX + 'init';
+
 export const ID_VALUE = RESERVED_PREFIX + 'id';
 export const DOM_VALUE = RESERVED_PREFIX + 'dom';
 export const ELEMENTINDEX_VALUE = RESERVED_PREFIX + 'elementIndex';
