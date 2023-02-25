@@ -1,0 +1,5 @@
+<html data-count1="0" data-count2="0" :did-init="[[
+  let key = isServer ? 'data-count1' : 'data-count2';
+  let n = __dom.getAttribute(key) - 0;
+  __dom.setAttribute(key, '' + (n + 1));
+]]"></html>

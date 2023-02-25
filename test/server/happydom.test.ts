@@ -19,6 +19,17 @@ describe('server: happydom', () => {
     worker.on('message', () => done());
   });
 
+  it(`should implement innerText setter`, () => {
+    const doc = new happy.Window().document;
+    doc.write(`<html><body><code id="code"></code></body></html>`);
+    const code = doc.getElementById('code') as happy.HTMLElement;
+    code.innerText = `<div>\n</div>`;
+    assert.equal(
+      doc.documentElement.outerHTML,
+      `<html><body><code id="code"><div><br></div></code></body></html>`
+    );
+  });
+
   it(`should dynamically load data (no delay)`, async () => {
     const doc = await loadPage(`http://localhost:${port}/data1.html`);
     const span = doc.getElementById('msg');
@@ -43,22 +54,41 @@ describe('server: happydom', () => {
     assert.equal(span.textContent, 'from exjs.js');
   });
 
-  it(`should run embedded js`, async () => {
-    const doc = await loadPage(`http://localhost:${port}/embeddedjs.html`, true);
+  it(`should run embedded js (1)`, async () => {
+    const doc = await loadPage(`http://localhost:${port}/js1.html`, true);
     const span = doc.getElementsByTagName('span')[0];
     assert.equal(span.textContent, 'meta');
   });
 
-  it(`should implement innerText setter`, () => {
-    const doc = new happy.Window().document;
-    doc.write(`<html><body><code id="code"></code></body></html>`);
-    const code = doc.getElementById('code') as happy.HTMLElement;
-    code.innerText = `<div>\n</div>`;
-    assert.equal(
-      doc.documentElement.outerHTML,
-      `<html><body><code id="code"><div><br></div></code></body></html>`
-    );
+  it(`should run embedded js (2)`, async () => {
+    const doc = await loadPage(`http://localhost:${port}/js2.html`, true);
+    const span = doc.getElementsByTagName('span')[0];
+    assert.equal(span.textContent, '1');
   });
+
+  it(`should run dynamically added script`, async () => {
+    const win = new happy.Window({ settings: {
+      disableJavaScriptFileLoading: true,
+      disableJavaScriptEvaluation: false,
+      disableCSSFileLoading: true,
+      enableFileSystemHttpRequests: false
+    }});
+    const doc = win.document;
+    doc.write(`<html><body><span id="span">0</span></body></html>`);
+    const script = doc.createElement('script');
+    script.id = 'test-script';
+    script.appendChild(doc.createTextNode(`
+      const span = document.getElementById('span');
+      let n = parseInt(span.innerText);
+      span.innerText = '' + (n + 1);
+    `));
+    doc.body.appendChild(script);
+    doc.body.appendChild(doc.createTextNode('\n'));
+    await win.happyDOM.whenAsyncComplete();
+    const span = doc.getElementsByTagName('span')[0];
+    assert.equal(span.textContent, '1');
+  });
+
 });
 
 export async function loadPage(url: string, loadJS = false) {
