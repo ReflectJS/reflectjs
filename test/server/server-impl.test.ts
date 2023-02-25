@@ -108,4 +108,28 @@ describe("server: server-impl", () => {
     const span = doc.getElementById('msg');
     assert.equal(span?.textContent, 'false');
   });
+
+  it(`should support :did-init (1)`, async () => {
+    // newly compiled page
+    const doc1 = await loadPage(`http://localhost:${port}/did-init1.html`);
+    const n1a = doc1.documentElement.getAttribute('data-count1');
+    assert.equal(n1a, '1');
+    const n1b = doc1.documentElement.getAttribute('data-count2');
+    assert.equal(n1b, '1');
+    // pre compiled page
+    const doc2 = await loadPage(`http://localhost:${port}/did-init1.html`);
+    const n2a = doc2.documentElement.getAttribute('data-count1');
+    assert.equal(n2a, '1');
+    const n2b = doc2.documentElement.getAttribute('data-count2');
+    assert.equal(n2b, '1');
+  });
+
+  it(`should support :did-init (2)`, async () => {
+    const doc = await loadPage(`http://localhost:${port}/did-init1.html?__noclient`);
+    const n1 = doc.documentElement.getAttribute('data-count1');
+    assert.equal(n1, '1');
+    const n2 = doc.documentElement.getAttribute('data-count2');
+    assert.equal(n2, '0');
+  });
+
 });

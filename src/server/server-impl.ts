@@ -316,6 +316,9 @@ export default class ServerImpl {
 
       await new Promise(resolve => setTimeout(resolve, 0));
       if (url.searchParams.has(SERVER_NOCLIENT_PARAM)) {
+        // if we remove the runtime script without clearing its content first
+        // it's executed again -- clearly an happy-dom bug
+        runtimeScript.removeChild(runtimeScript.firstChild);
         runtimeScript.remove();
         outdoc.getElementById(PROPS_SCRIPT_ID).remove();
       }
