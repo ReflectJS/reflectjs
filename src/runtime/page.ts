@@ -45,6 +45,7 @@ export const DID_INIT_HANDLER_VALUE = DID_HANDLER_VALUE_PREFIX + 'init';
 
 export const ID_VALUE = RESERVED_PREFIX + 'id';
 export const DOM_VALUE = RESERVED_PREFIX + 'dom';
+export const SCOPE_VALUE = RESERVED_PREFIX + 'scope';
 export const ELEMENTINDEX_VALUE = RESERVED_PREFIX + 'elementIndex';
 export const ISLASTELEMENT_VALUE = RESERVED_PREFIX + 'isLastElement';
 export const MIXCOLORS_VALUE = RESERVED_PREFIX + 'mixColors';
@@ -104,9 +105,11 @@ export interface PageProps {
 
   load(parent: Scope | null, props: ScopeProps, cloned?: ScopeCloning) {
     const ret = new Scope(this, parent, props, cloned);
-    props.children?.forEach(props => {
-      this.load(ret, props);
-    });
+    if (!ret.dom || ret.dom.tagName !== 'TEMPLATE') {
+      props.children?.forEach(props => {
+        this.load(ret, props);
+      });
+    }
     return ret;
   }
 

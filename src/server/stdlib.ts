@@ -85,7 +85,7 @@ export const STDLIB = `<lib>
       ` + // we need to link template dom
       `if (isServer) {
         const r = __dom.ownerDocument.createElement('div');
-        r.innerHTML = __dom.content.textContent.trim();
+        r.innerHTML = __dom.innerHTML.trim();
         e = r.firstElementChild;
         __dom.innerHTML = '';
       } else {
@@ -117,15 +117,17 @@ export const STDLIB = `<lib>
     }]]
 
     :ensureScopeInited=[[() => {
-      if (isServer) {
-
-      } else {
-
+      if (__scope.props.children && !__scope.children.length) {
+        const props = __scope.props.children[0];
+        const e = window.document.querySelector('[data-reflectjs="4"]');
+        __scope.page.load(__scope, __scope.props.children[0]);
       }
     }]]
 
     :ensureScopeDisposed=[[() => {
-
+      if (__scope.children.length > 0) {
+        __scope.children[0].dispose();
+      }
     }]]
 />
 
