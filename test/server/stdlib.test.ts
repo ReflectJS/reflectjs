@@ -1,6 +1,7 @@
 import { assert } from "chai";
 import * as happy from 'happy-dom';
-import { JSDOM } from 'jsdom';
+import { DOM_ID_ATTR } from "../../src/runtime/page";
+import { normalizeText } from "../../src/preprocessor/util";
 import Server from "../../src/server/server-impl";
 
 let server: Server;
@@ -26,15 +27,64 @@ describe("server: stdlib", () => {
   describe("<:data-source>", () => {
 
     it(`auto-get.html`, async () => {
-      const doc = await loadPage(`${baseUrl}/data-source/auto-get.html`);
-      const span = doc.getElementById('theSpan');
+      const win = await loadPage(`${baseUrl}/data-source/auto-get.html`);
+      const span = win.document.getElementById('theSpan');
       assert.equal(span?.textContent, 'OK');
     })
 
     it(`non-auto-get.html`, async () => {
-      const doc = await loadPage(`${baseUrl}/data-source/non-auto-get.html`);
-      const span = doc.getElementById('theSpan');
+      const win = await loadPage(`${baseUrl}/data-source/non-auto-get.html`);
+      const span = win.document.getElementById('theSpan');
       assert.equal(span?.textContent, '');
+    })
+
+  });
+
+  describe("<:on-off>", async () => {
+
+    it(`passive, off, noclient`, async () => {
+      const win = await loadPage(`${baseUrl}/on-off/on-off-passive-1.html?__noclient`);
+      assert.equal(normalizeText(win.document.body.outerHTML), normalizeText(
+        `<body data-reflectjs="2">
+        <template id="theTemplate" data-reflectjs="3">
+        <div id="theDiv">hi there</div>
+        </template>
+        </body>`
+      ));
+    })
+
+    it(`passive, off`, async () => {
+      const win = await loadPage(`${baseUrl}/on-off/on-off-passive-1.html`);
+      win.document.getElementsByTagName('script').forEach(e => e.remove());
+      assert.equal(normalizeText(win.document.body.outerHTML), normalizeText(
+        `<body data-reflectjs="2">
+        <template id="theTemplate" data-reflectjs="3">
+        <div id="theDiv">hi there</div>
+        </template>
+        </body>`
+      ));
+
+    })
+
+    it(`passive, on, noclient`, async () => {
+      const win = await loadPage(`${baseUrl}/on-off/on-off-passive-1.html?__noclient&on=true`);
+      assert.equal(normalizeText(win.document.body.outerHTML), normalizeText(
+        `<body data-reflectjs="2">
+        <div id="theDiv" data-refjs-template="3">hi there</div>` +
+        `<template id="theTemplate" data-reflectjs="3"></template>
+        </body>`
+      ));
+    })
+
+    it(`passive, on`, async () => {
+      const win = await loadPage(`${baseUrl}/on-off/on-off-passive-1.html?on=true`);
+      win.document.getElementsByTagName('script').forEach(e => e.remove());
+      assert.equal(normalizeText(win.document.body.outerHTML), normalizeText(
+        `<body data-reflectjs="2">
+        <div id="theDiv" data-refjs-template="3">hi there</div>` +
+        `<template id="theTemplate" data-reflectjs="3"></template>
+        </body>`
+      ));
     })
 
   });
@@ -44,6 +94,6 @@ describe("server: stdlib", () => {
 async function loadPage(url: string) {
   const win = new happy.Window();
   const text = await (await win.fetch(url)).text();
-  const dom = new JSDOM(text, { runScripts: "dangerously" });
-  return dom.window.document;
+  win.document.write(text);
+  return win;
 }

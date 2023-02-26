@@ -150,6 +150,7 @@ export class Scope {
     return ret;
   }
 
+  //TODO: init from markup is obsolete
   initDomFromMarkup(markup: string): Element {
     const p = (this.parent as Scope);
     const doc = p.dom.ownerDocument;
@@ -166,6 +167,7 @@ export class Scope {
       return this.cloned.dom; //this.cloneOf?.dom?.previousElementSibling as Element;
     }
     const e = this.parent?.dom ?? this.page.doc;
+    //TODO: collect elements w/ DOM_ID_ADDR at page load, add/remove ids when cloning, nesting, actuating templates
     const ret = e.querySelector(`[${pg.DOM_ID_ATTR}="${id}"]`) as Element;
     return ret;
   }
