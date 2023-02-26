@@ -30,6 +30,27 @@ describe('server: happydom', () => {
     );
   });
 
+  it(`should implement previousElementSibling`, () => {
+    const doc = new happy.Window().document;
+    doc.write(`<html><head></head><body></body></html>`);
+    assert.equal(doc.body.previousElementSibling, doc.head);
+  });
+
+  it(`<template> should implement previousElementSibling`, () => {
+    const doc = new happy.Window().document;
+    doc.write(`<html><body><div></div><template></template></body></html>`);
+    const div = doc.getElementsByTagName('div')[0];
+    const template = doc.getElementsByTagName('template')[0];
+    let prev: happy.IElement | null = template.previousElementSibling;
+
+    // happy-dom bug: previousSibling doesn't work on HTMLTemplateElement
+    const cc = Array.from(template.parentElement.children);
+    const i = cc.indexOf(template);
+    prev = (i > 0 ? cc[i - 1] : null);
+
+    assert.equal(prev, div);
+  });
+
   it(`should dynamically load data (no delay)`, async () => {
     const doc = await loadPage(`http://localhost:${port}/data1.html`);
     const span = doc.getElementById('msg');

@@ -76,6 +76,18 @@ describe('server: jsdom', () => {
     );
   });
 
+  it(`should implement previousElementSibling`, () => {
+    const doc = new JSDOM(`<html><head></head><body></body></html>`).window.document;
+    assert.equal(doc.body.previousElementSibling, doc.head);
+  });
+
+  it(`should implement previousElementSibling (2)`, () => {
+    const doc = new JSDOM(`<html><body><div></div><template></template></body></html>`).window.document;
+    const div = doc.getElementsByTagName('div')[0];
+    const template = doc.getElementsByTagName('template')[0];
+    assert.equal(template.previousElementSibling, div);
+  });
+
 });
 
 async function loadPage(url: string) {

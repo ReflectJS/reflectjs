@@ -78,38 +78,50 @@ export const STDLIB = `<lib>
     ]]
 
     :ensureDomLinked=[[() => {
-      window.console.log('ensureDomLinked()');
       let e = __dom.previousElementSibling;
       if (e && e.getAttribute('${TEMPLATE_ID_ATTR}') === __id) {
-        window.console.log('ensureDomLinked():', 'already present');
         return;
       }
-      // we need to link template dom
-      if (window.happyDOM) {
-        // we're in the server
+      ` + // we need to link template dom
+      `if (isServer) {
         const r = __dom.ownerDocument.createElement('div');
         r.innerHTML = __dom.content.textContent.trim();
         e = r.firstElementChild;
         __dom.innerHTML = '';
-        window.console.log('ensureDomLinked():', 'cloned (server)');
       } else {
         e = __dom.content.firstElementChild;
-        window.console.log('ensureDomLinked():', 'cloned (client)');
       }
       if (e) {
         e.remove();
         e.setAttribute('${TEMPLATE_ID_ATTR}', __id);
         __dom.parentElement.insertBefore(e, __dom);
-        window.console.log('ensureDomLinked():', 'added');
       }
     }]]
 
     :ensureDomUnlinked=[[() => {
-
+      let e;
+      if (isServer) {
+        ` + // happy-dom bug: previousSibling doesn't work on HTMLTemplateElement
+        `const cc = window.Array.from(__dom.parentElement.children);
+        const i = cc.indexOf(__dom);
+        e = (i > 0 ? cc[i - 1] : null);
+      } else {
+        e = __dom.previousElementSibling;
+      }
+      if (!e || e.getAttribute('${TEMPLATE_ID_ATTR}') !== __id) {
+        return;
+      }
+      ` + // we need to unlink template dom
+      `e.remove();
+      __dom.appendChild(e);
     }]]
 
     :ensureScopeInited=[[() => {
+      if (isServer) {
 
+      } else {
+
+      }
     }]]
 
     :ensureScopeDisposed=[[() => {
@@ -118,26 +130,3 @@ export const STDLIB = `<lib>
 />
 
 </lib>`;
-
-/*
-    :handle-on=[[
-      if (on && !clone) {
-        let e = __dom.content.firstElementChild;
-        if (e) {
-          // client
-          // e = e.cloneNode(true);
-        } else {
-          // server (happy-dom)
-          const r = __dom.ownerDocument.createElement('div');
-          r.innerHTML = __dom.content.textContent.trim();
-          e = r.firstElementChild;
-          e.setAttribute('${TEMPLATE_ID_ATTR}', __id);
-          __dom.innerHTML = '';
-        }
-        if (e) {
-          clone = e;
-          __dom.parentElement.insertBefore(e, __dom);
-        }
-      }
-    ]]
-*/
