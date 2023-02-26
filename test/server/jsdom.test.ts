@@ -76,13 +76,23 @@ describe('server: jsdom', () => {
     );
   });
 
+  it(`should implement previousElementSibling`, () => {
+    const doc = new JSDOM(`<html><head></head><body></body></html>`).window.document;
+    assert.equal(doc.body.previousElementSibling, doc.head);
+  });
+
+  it(`should implement previousElementSibling (2)`, () => {
+    const doc = new JSDOM(`<html><body><div></div><template></template></body></html>`).window.document;
+    const div = doc.getElementsByTagName('div')[0];
+    const template = doc.getElementsByTagName('template')[0];
+    assert.equal(template.previousElementSibling, div);
+  });
+
 });
 
-export async function loadPage(url: string) {
-  // we're using happy-dom for its `fetch` implementation
+async function loadPage(url: string) {
   const win = new happy.Window();
   const text = await (await win.fetch(url)).text();
-  // but we're returning a jsdom document because it does execute page scripts
   const dom = new JSDOM(text, { runScripts: "dangerously" });
   return dom.window.document;
 }

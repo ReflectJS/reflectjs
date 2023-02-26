@@ -1,9 +1,8 @@
 import { assert } from "chai";
 import * as happy from 'happy-dom';
-import { Window } from 'happy-dom';
+import { JSDOM } from 'jsdom';
 import { PROPS_SCRIPT_ID, RUNTIME_SCRIPT_ID } from "../../src/runtime/page";
 import Server from "../../src/server/server-impl";
-import { loadPage } from "./jsdom.test";
 
 let server: Server;
 let port: number;
@@ -29,7 +28,7 @@ describe("server: server-impl", () => {
   it(`should start`, async () => {
     assert.exists(server);
     assert.exists(port);
-    const res = await new Window().fetch(`http://localhost:${port}/text1.txt`);
+    const res = await new happy.Window().fetch(`http://localhost:${port}/text1.txt`);
     assert(res.text, 'test text: text1');
   });
 
@@ -133,3 +132,10 @@ describe("server: server-impl", () => {
   });
 
 });
+
+async function loadPage(url: string) {
+  const win = new happy.Window();
+  const text = await (await win.fetch(url)).text();
+  const dom = new JSDOM(text, { runScripts: "dangerously" });
+  return dom.window.document;
+}

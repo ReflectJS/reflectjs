@@ -150,6 +150,7 @@ export class Scope {
     return ret;
   }
 
+  //TODO: init from markup is obsolete
   initDomFromMarkup(markup: string): Element {
     const p = (this.parent as Scope);
     const doc = p.dom.ownerDocument;
@@ -163,9 +164,14 @@ export class Scope {
 
   initDomFromDomId(id: string): Element {
     if (this.cloned) {
-      return this.cloned.dom; //this.cloneOf?.dom?.previousElementSibling as Element;
+      return this.cloned.dom;
     }
-    const e = this.parent?.dom ?? this.page.doc;
+    let e = this.parent?.dom ?? this.page.doc;
+    e = (e.nodeType === pg.ELEMENT_NODE && (e as Element).tagName === 'TEMPLATE')
+        ? e.parentElement as Element
+        : e;
+    //TODO?: collect elements w/ DOM_ID_ADDR at page load,
+    // add/remove ids when cloning, nesting, actuating templates
     const ret = e.querySelector(`[${pg.DOM_ID_ATTR}="${id}"]`) as Element;
     return ret;
   }
@@ -176,7 +182,7 @@ export class Scope {
       const textId = p.getAttribute(pg.DOM_TEXTID_ATTR);
       if (textId) {
         // this is a "dynamic-text-only" tag, e.g. a <style>
-        if (p.childNodes.length != 1 || !p.firstChild || p.firstChild.nodeType !== pg.TEXT_NODE) {
+        if (p.childNodes.length !== 1 || !p.firstChild || p.firstChild.nodeType !== pg.TEXT_NODE) {
           while (p.firstChild) {
             p.firstChild.remove();
           }
@@ -237,6 +243,10 @@ export class Scope {
     }, this);
     ret[pg.DOM_VALUE] = new vl.Value(pg.DOM_VALUE, {
       val: this.dom,
+      passive: true,
+    }, this);
+    ret[pg.SCOPE_VALUE] = new vl.Value(pg.SCOPE_VALUE, {
+      val: this,
       passive: true,
     }, this);
     ret[pg.ELEMENTINDEX_VALUE] = new vl.Value(pg.ELEMENTINDEX_VALUE, {

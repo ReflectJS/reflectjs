@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <:on-off id="theTemplate" :aka="option" :on="[[
+      window.location.search.indexOf('on=true') >= 0
+    ]]">
+      <div id="theDiv" :text="there">hello <span>[[text]]</span></div>
+    </:on-off>
+  </body>
+</html>
