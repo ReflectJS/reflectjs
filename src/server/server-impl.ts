@@ -6,7 +6,6 @@ import * as http from 'http';
 import path from "path";
 import { compileDoc, PageError } from "../compiler/page-compiler";
 import { DomElement } from "../preprocessor/dom";
-import { HtmlDocument } from "../preprocessor/htmldom";
 import Preprocessor, { EMBEDDED_INCLUDE_FNAME } from "../preprocessor/preprocessor";
 import { PROPS_SCRIPT_ID, RUNTIME_SCRIPT_ID } from "../runtime/page";
 import exitHook from "./exit-hook";
@@ -198,9 +197,9 @@ export default class ServerImpl {
       var url = new URL(req.url, base);
       url.protocol = (props.assumeHttps ? 'https' : req.protocol);
       url.hostname = req.hostname;
-      const pathname = this.route(url.pathname);
       try {
-        const page = await that.getPage(url, pathname);
+        const filePath = this.getFilePath(url.pathname);
+        const page = await that.getPage(url, req.originalUrl, filePath);
         if (page.errors) {
           throw page.errors.map(pe => `${pe.type}: ${pe.msg}`).join('\n');
         }
@@ -219,7 +218,7 @@ export default class ServerImpl {
     this.clientJs = '\n' + fs.readFileSync(p, { encoding: 'utf8'});
   }
 
-  route(src: string): string {
+  getFilePath(src: string): string {
     let dst = this.routings.get(src);
 
     if (dst) {
@@ -227,10 +226,6 @@ export default class ServerImpl {
     }
 
     for (let route of this.routes) {
-      // if (route.regex.test(src)) {
-      //   dst = route.path;
-      //   break;
-      // }
       const res = route.regex.exec(src);
       if (res) {
         const sp = route.path.split(/\(\*\)/g);
@@ -253,8 +248,8 @@ export default class ServerImpl {
     return src;
   }
 
-  async getPage(url: URL, pathname: string): Promise<ExecutedPage> {
-    const compiledPage = await this.getCompiledPage(url, pathname);
+  async getPage(url: URL, originalUrl: string, filePath: string): Promise<ExecutedPage> {
+    const compiledPage = await this.getCompiledPage(url, filePath);
     if (compiledPage.errors && compiledPage.errors.length > 0) {
       return {
         compiledPage: compiledPage,
@@ -262,33 +257,33 @@ export default class ServerImpl {
         errors: compiledPage.errors.slice()
       }
     }
-    return this.executePage(url, compiledPage);
+    return this.executePage(url, originalUrl, compiledPage);
   }
 
-  async getCompiledPage(url: URL, pathname: string): Promise<CompiledPage> {
-    const cachedPage = this.compiledPages.get(pathname);
+  async getCompiledPage(url: URL, filePath: string): Promise<CompiledPage> {
+    const cachedPage = this.compiledPages.get(filePath);
     if (cachedPage && await this.isCompiledPageFresh(cachedPage)) {
       return cachedPage;
     }
-    const ret = await this.compilePage(url, pathname);
+    const ret = await this.compilePage(url, filePath);
     if (!ret.errors || !ret.errors.length) {
-      this.compiledPages.set(pathname, ret);
+      this.compiledPages.set(filePath, ret);
     }
     return ret;
   }
 
-  async compilePage(url: URL, pathname: string): Promise<CompiledPage> {
+  async compilePage(url: URL, filePath: string): Promise<CompiledPage> {
     const ret: CompiledPage = {
       tstamp: Date.now(),
       files: [],
       output: '<html></html>'
     };
     try {
-      const fname = decodeURIComponent(pathname);
+      const fname = decodeURIComponent(filePath);
       const pre = new Preprocessor(this.props.rootPath);
       const doc = await pre.read(fname, STDLIB);
       if (!doc) {
-        throw `failed to load page "${pathname}"`;
+        throw `failed to load page "${filePath}"`;
       }
       ret.files = pre.parser.origins;
       const { js, errors } = compileDoc(doc);
@@ -331,11 +326,11 @@ export default class ServerImpl {
     return true;
   }
 
-  async executePage(url: URL, compiledPage: CompiledPage): Promise<ExecutedPage> {
+  async executePage(url: URL, originalUrl: string, compiledPage: CompiledPage): Promise<ExecutedPage> {
     const ret: ExecutedPage = { compiledPage: compiledPage };
     try {
       const win = new Window({
-        url: url.toString(),
+        url: `${url.protocol}//${url.host}${originalUrl}`,
         // https://github.com/capricorn86/happy-dom/tree/master/packages/happy-dom#settings
         settings: {
           disableJavaScriptFileLoading: true,
