@@ -131,6 +131,48 @@ describe("server: server-impl", () => {
     assert.equal(n2, '0');
   });
 
+  it(`should support routing for app1 (index)`, async () => {
+    const doc = await loadPage(`http://localhost:${port}/app1/index.html?__noclient`);
+    const result = doc.getElementById('result')?.textContent;
+    assert.equal(result, 'index: /app1/index.html');
+  });
+
+  it(`should support routing for app1 (page1)`, async () => {
+    const doc = await loadPage(`http://localhost:${port}/app1/page1.html?__noclient`);
+    const result = doc.getElementById('result')?.textContent;
+    assert.equal(result, 'index: /app1/page1.html');
+  });
+
+  it(`should support routing for app1 (page2)`, async () => {
+    const doc = await loadPage(`http://localhost:${port}/app1/page2.html?__noclient`);
+    const result = doc.getElementById('result')?.textContent;
+    assert.equal(result, 'page2');
+  });
+
+  it(`should support routing for app1 (docs/index)`, async () => {
+    const doc = await loadPage(`http://localhost:${port}/app1/docs/index.html?__noclient`);
+    const result = doc.getElementById('result')?.textContent;
+    assert.equal(result, 'docs index: /app1/docs/index.html');
+  });
+
+  it(`should support routing for app1 (docs/other)`, async () => {
+    const doc = await loadPage(`http://localhost:${port}/app1/docs/other.html?__noclient`);
+    const result = doc.getElementById('result')?.textContent;
+    assert.equal(result, 'docs other: /app1/docs/other.html');
+  });
+
+  it(`should support routing for app1 (posts/index)`, async () => {
+    const doc = await loadPage(`http://localhost:${port}/app1/posts/index.html?__noclient`);
+    const result = doc.getElementById('result')?.textContent;
+    assert.equal(result, 'posts index: /app1/posts/index.html');
+  });
+
+  it(`should support routing for app1 (posts/other)`, async () => {
+    const doc = await loadPage(`http://localhost:${port}/app1/posts/other.html?__noclient`);
+    const result = doc.getElementById('result')?.textContent;
+    assert.equal(result, 'posts index: /app1/posts/other.html');
+  });
+
 });
 
 async function loadPage(url: string) {

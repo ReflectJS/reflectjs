@@ -15,6 +15,7 @@ import { STDLIB } from "./stdlib";
 const SERVER_PAGE_TIMEOUT = 2000;
 const CLIENT_JS_FILE = 'client.js';
 const SERVER_NOCLIENT_PARAM = '__noclient';
+const CONFIG_FILE = '.reflectjs.json';
 
 export interface ServerProps {
   port?: number,
@@ -35,6 +36,10 @@ export interface TrafficLimit {
   maxRequests: number,
 }
 
+interface Config {
+  routes?: Array<{ regex: string, path: string }>,
+}
+
 // https://expressjs.com/en/advanced/best-practice-performance.html
 export default class ServerImpl {
   props: ServerProps;
@@ -43,6 +48,9 @@ export default class ServerImpl {
   normalizeText: boolean;
   server: http.Server;
   clientJs?: string;
+  config: Config;
+  routes: Array<{ regex: RegExp, path: string }>;
+  routings: Map<string, string>;
 
   constructor(props: ServerProps, cb?: (port: number) => void) {
     this.props = props;
@@ -50,6 +58,21 @@ export default class ServerImpl {
     this.normalizeText = props.normalizeText !== undefined ? props.normalizeText : true;
     this.serverPageTimeout = props.serverPageTimeout ?? SERVER_PAGE_TIMEOUT;
     const app = express();
+
+    const configFile = path.join(props.rootPath, CONFIG_FILE);
+    try {
+      const text = fs.readFileSync(configFile)
+      this.config = JSON.parse(text.toString());
+      this.log('info', this.config);
+    } catch (ex: any) {
+      this.log('warn', `no ${CONFIG_FILE} found`);
+      this.config = {}
+    }
+    this.routes = (this.config.routes ?? []).map(route => ({
+      regex: new RegExp(route.regex),
+      path: route.path
+    }));
+    this.routings = new Map();
 
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
@@ -91,15 +114,16 @@ export default class ServerImpl {
     this.server.close();
   }
 
-  log(type:string, msg:string) {
+  log(type: 'error' | 'warn' | 'info' | 'debug', msg: any) {
     if (!this.props.mute) {
       if (this.props.logger) {
         this.props.logger(type, msg);
       } else {
         switch (type) {
           case 'error': console.error(msg); break;
-          case 'info': console.info(msg); break;
           case 'warn': console.warn(msg); break;
+          case 'info': console.info(msg); break;
+          case 'debug': console.debug(msg); break;
           default: console.log(msg);
         }
       }
@@ -174,8 +198,9 @@ export default class ServerImpl {
       var url = new URL(req.url, base);
       url.protocol = (props.assumeHttps ? 'https' : req.protocol);
       url.hostname = req.hostname;
+      const pathname = this.route(url.pathname);
       try {
-        const page = await that.getPage(url);
+        const page = await that.getPage(url, pathname);
         if (page.errors) {
           throw page.errors.map(pe => `${pe.type}: ${pe.msg}`).join('\n');
         }
@@ -194,8 +219,42 @@ export default class ServerImpl {
     this.clientJs = '\n' + fs.readFileSync(p, { encoding: 'utf8'});
   }
 
-  async getPage(url: URL): Promise<ExecutedPage> {
-    const compiledPage = await this.getCompiledPage(url);
+  route(src: string): string {
+    let dst = this.routings.get(src);
+
+    if (dst) {
+      return dst;
+    }
+
+    for (let route of this.routes) {
+      // if (route.regex.test(src)) {
+      //   dst = route.path;
+      //   break;
+      // }
+      const res = route.regex.exec(src);
+      if (res) {
+        const sp = route.path.split(/\(\*\)/g);
+        const dp = [sp[0]];
+        for (let i = 1; i < sp.length; i++) {
+          res.length > i && dp.push(res[i]);
+          dp.push(sp[i]);
+        }
+        dst = dp.join('');
+        break;
+      }
+    }
+    if (dst) {
+      this.log('debug', `routing "${src}" to "${dst}"`);
+      this.routings.set(src, dst);
+      return dst;
+    }
+
+    this.routings.set(src, src);
+    return src;
+  }
+
+  async getPage(url: URL, pathname: string): Promise<ExecutedPage> {
+    const compiledPage = await this.getCompiledPage(url, pathname);
     if (compiledPage.errors && compiledPage.errors.length > 0) {
       return {
         compiledPage: compiledPage,
@@ -206,28 +265,28 @@ export default class ServerImpl {
     return this.executePage(url, compiledPage);
   }
 
-  async getCompiledPage(url: URL): Promise<CompiledPage> {
-    const cachedPage = this.compiledPages.get(url.pathname);
+  async getCompiledPage(url: URL, pathname: string): Promise<CompiledPage> {
+    const cachedPage = this.compiledPages.get(pathname);
     if (cachedPage && await this.isCompiledPageFresh(cachedPage)) {
       return cachedPage;
     }
-    const ret = await this.compilePage(url);
+    const ret = await this.compilePage(url, pathname);
     if (!ret.errors || !ret.errors.length) {
-      this.compiledPages.set(url.pathname, ret);
+      this.compiledPages.set(pathname, ret);
     }
     return ret;
   }
 
-  async compilePage(url: URL): Promise<CompiledPage> {
+  async compilePage(url: URL, pathname: string): Promise<CompiledPage> {
     const ret: CompiledPage = {
       tstamp: Date.now(),
       files: [],
       output: '<html></html>'
     };
     try {
-      const pathname = decodeURIComponent(url.pathname);
+      const fname = decodeURIComponent(pathname);
       const pre = new Preprocessor(this.props.rootPath);
-      const doc = await pre.read(pathname, STDLIB);
+      const doc = await pre.read(fname, STDLIB);
       if (!doc) {
         throw `failed to load page "${pathname}"`;
       }

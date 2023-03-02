@@ -13,7 +13,7 @@ describe("server: stdlib", () => {
     server = new Server({
       rootPath: process.cwd() + '/test/server/stdlib',
       clientJsFilePath: process.cwd() + '/dist/client.js',
-      mute: false
+      mute: true
     }, (portNr) => {
       baseUrl = `http://localhost:${portNr}`;
       done();

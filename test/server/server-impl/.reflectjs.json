@@ -1,0 +1,8 @@
+{
+  "routes": [
+    { "regex": "^/app1/page2", "path": "/app1/page2.html" },
+    { "regex": "^/app1/docs/(.*)$", "path": "/app1/docs/(*)" },
+    { "regex": "^/app1/posts/(.*)$", "path": "/app1/posts/index.html" },
+    { "regex": "^/app1/", "path": "/app1/index.html" }
+  ]
+}
