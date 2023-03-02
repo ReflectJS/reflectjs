@@ -2,7 +2,7 @@
 
 [![CodeQL](https://github.com/fcapolini/reflectjs/actions/workflows/codeql.yml/badge.svg)](https://github.com/fcapolini/reflectjs/actions/workflows/codeql.yml)
 [![Node.js CI](https://github.com/fcapolini/reflectjs/actions/workflows/node.js.yml/badge.svg)](https://github.com/fcapolini/reflectjs/actions/workflows/node.js.yml)
-![Coverage](res/coverage-badge-230211.svg)
+![Coverage](res/coverage-badge-230301.svg)
 
 Reflect.js is a reactive web server and framework for [Node.js](https://nodejs.org) and the browser.
 
