@@ -8,6 +8,7 @@ export const TEXT_NODE = 3; //TODO
 export const COMMENT_NODE = 8; //TODO
 
 export const LOGIC_ATTR_PREFIX = ':';
+export const URLPATH_ATTR = LOGIC_ATTR_PREFIX + 'URLPATH';
 export const AKA_ATTR = LOGIC_ATTR_PREFIX + 'aka';
 
 export const DOM_ID_ATTR = 'data-reflectjs';

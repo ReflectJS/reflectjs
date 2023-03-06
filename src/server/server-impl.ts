@@ -9,6 +9,7 @@ import { DomElement } from "../preprocessor/dom";
 import Preprocessor, { EMBEDDED_INCLUDE_FNAME } from "../preprocessor/preprocessor";
 import { PROPS_SCRIPT_ID, RUNTIME_SCRIPT_ID } from "../runtime/page";
 import exitHook from "./exit-hook";
+import { Routing } from "./routing";
 import { STDLIB } from "./stdlib";
 
 const SERVER_PAGE_TIMEOUT = 2000;
@@ -35,10 +36,6 @@ export interface TrafficLimit {
   maxRequests: number,
 }
 
-interface Config {
-  routes?: Array<{ regex: string, path: string }>,
-}
-
 // https://expressjs.com/en/advanced/best-practice-performance.html
 export default class ServerImpl {
   props: ServerProps;
@@ -47,9 +44,7 @@ export default class ServerImpl {
   normalizeText: boolean;
   server: http.Server;
   clientJs?: string;
-  config: Config;
-  routes: Array<{ regex: RegExp, path: string }>;
-  routings: Map<string, string>;
+  routing?: Routing;
 
   constructor(props: ServerProps, cb?: (port: number) => void) {
     this.props = props;
@@ -57,21 +52,6 @@ export default class ServerImpl {
     this.normalizeText = props.normalizeText !== undefined ? props.normalizeText : true;
     this.serverPageTimeout = props.serverPageTimeout ?? SERVER_PAGE_TIMEOUT;
     const app = express();
-
-    const configFile = path.join(props.rootPath, CONFIG_FILE);
-    try {
-      const text = fs.readFileSync(configFile)
-      this.config = JSON.parse(text.toString());
-      this.log('info', this.config);
-    } catch (ex: any) {
-      this.log('warn', `no ${CONFIG_FILE} found`);
-      this.config = {}
-    }
-    this.routes = (this.config.routes ?? []).map(route => ({
-      regex: new RegExp(route.regex),
-      path: route.path
-    }));
-    this.routings = new Map();
 
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
@@ -87,13 +67,16 @@ export default class ServerImpl {
     app.use(express.static(props.rootPath));
 
     const listenCB = () => {
-      const port = (this.server.address() as any).port;
-      if (cb) {
-        cb(port);
-      } else {
-        this.log('info', `${this.getTimestamp()}: START `
-          + `http://localhost:${port} [${props.rootPath}]`);
-      }
+      new Routing(props.rootPath, (instance) => {
+        this.routing = instance;
+        const port = (this.server.address() as any).port;
+        if (cb) {
+          cb(port);
+        } else {
+          this.log('info', `${this.getTimestamp()}: START `
+            + `http://localhost:${port} [${props.rootPath}]`);
+        }
+      })
     }
 
     this.server = props.port
@@ -198,7 +181,7 @@ export default class ServerImpl {
       url.protocol = (props.assumeHttps ? 'https' : req.protocol);
       url.hostname = req.hostname;
       try {
-        const filePath = this.getFilePath(url.pathname);
+        const filePath = await this.routing?.route(url.pathname) ?? url.pathname;
         const page = await that.getPage(url, req.originalUrl, filePath);
         if (page.errors) {
           throw page.errors.map(pe => `${pe.type}: ${pe.msg}`).join('\n');
@@ -216,36 +199,6 @@ export default class ServerImpl {
     // load client runtime
     const p = props.clientJsFilePath ?? path.resolve(__dirname, CLIENT_JS_FILE);
     this.clientJs = '\n' + fs.readFileSync(p, { encoding: 'utf8'});
-  }
-
-  getFilePath(src: string): string {
-    let dst = this.routings.get(src);
-
-    if (dst) {
-      return dst;
-    }
-
-    for (let route of this.routes) {
-      const res = route.regex.exec(src);
-      if (res) {
-        const sp = route.path.split(/\(\*\)/g);
-        const dp = [sp[0]];
-        for (let i = 1; i < sp.length; i++) {
-          res.length > i && dp.push(res[i]);
-          dp.push(sp[i]);
-        }
-        dst = dp.join('');
-        break;
-      }
-    }
-    if (dst) {
-      this.log('debug', `routing "${src}" to "${dst}"`);
-      this.routings.set(src, dst);
-      return dst;
-    }
-
-    this.routings.set(src, src);
-    return src;
   }
 
   async getPage(url: URL, originalUrl: string, filePath: string): Promise<ExecutedPage> {
@@ -371,7 +324,7 @@ export default class ServerImpl {
       await new Promise(resolve => setTimeout(resolve, 0));
       if (url.searchParams.has(SERVER_NOCLIENT_PARAM)) {
         // if we remove the runtime script without clearing its content first
-        // it's executed again -- clearly an happy-dom bug
+        // it's executed again -- clearly a happy-dom bug
         runtimeScript.removeChild(runtimeScript.firstChild);
         runtimeScript.remove();
         outdoc.getElementById(PROPS_SCRIPT_ID).remove();
