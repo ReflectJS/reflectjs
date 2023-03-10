@@ -882,6 +882,8 @@ describe('runtime: scope', () => {
   // ---------------------------------------------------------------------------
   // delegate handlers
   // ---------------------------------------------------------------------------
+  //TODO: will_init
+  //TODO: will_dispose, did_dispose
 
   it('should call `did_init` (1)', () => {
     let didInitCount = 0;
@@ -934,6 +936,38 @@ describe('runtime: scope', () => {
     assert.equal(didInitCount, 1);
     assert.equal(x.props.val, 11);
     assert.equal(y.props.val, 21);
+  });
+
+  // ---------------------------------------------------------------------------
+  // timers
+  // ---------------------------------------------------------------------------
+
+  it('should clear timeouts on disposal', () => {
+    const page = baseApp(null, props => {
+      props.root.children && (props.root.children[1].values = {
+        did_init: { val: null, fn: function() { this.setTimeout(() => {}, 100) }, passive: true }
+      });
+    });
+    const bodyScope = page.root.children[1];
+    assert.notExists(bodyScope.timeouts);
+    page.refresh();
+    assert.equal(bodyScope.timeouts?.size, 1);
+    bodyScope.dispose();
+    assert.equal(bodyScope.timeouts?.size, 0);
+  });
+
+  it('should clear intervals on disposal', () => {
+    const page = baseApp(null, props => {
+      props.root.children && (props.root.children[1].values = {
+        did_init: { val: null, fn: function() { this.setInterval(() => {}, 100) }, passive: true }
+      });
+    });
+    const bodyScope = page.root.children[1];
+    assert.notExists(bodyScope.intervals);
+    page.refresh();
+    assert.equal(bodyScope.intervals?.size, 1);
+    bodyScope.dispose();
+    assert.equal(bodyScope.intervals?.size, 0);
   });
 
 });

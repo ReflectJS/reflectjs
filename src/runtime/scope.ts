@@ -48,6 +48,7 @@ export class Scope {
     this.texts = this.collectTextNodes();
     this.proxyHandler = new ScopeProxyHandler(page, this);
     this.values = this.initValues();
+    this.initTimers();
     this.proxy = new Proxy<any>(this.values, this.proxyHandler);
     this.didInit = false;
     !cloned && this.collectClones();
@@ -65,8 +66,12 @@ export class Scope {
   }
 
   dispose() {
+    this.disposeTimers();
     this.dom.remove();
     this.unlinkValues();
+    while (this.children.length > 0) {
+      this.children.pop()?.dispose();
+    }
     if (this.parent) {
       const i = this.parent.children.indexOf(this);
       i >= 0 && this.parent.children.splice(i, 1);
@@ -353,6 +358,58 @@ export class Scope {
       // (in dataCB() create)
       !s.cloned && s.updateValues();
     });
+  }
+
+  // ---------------------------------------------------------------------------
+  // timers
+  // ---------------------------------------------------------------------------
+  timeouts?: Set<any>;
+  intervals?: Set<any>;
+
+  initTimers() {
+    const that = this;
+
+    this.values['setTimeout'] = new vl.Value('setTimeout', {
+      val: function(cb: () => void, delay: number) {
+        const ret = setTimeout(cb, delay);
+        that.timeouts ? that.timeouts.add(ret) : that.timeouts = new Set([ret]);
+        return ret;
+      },
+      passive: true,
+    }, this);
+
+    this.values['setInterval'] = new vl.Value('setInterval', {
+      val: function(cb: () => void, delay: number) {
+        const ret = setInterval(cb, delay);
+        that.intervals ? that.intervals.add(ret) : that.intervals = new Set([ret]);
+        return ret;
+      },
+      passive: true,
+    }, this);
+
+    this.values['clearTimeout'] = new vl.Value('clearTimeout', {
+      val: function(id: any) {
+        clearTimeout(id);
+        that.timeouts?.delete(id);
+      },
+      passive: true,
+    }, this);
+
+    this.values['clearInterval'] = new vl.Value('clearInterval', {
+      val: function(id: any) {
+        clearInterval(id);
+        that.intervals?.delete(id);
+      },
+      passive: true,
+    }, this);
+
+  }
+
+  disposeTimers() {
+    this.timeouts?.forEach(id => clearTimeout(id));
+    this.timeouts?.clear();
+    this.intervals?.forEach(id => clearInterval(id));
+    this.intervals?.clear();
   }
 
   // ---------------------------------------------------------------------------
