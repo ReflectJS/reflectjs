@@ -18,6 +18,13 @@ export interface ScopeCloning {
   dom: Element;
 }
 
+type EventListener = {
+  target: EventTarget,
+  type: string,
+  callback: EventListenerOrEventListenerObject | null,
+  options?: AddEventListenerOptions | boolean
+}
+
 // =============================================================================
 // Scope
 // =============================================================================
@@ -63,10 +70,13 @@ export class Scope {
         }, parent);
       }
     }
+    page.scopes.set(props.id, this);
   }
 
   dispose() {
+    this.page.scopes.delete(this.props.id);
     this.disposeTimers();
+    this.disposeListeners();
     this.dom.remove();
     this.unlinkValues();
     while (this.children.length > 0) {
@@ -410,6 +420,39 @@ export class Scope {
     this.timeouts?.clear();
     this.intervals?.forEach(id => clearInterval(id));
     this.intervals?.clear();
+  }
+
+  // ---------------------------------------------------------------------------
+  // events
+  // ---------------------------------------------------------------------------
+  listeners?: Array<EventListener>;
+
+  addListener(
+    target: EventTarget,
+    type: string,
+    callback: EventListenerOrEventListenerObject | null,
+    options?: AddEventListenerOptions | boolean
+  ) {
+    const listener = { target, type, callback, options };
+    this.listeners ? this.listeners.push(listener) : this.listeners = [listener];
+  }
+
+  removeListener(
+    target: EventTarget,
+    type: string,
+    callback: EventListenerOrEventListenerObject | null,
+    options?: AddEventListenerOptions | boolean
+  ) {
+    const listener = { target, type, callback, options };
+    const i = this.listeners ? this.listeners.indexOf(listener) : -1;
+    i >= 0 && this.listeners?.splice(i, 1);
+  }
+
+  disposeListeners() {
+    while (this.listeners?.length) {
+      let l = this.listeners.pop() as EventListener;
+      l.target.removeEventListener(l.type, l.callback, l.options);
+    }
   }
 
   // ---------------------------------------------------------------------------

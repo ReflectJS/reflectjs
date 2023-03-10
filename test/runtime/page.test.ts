@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import { Window } from "happy-dom";
+import { GlobalWindow, Window } from "happy-dom";
 import { BODY_SCOPE_NAME, DOM_ID_ATTR, HEAD_SCOPE_NAME, Page, PageProps, ROOT_SCOPE_NAME } from "../../src/runtime/page";
 import { Scope, ScopeProps } from "../../src/runtime/scope";
 

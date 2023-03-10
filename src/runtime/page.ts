@@ -83,6 +83,7 @@ export interface PageProps {
   dom: Element;
   props: PageProps;
   globals: Map<string, Value>;
+  scopes: Map<string, Scope>;
   root: Scope;
   refreshLevel: number;
   pushLevel: number;
@@ -99,6 +100,8 @@ export interface PageProps {
     this.setGlobal('isServer', Reflect.has(win, 'happyDOM'));
     this.setGlobal(MIXCOLORS_VALUE, mixColors);
     this.setGlobal(REGEXMAP_VALUE, regexMap);
+    this.initEvents();
+    this.scopes = new Map();
     this.root = this.load(null, props.root);
     this.root.values[ROOT_SCOPE_NAME] = new Value(ROOT_SCOPE_NAME, {
       val: this.root.proxy
@@ -147,5 +150,34 @@ export interface PageProps {
 
   getMarkup() {
     return '<!DOCTYPE html>' + this.doc.documentElement.outerHTML;
+  }
+
+  initEvents() {
+    const origAdd = EventTarget.prototype.addEventListener;
+    const origRemove = EventTarget.prototype.removeEventListener;
+
+    const lookupScope = (e: any) => {
+      if (e.hasAttribute) {
+        while (e && !e.hasAttribute(DOM_ID_ATTR)) {
+          e = e.parentElement;
+        }
+        if (e && e.getAttribute) {
+          return this.scopes.get(e.getAttribute(DOM_ID_ATTR));
+        }
+      }
+      return null;
+    }
+
+    EventTarget.prototype.addEventListener = function(type, callback, options) {
+      const scope = lookupScope(this);
+      scope && scope.addListener(this, type, callback, options);
+      origAdd.call(this, type, callback, options);
+    }
+
+    EventTarget.prototype.removeEventListener = function(type, callback, options) {
+      const scope = lookupScope(this);
+      scope && scope.removeListener(this, type, callback, options);
+      origRemove.call(this, type, callback, options);
+    }
   }
 }
