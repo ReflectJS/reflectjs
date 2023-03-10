@@ -337,6 +337,9 @@ export class Scope {
   }
 
   updateValues() {
+    if (!this.didInit) {
+      this.eval(pg.WILL_INIT_HANDLER_VALUE);
+    }
     Object.keys(this.values).forEach(k => {
       const v = this.values[k];
       !v.props.passive && this.proxy[k];

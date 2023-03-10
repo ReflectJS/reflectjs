@@ -7,7 +7,7 @@ import path from "path";
 import { compileDoc, PageError } from "../compiler/page-compiler";
 import { DomElement } from "../preprocessor/dom";
 import Preprocessor, { EMBEDDED_INCLUDE_FNAME } from "../preprocessor/preprocessor";
-import { PROPS_SCRIPT_ID, RUNTIME_SCRIPT_ID } from "../runtime/page";
+import { PAGEPATH_ATTR, PROPS_SCRIPT_ID, RUNTIME_SCRIPT_ID } from "../runtime/page";
 import exitHook from "./exit-hook";
 import { Routing } from "./routing";
 import { STDLIB } from "./stdlib";
@@ -15,7 +15,6 @@ import { STDLIB } from "./stdlib";
 const SERVER_PAGE_TIMEOUT = 2000;
 const CLIENT_JS_FILE = 'client.js';
 const SERVER_NOCLIENT_PARAM = '__noclient';
-const CONFIG_FILE = '.reflectjs.json';
 
 export interface ServerProps {
   port?: number,
@@ -238,6 +237,7 @@ export default class ServerImpl {
       if (!doc) {
         throw `failed to load page "${filePath}"`;
       }
+      doc.firstElementChild?.setAttribute(PAGEPATH_ATTR, fname);
       ret.files = pre.parser.origins;
       const { js, errors } = compileDoc(doc);
       if (errors.length > 0) {

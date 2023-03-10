@@ -9,6 +9,7 @@ export const COMMENT_NODE = 8; //TODO
 
 export const LOGIC_ATTR_PREFIX = ':';
 export const URLPATH_ATTR = LOGIC_ATTR_PREFIX + 'URLPATH';
+export const PAGEPATH_ATTR = LOGIC_ATTR_PREFIX + 'PAGEPATH';
 export const AKA_ATTR = LOGIC_ATTR_PREFIX + 'aka';
 
 export const DOM_ID_ATTR = 'data-reflectjs';
@@ -42,6 +43,7 @@ export const STYLE_VALUE_PREFIX = 'style_';
 export const WILL_HANDLER_VALUE_PREFIX = 'will_';
 export const DID_HANDLER_VALUE_PREFIX = 'did_';
 
+export const WILL_INIT_HANDLER_VALUE = WILL_HANDLER_VALUE_PREFIX + 'init';
 export const DID_INIT_HANDLER_VALUE = DID_HANDLER_VALUE_PREFIX + 'init';
 
 export const ID_VALUE = RESERVED_PREFIX + 'id';
@@ -104,9 +106,9 @@ export interface PageProps {
     this.refreshLevel = this.pushLevel = 0;
   }
 
-  load(parent: Scope | null, props: ScopeProps, cloned?: ScopeCloning) {
+  load(parent: Scope | null, props: ScopeProps, cloned?: ScopeCloning): Scope {
     const ret = new Scope(this, parent, props, cloned);
-    if (!ret.dom || ret.dom.tagName !== 'TEMPLATE') {
+    if (/*!ret.dom || */ret.dom.tagName !== 'TEMPLATE') {
       props.children?.forEach(props => {
         this.load(ret, props);
       });

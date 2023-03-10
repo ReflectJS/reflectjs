@@ -4,18 +4,21 @@ import { URLPATH_ATTR } from "../runtime/page";
 
 export class Routing {
   rootPath: string;
-  rules: Array<{ prefix: string, pathname: string }> | undefined;
-  cache: Map<string, string> | undefined;
+  rules: Array<{ prefix: string, pathname: string }>;
+  pages: Set<string>;
 
   constructor(rootPath: string, cb?: (instance: Routing) => void) {
     this.rootPath = rootPath;
+    this.rules = [];
+    this.pages = new Set();
     this.update().finally(() => cb && cb(this));
   }
 
   async update() {
     const that = this;
     const re = new RegExp(`${URLPATH_ATTR}="(.+?)"`);
-    const res = new Array<{ prefix: string, pathname: string }>
+    const files = new Set<string>();
+    const rules = new Array<{ prefix: string, pathname: string }>
     async function f(path: string) {
       const list = await fs.promises.readdir(join(that.rootPath, path));
       for (let name of list) {
@@ -25,34 +28,25 @@ export class Routing {
         if (stat.isDirectory()) {
           await f(relpath);
         } else if (stat.isFile() && name.endsWith('.html')) {
+          files.add(relpath);
           const text = await that.read(abspath, 1000);
           const r = re.exec(text);
           if (r && r.length > 1) {
-            res.push({ prefix: path + r[1], pathname: relpath });
+            rules.push({ prefix: path + r[1], pathname: relpath });
           }
         }
       }
     }
     await f('/');
-    res.sort((a, b) => b.prefix.length - a.prefix.length);
-    this.rules = res;
-    this.cache = new Map();
+    rules.sort((a, b) => b.prefix.length - a.prefix.length);
+    this.rules = rules;
+    this.pages = files;
   }
 
   async route(pathname: string): Promise<string> {
-    let s;
-    if (this.cache && (s = this.cache.get(pathname)) !== undefined) {
-      return s;
-    }
-    try {
-      const abspath = join(this.rootPath, pathname);
-      await fs.promises.access(abspath, fs.constants.R_OK);
-      return pathname;
-    } catch (ignored: any) {}
-    if (this.rules) {
+    if (!this.pages.has(pathname)) {
       for (let rule of this.rules) {
         if (pathname.startsWith(rule.prefix)) {
-          this.cache?.set(pathname, rule.pathname);
           return rule.pathname;
         }
       }
