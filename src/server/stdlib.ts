@@ -65,70 +65,61 @@ export const STDLIB = `<lib>
 />
 
 <:define tag=":on-off:template"
-    :on=[[false]]
+    :on="[[false]]"
+    :_instanceDom="[[null]]"
 
-    :handle-on=[[
-      if (on) {
-        ensureDomLinked();
-        ensureScopeInited();
-      } else {
-        ensureScopeDisposed();
-        ensureDomUnlinked();
+    :will-init=[[
+      if (!isServer) {
+        _instanceDom = __dom.parentElement.querySelector('[data-reflectjs-from="' + __id + '"]');
       }
     ]]
 
-    :ensureDomLinked=[[() => {
-      let e = __dom.previousElementSibling;
-      if (e && e.getAttribute('${TEMPLATE_ID_ATTR}') === __id) {
-        return;
+    :did_init="[[
+      if (!isServer && _instanceDom && __scope.props.children) {
+        const s = __scope.page.load(__scope, __scope.props.children[0]);
+        __scope.page.refresh(s);
       }
-      ` + // we need to link template dom
-      `if (isServer) {
-        const r = __dom.ownerDocument.createElement('div');
-        r.innerHTML = __dom.innerHTML.trim();
-        e = r.firstElementChild;
-        __dom.innerHTML = '';
-      } else {
-        e = __dom.content.firstElementChild;
-      }
-      if (e) {
-        e.remove();
-        e.setAttribute('${TEMPLATE_ID_ATTR}', __id);
-        __dom.parentElement.insertBefore(e, __dom);
-      }
-    }]]
+    ]]"
 
-    :ensureDomUnlinked=[[() => {
-      let e;
+    :handle-on="[[
       if (isServer) {
-        ` + // happy-dom bug: previousSibling doesn't work on HTMLTemplateElement
-        `const cc = window.Array.from(__dom.parentElement.children);
-        const i = cc.indexOf(__dom);
-        e = (i > 0 ? cc[i - 1] : null);
+        if (on) {
+          const div = __dom.ownerDocument.createElement('div');
+          div.innerHTML = __dom.innerHTML.trim();
+          let e = div.firstElementChild;
+          if (e) {
+            e.remove();
+            e.setAttribute('data-reflectjs-from', __id);
+            __dom.parentElement.insertBefore(e, __dom);
+            __dom.innerHTML = '';
+            if (__scope.props.children) {
+              const s = __scope.page.load(__scope, __scope.props.children[0]);
+              __scope.page.refresh(s);
+            }
+          }
+        }
       } else {
-        e = __dom.previousElementSibling;
+        if (on && !_instanceDom) {
+          const e = __dom.content.firstElementChild;
+          if (e) {
+            _instanceDom = e;
+            e.remove();
+            e.setAttribute('data-reflectjs-from', __id);
+            __dom.parentElement.insertBefore(e, __dom);
+            if (__scope.props.children) {
+              const s = __scope.page.load(__scope, __scope.props.children[0]);
+              __scope.page.refresh(s);
+            }
+          }
+        } else if (!on && _instanceDom) {
+          while (__scope.children.length > 0) {
+            __scope.children[0].dispose();
+          }
+          __dom.content.appendChild(_instanceDom);
+          _instanceDom = null;
+        }
       }
-      if (!e || e.getAttribute('${TEMPLATE_ID_ATTR}') !== __id) {
-        return;
-      }
-      ` + // we need to unlink template dom
-      `e.remove();
-      __dom.appendChild(e);
-    }]]
-
-    :ensureScopeInited=[[() => {
-      if (__scope.props.children && !__scope.children.length) {
-        const props = __scope.props.children[0];
-        const e = window.document.querySelector('[data-reflectjs="4"]');
-        __scope.page.load(__scope, __scope.props.children[0]);
-      }
-    }]]
-
-    :ensureScopeDisposed=[[() => {
-      if (__scope.children.length > 0) {
-        __scope.children[0].dispose();
-      }
-    }]]
+    ]]"
 />
 
 </lib>`;
