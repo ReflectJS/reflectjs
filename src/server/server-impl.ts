@@ -157,13 +157,16 @@ export default class ServerImpl {
             throw '';
           }
           if (url.pathname.endsWith('/')) {
-            req.url = path.join(req.url, 'index.html');
+            url.pathname += 'index.html';
+            req.url = url.toString();
             next('route');
           } else {
-            res.redirect(req.url + '/index');
+            url.pathname += '/index';
+            res.redirect(url.toString());
           }
         } catch (ex: any) {
-          req.url = req.url + '.html';
+          url.pathname += '.html';
+          req.url = url.toString();
           next('route');
         }
       } else {

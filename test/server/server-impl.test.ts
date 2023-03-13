@@ -89,6 +89,48 @@ describe("server: server-impl", () => {
     assert.exists(doc.getElementById(RUNTIME_SCRIPT_ID));
   });
 
+  it(`should support arguments in external redirection`, async () => {
+    const doc = await loadPage(`http://localhost:${port}/app1?__noclient`);
+    const span = doc.getElementById('msg');
+    assert.equal(span?.textContent, `http://localhost:${port}/app1/index?__noclient`);
+    assert.notExists(doc.getElementById(RUNTIME_SCRIPT_ID));
+  });
+
+  it(`should support arguments in internal redirection (1)`, async () => {
+    const doc = await loadPage(`http://localhost:${port}/app1/?__noclient`);
+    const span = doc.getElementById('msg');
+    assert.equal(span?.textContent, `http://localhost:${port}/app1/?__noclient`);
+    assert.notExists(doc.getElementById(RUNTIME_SCRIPT_ID));
+  });
+
+  it(`should support arguments in internal redirection (2)`, async () => {
+    const doc = await loadPage(`http://localhost:${port}/app1/index?__noclient`);
+    const span = doc.getElementById('msg');
+    assert.equal(span?.textContent, `http://localhost:${port}/app1/index?__noclient`);
+    assert.notExists(doc.getElementById(RUNTIME_SCRIPT_ID));
+  });
+
+  it(`should support arguments in internal redirection (3)`, async () => {
+    const doc = await loadPage(`http://localhost:${port}/app1/index.html?__noclient`);
+    const span = doc.getElementById('msg');
+    assert.equal(span?.textContent, `http://localhost:${port}/app1/index.html?__noclient`);
+    assert.notExists(doc.getElementById(RUNTIME_SCRIPT_ID));
+  });
+
+  it(`should support arguments in internal redirection (4)`, async () => {
+    const doc = await loadPage(`http://localhost:${port}/app1/other?__noclient`);
+    const span = doc.getElementById('msg');
+    assert.equal(span?.textContent, `http://localhost:${port}/app1/other?__noclient`);
+    assert.notExists(doc.getElementById(RUNTIME_SCRIPT_ID));
+  });
+
+  it(`should support arguments in internal redirection (5)`, async () => {
+    const doc = await loadPage(`http://localhost:${port}/app1/other.html?__noclient`);
+    const span = doc.getElementById('msg');
+    assert.equal(span?.textContent, `http://localhost:${port}/app1/other.html?__noclient`);
+    assert.notExists(doc.getElementById(RUNTIME_SCRIPT_ID));
+  });
+
   it(`shouldn't include client runtime w/ ?__noclient`, async () => {
     const doc = await loadPage(`http://localhost:${port}/index.html?__noclient`);
     const span = doc.getElementById('msg');
