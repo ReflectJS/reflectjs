@@ -24,6 +24,7 @@ export class Value {
   fn?: () => any;
   src?: Set<Value>;
   dst?: Set<Value>;
+  classParts?: Set<string>;
 
   constructor(key: string, props: ValueProps, scope?: Scope) {
     this.props = props;
@@ -36,7 +37,12 @@ export class Value {
       if (key.startsWith(pg.ATTR_VALUE_PREFIX)) {
         this.key = camelToHyphen(key.substring(pg.ATTR_VALUE_PREFIX.length));
         this.dom = scope.dom;
-        this.cb = attrCB;
+        if (this.key.toLowerCase() === 'class') {
+          this.classParts = new Set();
+          this.cb = attrClassCB;
+        } else {
+          this.cb = attrCB;
+        }
       } else if (key.startsWith(pg.EVENT_VALUE_PREFIX)) {
         this.key = props.domKey as string;
         this.dom = scope.dom;
@@ -69,7 +75,7 @@ export class Value {
 }
 
 export function camelToHyphen(s: string) {
-  return regexMap(/([0-9a-z][A-Z])/g, s, match => 
+  return regexMap(/([0-9a-z][A-Z])/g, s, match =>
     s.charAt(match.index) + '-' + s.charAt(match.index + 1).toLowerCase()
   );
 }
@@ -88,6 +94,22 @@ export function hiddenCB(v: Value) {
   } else {
     (v.dom as Element).classList.remove(pg.HIDDEN_CLASS);
   }
+}
+
+export function attrClassCB(v: Value) {
+  const oldParts = v.classParts as Set<string>;
+  const newParts = new Set<string>((v.props.val || "").trim().split(/\s+/));
+  newParts.forEach((part) => {
+    if (!oldParts.has(part)) {
+      (v.dom as Element).classList.add(part);
+    }
+  });
+  oldParts.forEach((part) => {
+    if (!newParts.has(part)) {
+      (v.dom as Element).classList.remove(part);
+    }
+  });
+  v.classParts = newParts;
 }
 
 export function classCB(v: Value) {

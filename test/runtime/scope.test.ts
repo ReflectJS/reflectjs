@@ -106,6 +106,48 @@ describe('runtime: scope', () => {
     );
   });
 
+  it('should handle both class attributes and the `class` attribute', () => {
+    const page = baseApp(`<html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>
+      <body ${DOM_ID_ATTR}="2">
+      </body>
+    </html>`, props => {
+      props.root.children && (props.root.children[1].values = {
+        mode: { val: null, fn: function() { return 1; }},
+        attr_class: { val: null, fn: function() { return 'block highlight' + this.mode; }, refs: ['mode'] },
+        class_highlight: { val: null, fn: function() { return true; } }
+      });
+    });
+    page.refresh();
+    assert.equal(
+      normalizeText(page.getMarkup()),
+      normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>
+      <body ${DOM_ID_ATTR}="2" class="block highlight1 highlight">
+      </body>
+      </html>`)
+    );
+    const body = page.root.children[1];
+    body.proxy['mode'] = 2;
+    assert.equal(
+      normalizeText(page.getMarkup()),
+      normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>
+      <body ${DOM_ID_ATTR}="2" class="block highlight highlight2">
+      </body>
+      </html>`)
+    );
+    body.proxy['class_highlight'] = false;
+    assert.equal(
+      normalizeText(page.getMarkup()),
+      normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>
+      <body ${DOM_ID_ATTR}="2" class="block highlight2">
+      </body>
+      </html>`)
+    );
+  });
+
   // ---------------------------------------------------------------------------
   // style attributes
   // ---------------------------------------------------------------------------
