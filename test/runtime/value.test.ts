@@ -24,11 +24,11 @@ describe('runtime: value', () => {
     const page = baseApp(null, props => {
       const body = itemAt(1, props.root.children) as ScopeProps;
       body.values = {
-        attr_class: { val: 'base' }
+        attr_title: { val: 'base' }
       };
     });
-    const v = page.root.children[1]?.values['attr_class'];
-    assert.equal(v.key, 'class');
+    const v = page.root.children[1]?.values['attr_title'];
+    assert.equal(v.key, 'title');
     assert.equal(v.props.val, 'base');
     assert.equal(v.dom, page.root.children[1]?.dom);
     assert.equal(v.cb, attrCB);

@@ -113,7 +113,7 @@ describe('runtime: scope', () => {
       </body>
     </html>`, props => {
       props.root.children && (props.root.children[1].values = {
-        mode: { val: null, fn: function() { return 1; }},
+        mode: { val: null, fn: function() { return 1; } },
         attr_class: { val: null, fn: function() { return 'block highlight' + this.mode; }, refs: ['mode'] },
         class_highlight: { val: null, fn: function() { return true; } }
       });
@@ -209,6 +209,48 @@ describe('runtime: scope', () => {
       normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
       <head ${DOM_ID_ATTR}="1"></head>
       <body ${DOM_ID_ATTR}="2">
+      </body>
+      </html>`)
+    );
+  });
+
+  it('should handle both style attributes and the `style` attribute', () => {
+    const page = baseApp(`<html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>
+      <body ${DOM_ID_ATTR}="2">
+      </body>
+    </html>`, props => {
+      props.root.children && (props.root.children[1].values = {
+        mode: { val: null, fn: function() { return 1; } },
+        attr_style: { val: null, fn: function() { return 'color: red; margin: ' + this.mode + 'px'}, refs: ['mode'] },
+        style_backgroundColor: { val: null, fn: function() { return 'blue'; } }
+      });
+    });
+    page.refresh();
+    assert.equal(
+      normalizeText(page.getMarkup()),
+      normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>
+      <body ${DOM_ID_ATTR}="2" style="color: red; margin: 1px; background-color: blue;">
+      </body>
+      </html>`)
+    );
+    const body = page.root.children[1];
+    body.proxy['mode'] = 2;
+    assert.equal(
+      normalizeText(page.getMarkup()),
+      normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>
+      <body ${DOM_ID_ATTR}="2" style="color: red; margin: 2px; background-color: blue;">
+      </body>
+      </html>`)
+    );
+    body.proxy['style_backgroundColor'] = null;
+    assert.equal(
+      normalizeText(page.getMarkup()),
+      normalizeText(`<!DOCTYPE html><html ${DOM_ID_ATTR}="0">
+      <head ${DOM_ID_ATTR}="1"></head>
+      <body ${DOM_ID_ATTR}="2" style="color: red; margin: 2px;">
       </body>
       </html>`)
     );

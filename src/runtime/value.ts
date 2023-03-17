@@ -25,6 +25,7 @@ export class Value {
   src?: Set<Value>;
   dst?: Set<Value>;
   classParts?: Set<string>;
+  styleParts?: Map<string, string>;
 
   constructor(key: string, props: ValueProps, scope?: Scope) {
     this.props = props;
@@ -37,9 +38,13 @@ export class Value {
       if (key.startsWith(pg.ATTR_VALUE_PREFIX)) {
         this.key = camelToHyphen(key.substring(pg.ATTR_VALUE_PREFIX.length));
         this.dom = scope.dom;
-        if (this.key.toLowerCase() === 'class') {
+        const keyLC = this.key.toLowerCase();
+        if (keyLC === 'class') {
           this.classParts = new Set();
           this.cb = attrClassCB;
+        } else if (keyLC === 'style') {
+          this.styleParts = new Map();
+          this.cb = attrStyleCB;
         } else {
           this.cb = attrCB;
         }
@@ -118,6 +123,27 @@ export function classCB(v: Value) {
   } else {
     (v.dom as Element).classList.remove(v.key as string);
   }
+}
+
+export function attrStyleCB(v: Value) {
+  const oldParts = v.styleParts as Map<string, string>;
+  const newParts = new Map<string, string>();
+  const pp1 = (v.props.val || "").trim().split(/\s*;\s*/) as string[];
+  pp1.forEach(p1 => {
+    const pp2 = p1.split(/\s*:\s*/);
+    if (pp2.length > 1 && pp2[0] && pp2[1]) {
+      newParts.set(pp2[0], pp2[1]);
+    }
+  });
+  newParts.forEach((val, key) => {
+    (v.dom as HTMLElement).style.setProperty(key, val);
+  });
+  oldParts.forEach((val, key) => {
+    if (!newParts.has(key)) {
+      (v.dom as HTMLElement).style.removeProperty(key);
+    }
+  });
+  v.styleParts = newParts;
 }
 
 export function styleCB(v: Value) {
