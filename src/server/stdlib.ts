@@ -1,14 +1,8 @@
-import { HIDDEN_CLASS, DOM_ID_ATTR } from "../runtime/page";
+import { DOM_ID_ATTR } from "../runtime/page";
 
 export const TEMPLATE_ID_ATTR = 'data-refjs-template';
 
 export const STDLIB = `<lib>
-
-<style>
-  .${HIDDEN_CLASS} {
-    display: none !important;
-  }
-</style>
 
 <!--- https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch -->
 <:define tag=":data-source:script" type="text/json"

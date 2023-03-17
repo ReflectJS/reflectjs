@@ -52,9 +52,9 @@ export class Value {
         this.key = props.domKey as string;
         this.dom = scope.dom;
         this.dom.addEventListener(this.key, (ev) => props.val(ev));
-      } else if (key === pg.HIDDEN_VALUE) {
-        this.dom = scope.dom;
-        this.cb = hiddenCB;
+      // } else if (key === pg.HIDDEN_VALUE) {
+      //   this.dom = scope.dom;
+      //   this.cb = hiddenCB;
       } else if (key.startsWith(pg.CLASS_VALUE_PREFIX)) {
         this.key = camelToHyphen(key.substring(pg.CLASS_VALUE_PREFIX.length));
         this.dom = scope.dom;
@@ -93,13 +93,13 @@ export function attrCB(v: Value) {
   }
 }
 
-export function hiddenCB(v: Value) {
-  if (v.props.val) {
-    (v.dom as Element).classList.add(pg.HIDDEN_CLASS);
-  } else {
-    (v.dom as Element).classList.remove(pg.HIDDEN_CLASS);
-  }
-}
+// export function hiddenCB(v: Value) {
+//   if (v.props.val) {
+//     (v.dom as Element).classList.add(pg.HIDDEN_CLASS);
+//   } else {
+//     (v.dom as Element).classList.remove(pg.HIDDEN_CLASS);
+//   }
+// }
 
 export function attrClassCB(v: Value) {
   const oldParts = v.classParts as Set<string>;
