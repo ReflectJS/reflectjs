@@ -26,43 +26,43 @@ describe("server: routing", () => {
   it(`should support routing for app1 (index)`, async () => {
     const doc = await loadPage(`http://localhost:${port}/app1/index.html?__noclient`);
     const result = doc.getElementById('result')?.textContent;
-    assert.equal(result, 'index: /app1/index.html /app1/index.html');
+    assert.equal(result, 'index: /app1/index.html|/app1/|index.html|');
   });
 
   it(`should support routing for app1 (page1)`, async () => {
     const doc = await loadPage(`http://localhost:${port}/app1/page1.html?__noclient`);
     const result = doc.getElementById('result')?.textContent;
-    assert.equal(result, 'index: /app1/page1.html /app1/index.html');
+    assert.equal(result, 'index: /app1/page1.html|/app1/|index.html|');
   });
 
   it(`should support routing for app1 (page2)`, async () => {
     const doc = await loadPage(`http://localhost:${port}/app1/page2.html?__noclient`);
     const result = doc.getElementById('result')?.textContent;
-    assert.equal(result, 'page2 /app1/page2.html');
+    assert.equal(result, 'page2 /app1/page2.html|||');
   });
 
   it(`should support routing for app1 (docs/index)`, async () => {
     const doc = await loadPage(`http://localhost:${port}/app1/docs/index.html?__noclient`);
     const result = doc.getElementById('result')?.textContent;
-    assert.equal(result, 'docs index: /app1/docs/index.html /app1/docs/index.html');
+    assert.equal(result, 'docs index: /app1/docs/index.html|||');
   });
 
   it(`should support routing for app1 (docs/other)`, async () => {
     const doc = await loadPage(`http://localhost:${port}/app1/docs/other.html?__noclient`);
     const result = doc.getElementById('result')?.textContent;
-    assert.equal(result, 'docs other: /app1/docs/other.html /app1/docs/other.html');
+    assert.equal(result, 'docs other: /app1/docs/other.html|||');
   });
 
   it(`should support routing for app1 (posts/index)`, async () => {
     const doc = await loadPage(`http://localhost:${port}/app1/posts/index.html?__noclient`);
     const result = doc.getElementById('result')?.textContent;
-    assert.equal(result, 'posts index: /app1/posts/index.html /app1/posts/index.html');
+    assert.equal(result, 'posts index: /app1/posts/index.html|/app1/posts/|index.html|');
   });
 
   it(`should support routing for app1 (posts/other)`, async () => {
     const doc = await loadPage(`http://localhost:${port}/app1/posts/other.html?__noclient`);
     const result = doc.getElementById('result')?.textContent;
-    assert.equal(result, 'posts index: /app1/posts/other.html /app1/posts/index.html');
+    assert.equal(result, 'posts index: /app1/posts/other.html|/app1/posts/|index.html|');
   });
 
 });

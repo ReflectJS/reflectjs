@@ -1,5 +1,5 @@
 import fs from "fs";
-import { join } from "path";
+import { join, dirname } from "path";
 import { URLPATH_ATTR } from "../runtime/page";
 
 export class Routing {
@@ -43,7 +43,7 @@ export class Routing {
     this.pages = files;
   }
 
-  async route(pathname: string): Promise<string> {
+  getFilePath(pathname: string): string {
     if (!this.pages.has(pathname)) {
       for (let rule of this.rules) {
         if (pathname.startsWith(rule.prefix)) {
@@ -53,6 +53,17 @@ export class Routing {
     }
     return pathname;
   }
+
+  // getPathExclusions(fname: string): string[] | undefined {
+  //   const ret = [];
+  //   let fpath = dirname(fname) + '/';
+  //   for (let item of this.rules) {
+  //     if (item.prefix.startsWith(fpath)) {
+  //       ret.push(item.prefix);
+  //     }
+  //   }
+  //   return ret.length ? ret : undefined;
+  // }
 
   // ===========================================================================
   // private

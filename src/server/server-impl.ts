@@ -6,8 +6,9 @@ import * as http from 'http';
 import path from "path";
 import { compileDoc, PageError } from "../compiler/page-compiler";
 import { DomElement } from "../preprocessor/dom";
+import { HtmlDocument } from "../preprocessor/htmldom";
 import Preprocessor, { EMBEDDED_INCLUDE_FNAME } from "../preprocessor/preprocessor";
-import { PAGEPATH_ATTR, PROPS_SCRIPT_ID, RUNTIME_SCRIPT_ID } from "../runtime/page";
+import { PAGENAME_ATTR, PAGEPATH_ATTR, PROPS_SCRIPT_ID, RUNTIME_SCRIPT_ID, URLPATH_ATTR } from "../runtime/page";
 import exitHook from "./exit-hook";
 import { Routing } from "./routing";
 import { STDLIB } from "./stdlib";
@@ -183,7 +184,7 @@ export default class ServerImpl {
       url.protocol = (props.assumeHttps ? 'https' : req.protocol);
       url.hostname = req.hostname;
       try {
-        const filePath = await this.routing?.route(url.pathname) ?? url.pathname;
+        const filePath = this.routing?.getFilePath(url.pathname) ?? url.pathname;
         const page = await that.getPage(url, req.originalUrl, filePath);
         if (page.errors) {
           throw page.errors.map(pe => `${pe.type}: ${pe.msg}`).join('\n');
@@ -240,7 +241,7 @@ export default class ServerImpl {
       if (!doc) {
         throw `failed to load page "${filePath}"`;
       }
-      doc.firstElementChild?.setAttribute(PAGEPATH_ATTR, fname);
+      this.addRoutingAttributes(doc, fname);
       ret.files = pre.parser.origins;
       const { js, errors } = compileDoc(doc);
       if (errors.length > 0) {
@@ -263,6 +264,22 @@ export default class ServerImpl {
       }
     }
     return ret;
+  }
+
+  addRoutingAttributes(doc: HtmlDocument, fname: string) {
+    const rootElement = doc.firstElementChild;
+    if (!rootElement?.getAttribute(URLPATH_ATTR)) {
+      return;
+    }
+    const pagePath = path.dirname(fname) + '/';
+    const pageName = path.basename(fname);
+    rootElement.setAttribute(PAGEPATH_ATTR, pagePath);
+    rootElement.setAttribute(PAGENAME_ATTR, pageName);
+    // const urlExclusions = this.routing?.getPathExclusions(fname);
+    // if (urlExclusions) {
+    //   //TODO: do we need to escape the strings (esp. for '"' and ' ')?
+    //   rootElement.setAttribute(URLEXCLUDES_ATTR, urlExclusions.join(' '));
+    // }
   }
 
   async isCompiledPageFresh(compiledPage: CompiledPage): Promise<boolean> {
