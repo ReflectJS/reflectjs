@@ -138,6 +138,17 @@ describe("server: stdlib", () => {
 
   });
 
+  describe("<:page-router>", async () => {
+    //TODO
+
+    // it(`shouldn't handle pages w/o :URLPATH attribute`, async () => {
+    //   const doc = await loadPage(`${baseUrl}/page-router`);
+    //   assert.equal(doc.title, 'page-router/index.html');
+    //   doc.getElementById('goToOther')?.click();
+    // });
+
+  });
+
 });
 
 async function loadPage(url: string) {

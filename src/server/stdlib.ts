@@ -116,4 +116,37 @@ export const STDLIB = `<lib>
     ]]"
 />
 
+<script :aka="router"
+        :path=""
+        :roots=[[EXTURLS && EXTURLS.split(' ').map((v) => window.decodeURI(v))]]
+
+        :did-init="[[
+          const that = this;
+          _update(window.location.pathname);
+          EXTURLS && window.navigation && window.navigation.addEventListener('navigate', (ev) => {
+            if (!ev.canIntercept || ev.downloadRequest !== null) {
+              return;
+            }
+            if (ev.hashChange) {
+              _update(window.location.pathname);
+              return;
+            }
+            const url = new window.URL(ev.destination.url);
+            const pathname = url.pathname;
+            for (let root of that.roots) {
+              if (pathname.startsWith(root)) {
+                return;
+              }
+            }
+            ev.intercept({
+              handler: () => that._update(url.pathname)
+            })
+          });
+        ]]"
+
+        :_update=[[(s) => {
+          path = s.replace(/(.html)$/, '').replace(/(\\/)$/, '/index');
+        }]]
+></script>
+
 </lib>`;
