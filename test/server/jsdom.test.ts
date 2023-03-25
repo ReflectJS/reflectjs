@@ -91,8 +91,6 @@ describe('server: jsdom', () => {
 });
 
 async function loadPage(url: string) {
-  const win = new happy.Window();
-  const text = await (await win.fetch(url)).text();
-  const dom = new JSDOM(text, { runScripts: "dangerously" });
-  return dom.window.document;
+  const jsdom = await JSDOM.fromURL(url, { runScripts: "dangerously" });
+  return jsdom.window.document;
 }

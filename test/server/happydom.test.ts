@@ -52,38 +52,38 @@ describe('server: happydom', () => {
   });
 
   it(`should dynamically load data (no delay)`, async () => {
-    const doc = await loadPage(`http://localhost:${port}/data1.html`);
-    const span = doc.getElementById('msg');
+    const win = await loadPage(`http://localhost:${port}/data1.html`);
+    const span = win.document.getElementById('msg');
     assert.equal(span.textContent, 'OK');
   });
 
   it(`should dynamically load data (normal delay)`, async () => {
-    const doc = await loadPage(`http://localhost:${port}/data1b.html`);
-    const span = doc.getElementById('msg');
+    const win = await loadPage(`http://localhost:${port}/data1b.html`);
+    const span = win.document.getElementById('msg');
     assert.equal(span.textContent, 'OK');
   });
 
   it(`should dynamically load data (delay timeout)`, async () => {
-    const doc = await loadPage(`http://localhost:${port}/data1c.html`);
-    const span = doc.getElementById('msg');
+    const win = await loadPage(`http://localhost:${port}/data1c.html`);
+    const span = win.document.getElementById('msg');
     assert.equal(span.textContent, '');
   });
 
   it(`should run external js`, async () => {
-    const doc = await loadPage(`http://localhost:${port}/exjs.html`, true);
-    const span = doc.getElementsByTagName('span')[0];
+    const win = await loadPage(`http://localhost:${port}/exjs.html`, true);
+    const span = win.document.getElementsByTagName('span')[0];
     assert.equal(span.textContent, 'from exjs.js');
   });
 
   it(`should run embedded js (1)`, async () => {
-    const doc = await loadPage(`http://localhost:${port}/js1.html`, true);
-    const span = doc.getElementsByTagName('span')[0];
+    const win = await loadPage(`http://localhost:${port}/js1.html`, true);
+    const span = win.document.getElementsByTagName('span')[0];
     assert.equal(span.textContent, 'meta');
   });
 
   it(`should run embedded js (2)`, async () => {
-    const doc = await loadPage(`http://localhost:${port}/js2.html`, true);
-    const span = doc.getElementsByTagName('span')[0];
+    const win = await loadPage(`http://localhost:${port}/js2.html`, true);
+    const span = win.document.getElementsByTagName('span')[0];
     assert.equal(span.textContent, '1');
   });
 
@@ -112,7 +112,7 @@ describe('server: happydom', () => {
 
 });
 
-export async function loadPage(url: string, loadJS = false) {
+export async function loadPage(url: string, loadJS = false): Promise<happy.Window> {
   const win = new happy.Window({
     url: url.toString(),
     // https://github.com/capricorn86/happy-dom/tree/master/packages/happy-dom#settings
@@ -131,5 +131,5 @@ export async function loadPage(url: string, loadJS = false) {
   ])
   win.happyDOM.cancelAsync();
   await new Promise(resolve => setTimeout(resolve, 0));
-  return win.document;
+  return win;
 }

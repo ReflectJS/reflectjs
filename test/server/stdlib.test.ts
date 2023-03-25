@@ -45,8 +45,8 @@ describe("server: stdlib", () => {
     it(`off, noclient`, async () => {
       const doc = await loadPage(`${baseUrl}/on-off/on-off-passive-1.html?__noclient`);
       assert.equal(normalizeText(doc.body.outerHTML), normalizeText(
-        `<body data-reflectjs="2">
-        <template id="theTemplate" data-reflectjs="3">
+        `<body data-reflectjs="3">
+        <template id="theTemplate" data-reflectjs="4">
         <div id="theDiv">hi there</div>
         </template>
         </body>`
@@ -57,8 +57,8 @@ describe("server: stdlib", () => {
       const doc = await loadPage(`${baseUrl}/on-off/on-off-passive-1.html`);
       Array.from(doc.getElementsByTagName('script')).forEach(e => e.remove());
       assert.equal(normalizeText(doc.body.outerHTML), normalizeText(
-        `<body data-reflectjs="2">
-        <template id="theTemplate" data-reflectjs="3">
+        `<body data-reflectjs="3">
+        <template id="theTemplate" data-reflectjs="4">
         <div id="theDiv">hi there</div>
         </template>
         </body>`
@@ -68,9 +68,9 @@ describe("server: stdlib", () => {
     it(`on, noclient`, async () => {
       const doc = await loadPage(`${baseUrl}/on-off/on-off-passive-1.html?__noclient&on=true`);
       assert.equal(normalizeText(doc.body.outerHTML), normalizeText(
-        `<body data-reflectjs="2">
-        <div id="theDiv" data-reflectjs-from="3">hi there</div>` +
-        `<template id="theTemplate" data-reflectjs="3"></template>
+        `<body data-reflectjs="3">
+        <div id="theDiv" data-reflectjs-from="4">hi there</div>` +
+        `<template id="theTemplate" data-reflectjs="4"></template>
         </body>`
       ));
     })
@@ -79,9 +79,9 @@ describe("server: stdlib", () => {
       const doc = await loadPage(`${baseUrl}/on-off/on-off-passive-1.html?on=true`);
       Array.from(doc.getElementsByTagName('script')).forEach(e => e.remove());
       assert.equal(normalizeText(doc.body.outerHTML), normalizeText(
-        `<body data-reflectjs="2">
-        <div id="theDiv" data-reflectjs-from="3">hi there</div>` +
-        `<template id="theTemplate" data-reflectjs="3"></template>
+        `<body data-reflectjs="3">
+        <div id="theDiv" data-reflectjs-from="4">hi there</div>` +
+        `<template id="theTemplate" data-reflectjs="4"></template>
         </body>`
       ));
     })
@@ -93,9 +93,9 @@ describe("server: stdlib", () => {
     it(`off, noclient`, async () => {
       const doc = await loadPage(`${baseUrl}/on-off/on-off-active-1.html?__noclient`);
       assert.equal(normalizeText(doc.body.outerHTML), normalizeText(
-        `<body data-reflectjs="2">
-        <template id="theTemplate" data-reflectjs="3">
-        <div id="theDiv" data-reflectjs="4">hello <span><!---t0--><!---/--></span></div>
+        `<body data-reflectjs="3">
+        <template id="theTemplate" data-reflectjs="4">
+        <div id="theDiv" data-reflectjs="5">hello <span><!---t0--><!---/--></span></div>
         </template>
         </body>`
       ));
@@ -105,9 +105,9 @@ describe("server: stdlib", () => {
       const doc = await loadPage(`${baseUrl}/on-off/on-off-active-1.html`);
       Array.from(doc.getElementsByTagName('script')).forEach(e => e.remove());
       assert.equal(normalizeText(doc.body.outerHTML), normalizeText(
-        `<body data-reflectjs="2">
-        <template id="theTemplate" data-reflectjs="3">
-        <div id="theDiv" data-reflectjs="4">hello <span><!---t0--><!---/--></span></div>
+        `<body data-reflectjs="3">
+        <template id="theTemplate" data-reflectjs="4">
+        <div id="theDiv" data-reflectjs="5">hello <span><!---t0--><!---/--></span></div>
         </template>
         </body>`
       ));
@@ -116,10 +116,10 @@ describe("server: stdlib", () => {
     it(`on, noclient`, async () => {
       const doc = await loadPage(`${baseUrl}/on-off/on-off-active-1.html?__noclient&on=true`);
       assert.equal(normalizeText(doc.body.outerHTML), normalizeText(
-        `<body data-reflectjs="2">
-        <div id="theDiv" data-reflectjs="4" data-reflectjs-from="3">hello ` +
+        `<body data-reflectjs="3">
+        <div id="theDiv" data-reflectjs="5" data-reflectjs-from="4">hello ` +
         `<span><!---t0-->there<!---/--></span>` +
-        `</div><template id="theTemplate" data-reflectjs="3"></template>
+        `</div><template id="theTemplate" data-reflectjs="4"></template>
         </body>`
       ));
     })
@@ -128,10 +128,10 @@ describe("server: stdlib", () => {
       const doc = await loadPage(`${baseUrl}/on-off/on-off-active-1.html?on=true`);
       Array.from(doc.getElementsByTagName('script')).forEach(e => e.remove());
       assert.equal(normalizeText(doc.body.outerHTML), normalizeText(
-        `<body data-reflectjs="2">
-        <div id="theDiv" data-reflectjs="4" data-reflectjs-from="3">hello ` +
+        `<body data-reflectjs="3">
+        <div id="theDiv" data-reflectjs="5" data-reflectjs-from="4">hello ` +
         `<span><!---t0-->there<!---/--></span>` +
-        `</div><template id="theTemplate" data-reflectjs="3"></template>
+        `</div><template id="theTemplate" data-reflectjs="4"></template>
         </body>`
       ));
     })
@@ -152,13 +152,8 @@ describe("server: stdlib", () => {
 });
 
 async function loadPage(url: string) {
-  const win = new happy.Window();
-  const text = await (await win.fetch(url)).text();
   // we're using JSDOM for simulating the client, because
   // `isServer` is true when the environment is happy-dom
-  const dom = new JSDOM(text, {
-    url: url,
-    runScripts: "dangerously"
-  });
+  const dom = await JSDOM.fromURL(url, { runScripts: "dangerously" });
   return dom.window.document;
 }
