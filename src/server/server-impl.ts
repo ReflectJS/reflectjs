@@ -8,7 +8,7 @@ import { compileDoc, PageError } from "../compiler/page-compiler";
 import { DomElement } from "../preprocessor/dom";
 import { HtmlDocument } from "../preprocessor/htmldom";
 import Preprocessor, { EMBEDDED_INCLUDE_FNAME } from "../preprocessor/preprocessor";
-import { PAGENAME_ATTR, PAGEPATH_ATTR, PROPS_SCRIPT_ID, RUNTIME_SCRIPT_ID, URLPATH_ATTR } from "../runtime/page";
+import { EXTURLS_ATTR, PAGENAME_ATTR, PAGEPATH_ATTR, PROPS_SCRIPT_ID, RUNTIME_SCRIPT_ID, URLPATH_ATTR } from "../runtime/page";
 import exitHook from "./exit-hook";
 import { Routing } from "./routing";
 import { STDLIB } from "./stdlib";
@@ -268,18 +268,23 @@ export default class ServerImpl {
 
   addRoutingAttributes(doc: HtmlDocument, fname: string) {
     const rootElement = doc.firstElementChild;
-    if (!rootElement?.getAttribute(URLPATH_ATTR)) {
+    if (!this.routing || !rootElement?.getAttribute(URLPATH_ATTR)) {
       return;
     }
+    const urlPath = rootElement.getAttribute(URLPATH_ATTR) as string;
     const pagePath = path.dirname(fname) + '/';
     const pageName = path.basename(fname);
     rootElement.setAttribute(PAGEPATH_ATTR, pagePath);
     rootElement.setAttribute(PAGENAME_ATTR, pageName);
-    // const urlExclusions = this.routing?.getPathExclusions(fname);
-    // if (urlExclusions) {
-    //   //TODO: do we need to escape the strings (esp. for '"' and ' ')?
-    //   rootElement.setAttribute(URLEXCLUDES_ATTR, urlExclusions.join(' '));
-    // }
+    const prefix = path.join(pagePath, urlPath);
+    const extUrls = [];
+    for (let r of this.routing.rules) {
+      r.prefix.startsWith(prefix) && extUrls.push(encodeURI(r.prefix));
+    }
+    for (let p of this.routing.pages) {
+      p.startsWith(prefix) && extUrls.push(encodeURI(p));
+    }
+    extUrls.length && rootElement.setAttribute(EXTURLS_ATTR, extUrls.join(' '));
   }
 
   async isCompiledPageFresh(compiledPage: CompiledPage): Promise<boolean> {

@@ -23,6 +23,10 @@ describe("server: routing", () => {
     return server.close();
   });
 
+  // ==========================================================================
+  // URLPATH, PAGEPATH, PAGENAME
+  // ==========================================================================
+
   it(`should support routing for app1 ('index.html')`, async () => {
     const doc = await loadPage(`http://localhost:${port}/app1/index.html?__noclient`);
     const result = doc.getElementById('result')?.textContent;
@@ -123,6 +127,82 @@ describe("server: routing", () => {
     const doc = await loadPage(`http://localhost:${port}/app1/posts/fake?__noclient`);
     const result = doc.getElementById('result')?.textContent;
     assert.equal(result, 'posts index: /app1/posts/fake|/app1/posts/|index.html|');
+  });
+
+  // ==========================================================================
+  // EXTURLS
+  // ==========================================================================
+
+  /*
+    docroot/
+      +-app1/
+      |	  +-docs/
+      |	  |	  +-index.html
+      |	  |	  +-other.html
+      |	  |	  +-other still.html
+      |	  +-posts/
+      |	  |	  +-index.html :URLPATH="/"
+      |   |                :PAGEPATH="/app1/posts/"
+      |   |                :PAGENAME="index.html"
+      |	  +-index.html :URLPATH="/"
+      |   |            :PAGEPATH="/app1/"
+      |   |            :PAGENAME="index.html"
+      |	  +-page2.html
+      +-index.html
+  */
+
+  it('should support EXTURLS (index.html)', async () => {
+    const doc = await loadPage(`http://localhost:${port}/index.html?__noclient`);
+    const exturls = doc.getElementById('exturls')?.textContent;
+    assert.equal(exturls, '');
+  });
+
+  it('should support EXTURLS (app1/index.html)', async () => {
+    const doc = await loadPage(`http://localhost:${port}/app1/index.html?__noclient`);
+    const extUrls = doc.getElementById('exturls')?.textContent;
+    assert.deepEqual(extUrls?.split(' '), [
+      '/app1/posts/',
+      '/app1/',
+      '/app1/docs/index.html',
+      '/app1/docs/other%20still.html',
+      '/app1/docs/other.html',
+      '/app1/index.html',
+      '/app1/page2.html',
+      '/app1/posts/index.html'
+    ]);
+  });
+
+  it('should support EXTURLS (app1/page2.html)', async () => {
+    const doc = await loadPage(`http://localhost:${port}/app1/page2.html?__noclient`);
+    const extUrls = doc.getElementById('exturls')?.textContent;
+    assert.deepEqual(extUrls, '');
+  });
+
+  it('should support EXTURLS (app1/docs/index.html)', async () => {
+    const doc = await loadPage(`http://localhost:${port}/app1/docs/index.html?__noclient`);
+    const extUrls = doc.getElementById('exturls')?.textContent;
+    assert.deepEqual(extUrls, '');
+  });
+
+  it('should support EXTURLS (app1/docs/other.html)', async () => {
+    const doc = await loadPage(`http://localhost:${port}/app1/docs/other.html?__noclient`);
+    const extUrls = doc.getElementById('exturls')?.textContent;
+    assert.deepEqual(extUrls, '');
+  });
+
+  it('should support EXTURLS (app1/docs/other still.html)', async () => {
+    const doc = await loadPage(`http://localhost:${port}/app1/docs/other%20still.html?__noclient`);
+    const extUrls = doc.getElementById('exturls')?.textContent;
+    assert.deepEqual(extUrls, '');
+  });
+
+  it('should support EXTURLS (app1/posts/index.html)', async () => {
+    const doc = await loadPage(`http://localhost:${port}/app1/posts/index.html?__noclient`);
+    const extUrls = doc.getElementById('exturls')?.textContent;
+    assert.deepEqual(extUrls?.split(' '), [
+      '/app1/posts/',
+      '/app1/posts/index.html'
+    ]);
   });
 
 });

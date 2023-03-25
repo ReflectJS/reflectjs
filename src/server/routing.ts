@@ -44,6 +44,7 @@ export class Routing {
   }
 
   getFilePath(pathname: string): string {
+    pathname = decodeURI(pathname);
     if (!this.pages.has(pathname)) {
       for (let rule of this.rules) {
         if (pathname.startsWith(rule.prefix)) {
