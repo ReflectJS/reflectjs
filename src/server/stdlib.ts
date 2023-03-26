@@ -118,35 +118,34 @@ export const STDLIB = `<lib>
 
 <script :aka="router"
         :path=""
-        :roots=[[EXTURLS && EXTURLS.split(' ').map((v) => window.decodeURI(v))]]
+        :_roots=[[ [] ]]
 
         :did-init="[[
-          const that = this;
+          EXTURLS && (_roots = EXTURLS.split(' ').map((v) => window.decodeURI(v)));
           _update(window.location.pathname);
-          EXTURLS && window.navigation && window.navigation.addEventListener('navigate', (ev) => {
-            if (!ev.canIntercept || ev.downloadRequest !== null) {
+          window.navigation && window.navigation.addEventListener('navigate', (ev) => {
+            if (!ev.canIntercept || ev.hashChange || ev.downloadRequest !== null) {
               return;
             }
-            if (ev.hashChange) {
-              _update(window.location.pathname);
-              return;
-            }
+            const that = this;
             const url = new window.URL(ev.destination.url);
-            const pathname = url.pathname;
-            for (let root of that.roots) {
+            const pathname = window.decodeURI(url.pathname);
+            for (let root of _roots) {
               if (pathname.startsWith(root)) {
                 return;
               }
             }
-            ev.intercept({
-              handler: () => that._update(url.pathname)
-            })
+            if (URLPATH && pathname.startsWith(URLPATH)) {
+              ev.intercept({
+                handler() { that._update(pathname); },
+              })
+            }
           });
         ]]"
 
-        :_update=[[(s) => {
+        :_update="[[(s) => {
           path = s.replace(/(.html)$/, '').replace(/(\\/)$/, '/index');
-        }]]
+        }]]"
 ></script>
 
 </lib>`;

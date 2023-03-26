@@ -29,6 +29,7 @@ export interface ServerProps {
   clientJsFilePath?: string,
   serverPageTimeout?: number,
   normalizeText?: boolean,
+  willServePage?: (url: URL) => void;
 }
 
 export interface TrafficLimit {
@@ -184,6 +185,7 @@ export default class ServerImpl {
       url.protocol = (props.assumeHttps ? 'https' : req.protocol);
       url.hostname = req.hostname;
       try {
+        this.props.willServePage && this.props.willServePage(url);
         const filePath = this.routing?.getFilePath(url.pathname) ?? url.pathname;
         const page = await that.getPage(url, req.originalUrl, filePath);
         if (page.errors) {
@@ -279,7 +281,7 @@ export default class ServerImpl {
     const prefix = path.join(pagePath, urlPath);
     const extUrls = [];
     for (let r of this.routing.rules) {
-      r.prefix.startsWith(prefix) && extUrls.push(encodeURI(r.prefix));
+      r.prefix.startsWith(prefix) && r.prefix != prefix && extUrls.push(encodeURI(r.prefix));
     }
     for (let p of this.routing.pages) {
       p.startsWith(prefix) && extUrls.push(encodeURI(p));

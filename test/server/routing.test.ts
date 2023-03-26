@@ -162,7 +162,6 @@ describe("server: routing", () => {
     const extUrls = doc.getElementById('exturls')?.textContent;
     assert.deepEqual(extUrls?.split(' '), [
       '/app1/posts/',
-      '/app1/',
       '/app1/docs/index.html',
       '/app1/docs/other%20still.html',
       '/app1/docs/other.html',
@@ -200,7 +199,6 @@ describe("server: routing", () => {
     const doc = await loadPage(`http://localhost:${port}/app1/posts/index.html?__noclient`);
     const extUrls = doc.getElementById('exturls')?.textContent;
     assert.deepEqual(extUrls?.split(' '), [
-      '/app1/posts/',
       '/app1/posts/index.html'
     ]);
   });
