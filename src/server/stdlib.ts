@@ -117,7 +117,9 @@ export const STDLIB = `<lib>
 />
 
 <script :aka="router"
-        :path=""
+        :pathname=""
+        :path=[[pathname.split('/').slice(0, -1).join('/')]]
+        :name=[[pathname.split('/').pop()]]
         :_roots=[[ [] ]]
 
         :did-init="[[
@@ -144,7 +146,7 @@ export const STDLIB = `<lib>
         ]]"
 
         :_update="[[(s) => {
-          path = s.replace(/(.html)$/, '').replace(/(\\/)$/, '/index');
+          pathname = s.replace(/(.html)$/, '').replace(/(\\/)$/, '/index');
         }]]"
 ></script>
 
