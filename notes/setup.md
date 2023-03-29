@@ -258,3 +258,11 @@ npm i express-rate-limit
 ```
 npm i piscina
 ```
+
+### markdown-it
+
+```
+npm i markdown-it
+npm i -D @types/markdown-it
+npm i markdown-it-highlightjs
+```

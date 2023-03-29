@@ -307,6 +307,26 @@ describe("preprocessor: preprocessor", () => {
     ));
   });
 
+  // =========================================================================
+  // <:markdown> directive
+  // =========================================================================
+
+  it('should render markdown', async () => {
+    var prepro = new Preprocessor(preprocessor.rootPath, [{
+      fname: 'dummy.html',
+      content: `<html><body><:markdown>
+# Intro
+Here is some *markdown* text.
+      </:markdown></body></html>`
+    }]);
+    const doc = await prepro.read('dummy.html');
+    assert.equal(normalizeText(doc?.toString()), normalizeText(
+      `<html><head></head><body><h1>Intro</h1>
+        <p>Here is some <em>markdown</em> text.</p>
+      </body></html>`
+    ));
+  });
+
 });
 
 // =============================================================================

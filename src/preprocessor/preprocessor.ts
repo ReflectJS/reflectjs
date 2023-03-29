@@ -18,6 +18,8 @@ const SLOT_TAG = ':SLOT';
 const SLOT_ARG = 'name';
 const SLOT_ATTR = ':slot';
 
+const MARKDOWN_TAG = ':MARKDOWN';
+
 const MAX_RECURSIONS = 100;
 
 interface Definition {
@@ -93,6 +95,7 @@ export default class Preprocessor {
           this.joinAdjacentTexts(head);
         }
       }
+      this.processMarkdownDirectives(ret);
       this.processMacros(ret);
     }
     return ret;
@@ -288,6 +291,31 @@ export default class Preprocessor {
   }
 
   // =========================================================================
+  // markdown
+  // =========================================================================
+  md = require('markdown-it')()
+      .set({ html: true })
+      .use(require('markdown-it-highlightjs'));
+
+  private processMarkdownDirectives(doc: HtmlDocument) {
+    var ee = lookupTags(doc, new Set<string>([MARKDOWN_TAG]));
+    for (var e of ee) {
+      this.processMarkdownDirective(e);
+    }
+  }
+
+  private processMarkdownDirective(e: HtmlElement) {
+    const p = e.parentElement as HtmlElement;
+    const src = e.innerHTML;
+    const dst = this.md.render(src);
+    e.innerHTML = dst;
+    while (e.firstChild) {
+      p.insertBefore(e.firstChild.remove(), e);
+    }
+    e.remove();
+  }
+
+  // =========================================================================
   // macros
   // =========================================================================
 
@@ -301,9 +329,7 @@ export default class Preprocessor {
   // -------------------------------------------------------------------------
 
   private collectMacros(p: HtmlElement, nesting: number) {
-    var tags = new Set<string>();
-    tags.add(DEFINE_TAG);
-    var macros = lookupTags(p, tags);
+    var macros = lookupTags(p, new Set<string>([DEFINE_TAG]));
     for (var e of macros) {
       this.collectMacro(e, nesting);
     }
