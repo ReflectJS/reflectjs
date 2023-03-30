@@ -107,8 +107,9 @@ export const STDLIB = `<lib>
           }
         } else if (!on && _instanceDom) {
           while (__scope.children.length > 0) {
-            __scope.children[0].dispose();
+            __scope.children[0].dispose(__scope.children[0].dom !== _instanceDom);
           }
+          _instanceDom.remove();
           __dom.content.appendChild(_instanceDom);
           _instanceDom = null;
         }

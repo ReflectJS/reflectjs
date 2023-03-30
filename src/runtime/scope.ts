@@ -73,14 +73,14 @@ export class Scope {
     page.scopes.set(props.id, this);
   }
 
-  dispose() {
+  dispose(unlinkdom = true) {
     this.page.scopes.delete(this.props.id);
     this.disposeTimers();
     this.disposeListeners();
-    this.dom.remove();
+    unlinkdom && this.dom.remove();
     this.unlinkValues();
     while (this.children.length > 0) {
-      this.children.pop()?.dispose();
+      this.children.pop()?.dispose(unlinkdom);
     }
     if (this.parent) {
       const i = this.parent.children.indexOf(this);
@@ -102,7 +102,7 @@ export class Scope {
     }
     if (this.nestings) {
       while (this.nestings.length > 0) {
-        this.nestings.pop()?.dispose();
+        this.nestings.pop()?.dispose(unlinkdom);
       }
     }
   }
