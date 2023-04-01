@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import ServerImpl from "./server/server-impl";
 
 new ServerImpl({

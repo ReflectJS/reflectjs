@@ -202,7 +202,7 @@ export default class ServerImpl {
     });
 
     // load client runtime
-    const p = props.clientJsFilePath ?? path.resolve(__dirname, CLIENT_JS_FILE);
+    const p = props.clientJsFilePath ?? path.resolve(__dirname, '..', CLIENT_JS_FILE);
     this.clientJs = '\n' + fs.readFileSync(p, { encoding: 'utf8'});
   }
 

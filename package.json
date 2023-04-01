@@ -7,7 +7,10 @@
     "test": "npm run build && mocha --exit -r ts-node/register test/**/*.test.ts",
     "test-only": "mocha --exit -r ts-node/register test/**/*.test.ts",
     "coverage": "nyc npm run test && coverage-badges --output res/coverage-badge.svg",
-    "build": "tsc && browserify dist/client/client-main.js -o dist/client.js"
+    "build": "rm -rf dist/* && tsc && browserify dist/client/client-main.js -o dist/client.js && cp package.json dist"
+  },
+  "bin": {
+    "reflectjs": "./index.js"
   },
   "keywords": [],
   "author": "Fabrizio Capolini",
