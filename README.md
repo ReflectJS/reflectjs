@@ -1,8 +1,8 @@
 # Reflect.js
 
-[![CodeQL](https://github.com/fcapolini/reflectjs/actions/workflows/codeql.yml/badge.svg)](https://github.com/fcapolini/reflectjs/actions/workflows/codeql.yml)
-[![Node.js CI](https://github.com/fcapolini/reflectjs/actions/workflows/node.js.yml/badge.svg)](https://github.com/fcapolini/reflectjs/actions/workflows/node.js.yml)
-![Coverage](res/coverage-badge-230402.svg)
+[![CodeQL](https://github.com/reflectjs-org/reflectjs-server/actions/workflows/codeql.yml/badge.svg)](https://github.com/reflectjs-org/reflectjs-server/actions/workflows/codeql.yml)
+[![Node.js CI](https://github.com/reflectjs-org/reflectjs-server/actions/workflows/node.js.yml/badge.svg)](https://github.com/reflectjs-org/reflectjs-server/actions/workflows/node.js.yml)
+![Coverage](https://github.com/reflectjs-org/reflectjs-server/raw/main/res/coverage-badge-230402.svg)
 
 Reflect.js turns *HTML itself* into a [reactive language](https://github.com/reflectjs-org/reflectjs-server/wiki/reactivity) for creating modern web sites and web apps, still [fully indexable](https://github.com/reflectjs-org/reflectjs-server/wiki/indexability) out of the box, that can easily be based on [reusable components](https://github.com/reflectjs-org/reflectjs-server/wiki/reusability).
 
