@@ -12,7 +12,7 @@ Reflect.js turns *HTML itself* into a [reactive language](https://github.com/ref
 Reflect.js is an [Express](https://expressjs.com/) application for [Node.js](https://nodejs.org/) which processes and serves web pages, giving them the ability to execute unified client/server reactive logic.
 
 ```bash
-npm install -g reflectjs
+npm install -g reflectjs-core
 # now you can start a local server with the "reflectjs" command
 cd <document-root-dir>
 reflectjs
