@@ -1,5 +1,5 @@
 {
-  "name": "reflectjs-server",
+  "name": "@reflectjs/core",
   "version": "0.2.0",
   "description": "The simplest reactive web framework, built for Node.js and the browser.",
   "keywords": [
@@ -11,12 +11,12 @@
     "runtime",
     "HTML"
   ],
-  "homepage": "https://github.com/reflectjs-org/reflectjs-server#readme",
-  "bugs": "https://github.com/reflectjs-org/reflectjs-server/issues",
+  "homepage": "https://github.com/reflectjs/reflectjs-core#readme",
+  "bugs": "https://github.com/reflectjs/reflectjs-core/issues",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/reflectjs-org/reflectjs-server.git"
+    "url": "https://github.com/reflectjs/reflectjs-core.git"
   },
   "author": "Fabrizio Capolini",
   "license": "MIT",
