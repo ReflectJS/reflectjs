@@ -1,6 +1,6 @@
 {
   "name": "reflectjs-server",
-  "version": "0.1.1-reflectjs.org.0",
+  "version": "0.2.0",
   "description": "The simplest reactive web framework, built for Node.js and the browser.",
   "keywords": [
     "reactive",
