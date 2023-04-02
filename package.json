@@ -1,20 +1,29 @@
 {
-  "name": "reflectjs",
+  "name": "reflectjs-server",
   "version": "0.1.0",
-  "description": "",
+  "description": "The simplest reactive web framework, built for Node.js and the browser.",
+  "keywords": ["reactive", "web", "framework", "server", "browser", "runtime", "HTML"],
+  "homepage": "https://github.com/reflectjs-org/reflectjs-server#readme",
+  "bugs": "https://github.com/reflectjs-org/reflectjs-server/issues",
   "main": "index.js",
+  "repository": {
+			"type": "git",
+			"url": "https://github.com/reflectjs-org/reflectjs-server.git"
+	},
+  "author": "Fabrizio Capolini",
+  "license": "MIT",
   "scripts": {
+    "build": "rm -rf dist/* && tsc && browserify dist/client/client-main.js -o dist/client.js && cp package.json dist && cp README.md dist && cp LICENSE dist",
     "test": "npm run build && mocha --exit -r ts-node/register test/**/*.test.ts",
-    "test-only": "mocha --exit -r ts-node/register test/**/*.test.ts",
-    "coverage": "nyc npm run test && coverage-badges --output res/coverage-badge.svg",
-    "build": "rm -rf dist/* && tsc && browserify dist/client/client-main.js -o dist/client.js && cp package.json dist"
+    "test:only": "mocha --exit -r ts-node/register test/**/*.test.ts",
+    "test:coverage": "nyc npm run test && coverage-badges --output res/coverage-badge.svg",
+    "release:minor": "npm version $(semver $npm_package_version -i minor) && npm publish ./dist --tag latest",
+    "release:patch": "npm version $(semver $npm_package_version -i patch) && npm publish ./dist --tag latest",
+    "release:beta": "npm version $(semver $npm_package_version -i prerelease --preid $(npm whoami) ) && npm publish ./dist --tag beta"
   },
   "bin": {
     "reflectjs": "./index.js"
   },
-  "keywords": [],
-  "author": "Fabrizio Capolini",
-  "license": "MIT",
   "devDependencies": {
     "@swc/core": "^1.3.23",
     "@types/chai": "^4.3.4",
@@ -34,6 +43,7 @@
     "nyc": "^15.1.0",
     "puppeteer": "^19.8.0",
     "regenerator-runtime": "^0.13.11",
+    "semver": "^7.3.8",
     "ts-node": "^10.9.1",
     "tsify": "^5.0.4",
     "typescript": "^4.9.3"
