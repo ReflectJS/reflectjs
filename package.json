@@ -1,5 +1,6 @@
 {
   "name": "@reflectjs/core",
+  "private": "false",
   "version": "0.3.0",
   "description": "The simplest reactive web framework, built for Node.js and the browser.",
   "keywords": [
