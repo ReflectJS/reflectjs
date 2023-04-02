@@ -4,11 +4,11 @@
 [![Node.js CI](https://github.com/fcapolini/reflectjs/actions/workflows/node.js.yml/badge.svg)](https://github.com/fcapolini/reflectjs/actions/workflows/node.js.yml)
 ![Coverage](res/coverage-badge-230402.svg)
 
-Reflect.js turns *HTML itself* into a [reactive language](#reactivity) for creating modern web sites and web apps, still [fully indexable](#indexability) out of the box, that can easily be based on [reusable components](#reusability).
+Reflect.js turns *HTML itself* into a [reactive language](https://github.com/reflectjs-org/reflectjs-server/wiki/reactivity) for creating modern web sites and web apps, still [fully indexable](https://github.com/reflectjs-org/reflectjs-server/wiki/indexability) out of the box, that can easily be based on [reusable components](https://github.com/reflectjs-org/reflectjs-server/wiki/reusability).
 
 ---
 
-## Reactivity {#reactivity}
+## Reactivity
 
 Reflect.js is an [Express](https://expressjs.com/) application for [Node.js](https://nodejs.org/) which processes and serves web pages, giving them the ability to execute unified client/server reactive logic.
 
@@ -41,7 +41,7 @@ Requests with the `__noclient` parameter can be used to see what the page looks 
 
 ---
 
-## Indexability {#indexability}
+## Indexability
 
 Reflect.js lets you easily create web projects that behave as both classic websites (ensuring page indexability) and as dynamic webapps (providing a modern user experience).
 
@@ -95,7 +95,7 @@ The `head.router` built-in component is implemented using the [Navigation API](h
 
 ---
 
-## Reusability {#reusability}
+## Reusability
 
 In HTML pages there's always a number of blocks replicated with minimal changes:
 
