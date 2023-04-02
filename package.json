@@ -1,15 +1,23 @@
 {
   "name": "reflectjs-server",
-  "version": "0.1.0",
+  "version": "0.1.1-reflectjs.org.0",
   "description": "The simplest reactive web framework, built for Node.js and the browser.",
-  "keywords": ["reactive", "web", "framework", "server", "browser", "runtime", "HTML"],
+  "keywords": [
+    "reactive",
+    "web",
+    "framework",
+    "server",
+    "browser",
+    "runtime",
+    "HTML"
+  ],
   "homepage": "https://github.com/reflectjs-org/reflectjs-server#readme",
   "bugs": "https://github.com/reflectjs-org/reflectjs-server/issues",
   "main": "index.js",
   "repository": {
-			"type": "git",
-			"url": "https://github.com/reflectjs-org/reflectjs-server.git"
-	},
+    "type": "git",
+    "url": "https://github.com/reflectjs-org/reflectjs-server.git"
+  },
   "author": "Fabrizio Capolini",
   "license": "MIT",
   "scripts": {
