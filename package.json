@@ -25,8 +25,8 @@
     "test": "npm run build && mocha --exit -r ts-node/register test/**/*.test.ts",
     "test:only": "mocha --exit -r ts-node/register test/**/*.test.ts",
     "test:coverage": "nyc npm run test && coverage-badges --output res/coverage-badge.svg",
-    "release:minor": "npm version $(semver $npm_package_version -i minor) && npm publish ./dist --tag latest",
-    "release:patch": "npm version $(semver $npm_package_version -i patch) && npm publish ./dist --tag latest"
+    "release:minor": "npm version $(semver $npm_package_version -i minor) && cp package.json dist && npm publish ./dist --tag latest",
+    "release:patch": "npm version $(semver $npm_package_version -i patch) && cp package.json dist && npm publish ./dist --tag latest"
   },
   "bin": {
     "reflectjs": "./index.js"
