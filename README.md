@@ -6,7 +6,6 @@
 
 Reflect.js turns *HTML itself* into a [reactive language](https://github.com/reflectjs-org/reflectjs-server/wiki/reactivity) for creating modern web sites and web apps, still [fully indexable](https://github.com/reflectjs-org/reflectjs-server/wiki/indexability) out of the box, that can easily be based on [reusable components](https://github.com/reflectjs-org/reflectjs-server/wiki/reusability).
 
----
 
 ## Reactivity
 
@@ -39,7 +38,6 @@ By opening [http://localhost:3001/](http://localhost:3001/) you'll get a live se
 
 Requests with the `__noclient` parameter can be used to see what the page looks like to clients with no support for JavaScript, like search engine crawlers, so opening [http://localhost:3001/?__noclient](http://localhost:3001/?__noclient) you'll get a static page saying "seconds: 0".
 
----
 
 ## Indexability
 
@@ -93,7 +91,6 @@ The `head.router` built-in component is implemented using the [Navigation API](h
 
 👉 In a real app you'll want to keep different page contents in different `.htm` page fragment files, and you'll include them in the main file using the `<:include>` directive
 
----
 
 ## Reusability
 
