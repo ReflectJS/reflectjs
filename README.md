@@ -89,7 +89,7 @@ The `<:on-off>` built-in component is implemented using a [`<template>`](https:/
 
 The `head.router` built-in component is implemented using the [Navigation API](https://developer.mozilla.org/en-US/docs/Web/API/Navigation_API) in browsers which support it. Those that don't (including web search engines) will simply navigate the app making actual HTTP requests.
 
-👉 In a real app you'll want to keep different page contents in different `.htm` page fragment files, and you'll include them in the main file using the `<:include>` directive
+👉 In a real app you'll want to keep different page contents in different `.htm` page fragment files and include them in the main file using the `<:include>` directive
 
 
 ## Reusability
