@@ -123,7 +123,7 @@ Using the `<:define>` directive you can declare your own custom tags:
 </div>
 ```
 
-We now have a much simpler markup that clearly specifies what it represent (an application product) and what's specific to each instance (name and price), greatly improving readability and mainainability.
+We now have a much simpler markup that clearly specifies what it represent (an application product) and what's specific to each instance (name and price), greatly improving readability and maintainability.
 
 Custom tag definitions are usually collected in page fragment files, with a `.htm` extensions so the server won't deliver them, and page fragments are `<:import>`-ed in pages when needed:
 
