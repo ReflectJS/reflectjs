@@ -1,2 +1,2 @@
 #!/usr/bin/env sh
-sudo npm uninstall -g reflectjs
+sudo npm uninstall -g reflectjs-core

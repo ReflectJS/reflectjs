@@ -4,14 +4,14 @@ import fs from "fs";
 import { Window } from "happy-dom";
 import * as http from 'http';
 import path from "path";
-import { compileDoc, PageError } from "../compiler/page-compiler";
-import { DomElement } from "../preprocessor/dom";
-import { HtmlDocument } from "../preprocessor/htmldom";
-import Preprocessor, { EMBEDDED_INCLUDE_FNAME } from "../preprocessor/preprocessor";
-import { EXTURLS_ATTR, PAGENAME_ATTR, PAGEPATH_ATTR, PROPS_SCRIPT_ID, RUNTIME_SCRIPT_ID, URLPATH_ATTR } from "../runtime/page";
-import exitHook from "./exit-hook";
-import { Routing } from "./routing";
-import { STDLIB } from "./stdlib";
+import { compileDoc, PageError } from "./compiler/page-compiler";
+import { DomElement } from "./preprocessor/dom";
+import { HtmlDocument } from "./preprocessor/htmldom";
+import Preprocessor, { EMBEDDED_INCLUDE_FNAME } from "./preprocessor/preprocessor";
+import { EXTURLS_ATTR, PAGENAME_ATTR, PAGEPATH_ATTR, PROPS_SCRIPT_ID, RUNTIME_SCRIPT_ID, URLPATH_ATTR } from "./runtime/page";
+import exitHook from "./service/exit-hook";
+import { Routing } from "./service/routing";
+import { STDLIB } from "./service/stdlib";
 
 const SERVER_PAGE_TIMEOUT = 2000;
 const CLIENT_JS_FILE = 'client.js';
@@ -26,10 +26,11 @@ export interface ServerProps {
   init?: (props: ServerProps, app: Application) => void,
   logger?: (type: string, msg: string) => void,
   mute?: boolean,
-  clientJsFilePath?: string,
   serverPageTimeout?: number,
   normalizeText?: boolean,
-  willServePage?: (url: URL) => void;
+  // reserved, used for testing
+  __clientJsFilePath?: string,
+  __willServePage?: (url: URL) => void;
 }
 
 export interface TrafficLimit {
@@ -38,7 +39,7 @@ export interface TrafficLimit {
 }
 
 // https://expressjs.com/en/advanced/best-practice-performance.html
-export default class ServerImpl {
+export class Server {
   props: ServerProps;
   compiledPages: Map<string, CompiledPage>;
   serverPageTimeout: number;
@@ -142,7 +143,7 @@ export default class ServerImpl {
   private init(props: ServerProps, app: Express) {
     // limit page requests rate
     if (props.pageLimit) {
-      ServerImpl.setLimiter(props.pageLimit, ['*', '*.html'], app);
+      Server.setLimiter(props.pageLimit, ['*', '*.html'], app);
     }
 
     // externally redirect requests for directories to <dir>/index
@@ -185,7 +186,7 @@ export default class ServerImpl {
       url.protocol = (props.assumeHttps ? 'https' : req.protocol);
       url.hostname = req.hostname;
       try {
-        this.props.willServePage && this.props.willServePage(url);
+        this.props.__willServePage && this.props.__willServePage(url);
         const filePath = this.routing?.getFilePath(url.pathname) ?? url.pathname;
         const page = await that.getPage(url, req.originalUrl, filePath);
         if (page.errors) {
@@ -202,7 +203,7 @@ export default class ServerImpl {
     });
 
     // load client runtime
-    const p = props.clientJsFilePath ?? path.resolve(__dirname, '..', CLIENT_JS_FILE);
+    const p = props.__clientJsFilePath ?? path.resolve(__dirname, CLIENT_JS_FILE);
     this.clientJs = '\n' + fs.readFileSync(p, { encoding: 'utf8'});
   }
 

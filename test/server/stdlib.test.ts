@@ -3,7 +3,7 @@ import * as happy from 'happy-dom';
 import { JSDOM } from 'jsdom';
 import puppeteer, { Browser } from "puppeteer";
 import { normalizeText } from "../../src/preprocessor/util";
-import Server from "../../src/server/server-impl";
+import { Server } from "../../src/server";
 import { DOMWindow } from "jsdom";
 
 let server: Server;
@@ -16,9 +16,9 @@ describe("server: stdlib", () => {
   before((done) => {
     server = new Server({
       rootPath: process.cwd() + '/test/server/stdlib',
-      clientJsFilePath: process.cwd() + '/dist/client.js',
+      __clientJsFilePath: process.cwd() + '/dist/client.js',
       mute: true,
-      willServePage: (url) => servedPages++,
+      __willServePage: (url) => servedPages++,
     }, (portNr) => {
       baseUrl = `http://localhost:${portNr}`;
       puppeteer.launch({

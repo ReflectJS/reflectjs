@@ -4,7 +4,7 @@ import * as happy from 'happy-dom';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 import { Page, PAGE_JS_ID } from "../../src/runtime/page";
-import Server from "../../src/server/server-impl";
+import { Server } from "../../src/server";
 
 const rootPath = process.cwd() + '/test/client/roundtrip';
 
@@ -16,7 +16,7 @@ describe('client: roundtrip', async () => {
   before((done) => {
     server = new Server({
       rootPath: process.cwd() + '/test/client/roundtrip',
-      clientJsFilePath: process.cwd() + '/dist/client.js',
+      __clientJsFilePath: process.cwd() + '/dist/client.js',
       mute: true,
     }, (portNr) => {
       port = portNr;

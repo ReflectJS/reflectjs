@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import Server from "../../src/server/server-impl";
+import { Server } from "../../src/server";
 import { loadPage } from "./server-impl.test";
 
 let server: Server;
@@ -10,7 +10,7 @@ describe("server: routing", () => {
   before((done) => {
     server = new Server({
       rootPath: process.cwd() + '/test/server/routing',
-      clientJsFilePath: process.cwd() + '/dist/client.js',
+      __clientJsFilePath: process.cwd() + '/dist/client.js',
       mute: true,
       pageLimit: { maxRequests: 1000, windowMs: 1000 }
     }, (portNr) => {

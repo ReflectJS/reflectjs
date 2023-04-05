@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-import ServerImpl from "./server/server-impl";
+import { Server } from "./server";
 
-new ServerImpl({
+new Server({
   port: 3001,
   rootPath: process.cwd(),
   trustProxy: false,

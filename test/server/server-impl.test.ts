@@ -2,7 +2,7 @@ import { assert } from "chai";
 import * as happy from 'happy-dom';
 import { JSDOM } from 'jsdom';
 import { PROPS_SCRIPT_ID, RUNTIME_SCRIPT_ID } from "../../src/runtime/page";
-import Server from "../../src/server/server-impl";
+import { Server } from "../../src/server";
 
 let server: Server;
 let port: number;
@@ -12,7 +12,7 @@ describe("server: server-impl", () => {
   before((done) => {
     server = new Server({
       rootPath: process.cwd() + '/test/server/server-impl',
-      clientJsFilePath: process.cwd() + '/dist/client.js',
+      __clientJsFilePath: process.cwd() + '/dist/client.js',
       mute: true,
       pageLimit: { maxRequests: 1000, windowMs: 1000 }
     }, (portNr) => {

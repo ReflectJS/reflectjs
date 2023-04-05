@@ -13,7 +13,6 @@
   ],
   "homepage": "https://github.com/reflectjs/reflectjs-core#readme",
   "bugs": "https://github.com/reflectjs/reflectjs-core/issues",
-  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/reflectjs/reflectjs-core.git"
@@ -28,8 +27,12 @@
     "release:minor": "npm version $(semver $npm_package_version -i minor) && cp package.json dist && npm publish ./dist --tag latest",
     "release:patch": "npm version $(semver $npm_package_version -i patch) && cp package.json dist && npm publish ./dist --tag latest"
   },
+  "main": "server.js",
   "bin": {
-    "reflectjs": "./index.js"
+    "reflectjs": "./command.js"
+  },
+  "engines": {
+    "node": ">=16.0.0"
   },
   "devDependencies": {
     "@swc/core": "^1.3.23",
