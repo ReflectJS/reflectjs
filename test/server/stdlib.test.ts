@@ -223,6 +223,38 @@ describe("server: stdlib", () => {
       await page.close();
     });
 
+    it(`should display alternative content w/ :on-off (1)`, async () => {
+      let win: DOMWindow;
+
+      win = await loadPage(`${baseUrl}/page-router/on-off-1?__noclient`);
+      assert.equal(win.document.querySelector('body div')?.textContent, 'Index');
+      win.close();
+
+      win = await loadPage(`${baseUrl}/page-router/on-off-1/index?__noclient`);
+      assert.equal(win.document.querySelector('body div')?.textContent, 'Index');
+      win.close();
+
+      win = await loadPage(`${baseUrl}/page-router/on-off-1/doc?__noclient`);
+      assert.equal(win.document.querySelector('body div')?.textContent, 'Doc');
+      win.close();
+
+      win = await loadPage(`${baseUrl}/page-router/on-off-1/inexistent?__noclient`);
+      assert.notExists(win.document.querySelector('body div'));
+      win.close();
+    });
+
+    it(`should display alternative content w/ :on-off (2)`, async () => {
+      let win: DOMWindow;
+
+      win = await loadPage(`${baseUrl}/page-router/on-off-2?__noclient`);
+      assert.equal(win.document.querySelector('body div h1')?.textContent, 'Quick Start');
+      win.close();
+
+      win = await loadPage(`${baseUrl}/page-router/on-off-2/introduction?__noclient`);
+      assert.equal(win.document.querySelector('body div h1')?.textContent, 'Introduction');
+      win.close();
+    });
+
   });
 
 });

@@ -1,0 +1,12 @@
+<html :URLPATH="/">
+  <body>
+    <div class="app-content">
+      <:on-off :on="[[head.router.name === 'index']]"><div>
+        <:markdown><:include src="markdown/quick-start.md"/></:markdown>
+      </div></:on-off>
+      <:on-off :on="[[head.router.name === 'introduction']]"><div>
+        <:markdown><:include src="markdown/introduction.md"/></:markdown>
+      </div></:on-off>
+    </div>
+  </body>
+</html>

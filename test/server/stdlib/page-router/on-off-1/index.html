@@ -1,0 +1,10 @@
+<html :URLPATH="/">
+  <body>
+    <:on-off :on="[[head.router.name === 'index']]">
+      <div>Index</div>
+    </:on-off>
+    <:on-off :on="[[head.router.name === 'doc']]">
+      <div>Doc</div>
+    </:on-off>
+  </body>
+</html>
