@@ -1,5 +1,6 @@
 import { ELEMENT_NODE, TEXT_NODE } from "../preprocessor/dom";
 import { HtmlAttribute, HtmlDocument, HtmlElement, HtmlText } from "../preprocessor/htmldom";
+import { MARKDOWN_TAG } from "../preprocessor/preprocessor";
 import { regexMap } from "../preprocessor/util";
 import * as page from "../runtime/page";
 import { ScopeProps } from "../runtime/scope";
@@ -32,6 +33,14 @@ export function loadPage(doc: HtmlDocument) {
   }
 
   function markScopes(e: HtmlElement) {
+    if (e.tagName === MARKDOWN_TAG) {
+      // <:markdown> tag special treatment:
+      // 1) it's turned into a <div>
+      // 2) its content is static, '[[' doesn't mean expression
+      e.tagName = 'DIV';
+      e.setAttribute(page.DOM_ID_ATTR, `${-1}`);
+      return;
+    }
     if (needsScope(e)) {
       e.setAttribute(page.DOM_ID_ATTR, `${count++}`);
     }
@@ -70,11 +79,14 @@ function loadScope(e: HtmlElement, errors: PageError[]): ScopeProps {
   e.removeAttribute(page.AKA_ATTR);
 
   function scan(p: HtmlElement) {
+    let id;
     const staticText = STATIC_TEXT_TAGS[p.tagName];
     p.childNodes.forEach(n => {
       if (n.nodeType === ELEMENT_NODE) {
-        if ((n as HtmlElement).getAttribute(page.DOM_ID_ATTR) != null) {
-          children.push(loadScope((n as HtmlElement), errors));
+        if ((id = (n as HtmlElement).getAttribute(page.DOM_ID_ATTR)) != null) {
+          if (parseInt(id) >= 0) {
+            children.push(loadScope((n as HtmlElement), errors));
+          }
         } else {
           scan(n as HtmlElement);
         }

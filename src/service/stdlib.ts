@@ -119,7 +119,8 @@ export const STDLIB = `<lib>
 
 <script :aka="router"
         :pathname=""
-        :path=[[pathname.split('/').slice(0, -1).join('/')]]
+        :path=[[pathname.split('/').slice(0, -1).join('/') + '/']]
+        :relpath=[[page.PAGEPATH ? path.substring(page.PAGEPATH) : path]]
         :name=[[pathname.split('/').pop()]]
         :_roots=[[ [] ]]
 

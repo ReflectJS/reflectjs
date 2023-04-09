@@ -18,7 +18,7 @@ const SLOT_TAG = ':SLOT';
 const SLOT_ARG = 'name';
 const SLOT_ATTR = ':slot';
 
-const MARKDOWN_TAG = ':MARKDOWN';
+export const MARKDOWN_TAG = ':MARKDOWN';
 
 const MAX_RECURSIONS = 100;
 
@@ -309,10 +309,10 @@ export default class Preprocessor {
     const src = e.innerHTML;
     const dst = this.md.render(src);
     e.innerHTML = dst;
-    while (e.firstChild) {
-      p.insertBefore(e.firstChild.remove(), e);
-    }
-    e.remove();
+    // while (e.firstChild) {
+    //   p.insertBefore(e.firstChild.remove(), e);
+    // }
+    // e.remove();
   }
 
   // =========================================================================

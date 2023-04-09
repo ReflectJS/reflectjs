@@ -320,10 +320,13 @@ Here is some *markdown* text.
       </:markdown></body></html>`
     }]);
     const doc = await prepro.read('dummy.html');
+    //NOTE: the preprocessor doesn't remove the <:markdown> tag
+    //itself, that's done by the page compiler so it knows
+    //its content are static (i.e. `[[` strings don't mean expression)
     assert.equal(normalizeText(doc?.toString()), normalizeText(
-      `<html><head></head><body><h1>Intro</h1>
+      `<html><head></head><body><:markdown><h1>Intro</h1>
         <p>Here is some <em>markdown</em> text.</p>
-      </body></html>`
+      </:markdown></body></html>`
     ));
   });
 
