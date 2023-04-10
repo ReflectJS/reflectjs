@@ -66,6 +66,8 @@
     "express-rate-limit": "^6.7.0",
     "happy-dom": "^8.4.4",
     "markdown-it": "^13.0.1",
+    "markdown-it-anchor": "^8.6.7",
+    "markdown-it-attrs": "^4.1.6",
     "markdown-it-highlightjs": "^4.0.1",
     "piscina": "^3.2.0"
   }

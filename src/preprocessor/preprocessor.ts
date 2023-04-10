@@ -293,9 +293,14 @@ export default class Preprocessor {
   // =========================================================================
   // markdown
   // =========================================================================
+  mdAttrs = require('markdown-it-attrs');
+  mdAnchor = require('markdown-it-anchor');
+  mdHighlight = require('markdown-it-highlightjs');
   md = require('markdown-it')()
       .set({ html: true })
-      .use(require('markdown-it-highlightjs'));
+      .use(this.mdAttrs)
+      .use(this.mdAnchor, { permalink: this.mdAnchor.permalink.headerLink() })
+      .use(this.mdHighlight);
 
   private processMarkdownDirectives(doc: HtmlDocument) {
     var ee = lookupTags(doc, new Set<string>([MARKDOWN_TAG]));
