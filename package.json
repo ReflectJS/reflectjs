@@ -44,7 +44,6 @@
     "@types/jsdom": "^20.0.1",
     "@types/markdown-it": "^12.2.3",
     "@types/mocha": "^10.0.1",
-    "@types/puppeteer": "^7.0.4",
     "browserify": "^17.0.0",
     "chai": "^4.3.7",
     "coverage-badges-cli": "^1.0.11",

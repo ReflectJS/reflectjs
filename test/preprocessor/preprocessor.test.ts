@@ -324,7 +324,8 @@ Here is some *markdown* text.
     //itself, that's done by the page compiler so it knows
     //its content are static (i.e. `[[` strings don't mean expression)
     assert.equal(normalizeText(doc?.toString()), normalizeText(
-      `<html><head></head><body><:markdown><h1>Intro</h1>
+      `<html><head></head><body><:markdown>` +
+      `<h1 id="intro" tabindex="-1"><a class="header-anchor" href="#intro">Intro</a></h1>
         <p>Here is some <em>markdown</em> text.</p>
       </:markdown></body></html>`
     ));
