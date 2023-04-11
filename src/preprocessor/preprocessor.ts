@@ -19,6 +19,7 @@ const SLOT_ARG = 'name';
 const SLOT_ATTR = ':slot';
 
 export const MARKDOWN_TAG = ':MARKDOWN';
+const MARKDOWN_DEFAULT_CLASS = 'reflectjs-markdown';
 
 const MAX_RECURSIONS = 100;
 
@@ -314,6 +315,9 @@ export default class Preprocessor {
     const src = e.innerHTML;
     const dst = this.md.render(src);
     e.innerHTML = dst;
+    if (!e.getAttribute('class')) {
+      e.setAttribute('class', MARKDOWN_DEFAULT_CLASS);
+    }
     // while (e.firstChild) {
     //   p.insertBefore(e.firstChild.remove(), e);
     // }
