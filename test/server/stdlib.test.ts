@@ -189,7 +189,11 @@ describe("server: stdlib", () => {
 
   });
 
-  describe("<:page-router>", async () => {
+  describe("<:page-router>", async function() {
+    // increase default timeout (from 2000)
+    // because we're using puppeteer w/ headless chrome
+    // and first launch on CI servers can take time
+    this.timeout(10000);
 
     it(`shouldn't intercept pages w/o :URLPATH attribute`, async () => {
       const page = await browser.newPage();
