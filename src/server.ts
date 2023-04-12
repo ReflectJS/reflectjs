@@ -151,7 +151,7 @@ export class Server {
     app.get("*", async (req, res, next) => {
       if (/^[^\.]+$/.test(req.url)) {
         // no suffix
-        var base = `http${props.assumeHttps ? 'https' : ''}://${req.headers.host}`;
+        var base = `http${props.assumeHttps ? 's' : ''}://${req.headers.host}`;
         var url = new URL(req.url, base);
         var pathname = path.join(props.rootPath, url.pathname);
         try {
