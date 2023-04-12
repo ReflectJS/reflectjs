@@ -142,13 +142,13 @@ export interface PageProps {
   }
 
   lookupGlobal(key: string): Value | undefined {
-    // let ret = this.globals.get(key);
-    // if (!ret && Reflect.has(this.win, key)) {
-    //   ret = new Value(key, { passive: true, val: Reflect.get(this.win, key) });
-    //   this.globals.set(key, ret);
-    // }
-    // return ret;
-    return this.globals.get(key);
+    let ret = this.globals.get(key);
+    if (!ret && Reflect.has(this.win, key)) {
+      ret = new Value(key, { passive: true, val: Reflect.get(this.win, key) });
+      this.globals.set(key, ret);
+    }
+    return ret;
+    // return this.globals.get(key);
   }
 
   getMarkup() {
