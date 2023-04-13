@@ -4,154 +4,111 @@
 [![Node.js CI](https://github.com/reflectjs/reflectjs-core/actions/workflows/node.js.yml/badge.svg)](https://github.com/reflectjs/reflectjs-core/actions/workflows/node.js.yml)
 ![Coverage](https://github.com/reflectjs/reflectjs-core/raw/main/res/coverage-badge-230402.svg)
 
-Reflect.js turns *HTML itself* into a [reactive language](https://github.com/reflectjs/reflectjs-core/wiki/reactivity) for creating modern web sites and web apps, still [fully indexable](https://github.com/reflectjs/reflectjs-core/wiki/indexability) out of the box, that can easily be based on [reusable components](https://github.com/reflectjs/reflectjs-core/wiki/reusability).
+Reflect.js is an [Express](https://expressjs.com/) application for [Node.js](https://nodejs.org/) which processes and serves web pages, giving them the ability to execute unified client/server reactive logic.
 
+## Installation
 
-## Reactivity
-
-Reflect.js is an [Express](https://expressjs.com/) application for [Node.js](https://nodejs.org/) which processes and serves web pages, giving them the ability to execute unified client/server reactive logic.
-
-```bash
+```sh
 npm install -g reflectjs-core
-# now you can start a local server with the "reflectjs" command
-cd <document-root-dir>
+```
+
+Once installed, we can use the [`reflectjs`](https://reflectjs.org/doc/reference/cli) command to start a [development server](https://reflectjs.org/doc/reference/server) from our current directory.
+
+## Hello World
+
+```sh
+mkdir myapp
+cd myapp
 reflectjs
-# 2023-03-31 11:46:18: START http://localhost:3001
+# ... http://localhost:3001
 ```
 
-index.html:
+We can add a simple page...
 
 ```html
+<!-- index.html -->
 <html>
-  <body :count="[[0]]"
-        :did-init="[[
-            setInterval(() => count++, 1000)
-        ]]">
-    seconds: [[count]]
+  <body>
+    Good [[
+      new Date().getHours() <= 12
+          ? 'morning'
+          : 'evening'
+    ]]!
   </body>
 </html>
 ```
 
-Reflect.js adds page-specific code that starts executing in the server and continues in the client.
+...and open [http://localhost:3001](http://localhost:3001/) to see it in action:
 
-By opening [http://localhost:3001/](http://localhost:3001/) you'll get a live seconds counter, and in the page source you can see it was initially output with "seconds: 0" and then regularly updated in the client.
+```
+Good morning!
+```
 
-Requests with the `__noclient` parameter can be used to see what the page looks like to clients with no support for JavaScript, like search engine crawlers, so opening [http://localhost:3001/?__noclient](http://localhost:3001/?__noclient) you'll get a static page saying "seconds: 0".
+## Use in a project
 
+Let's create a demo project...
 
-## Indexability
+```sh
+mkdir myproject
+cd myproject
+npm init -y
+npm install reflectjs-core
+mkdir docroot
+```
 
-Reflect.js lets you easily create web projects that behave as both classic websites (ensuring page indexability) and as dynamic webapps (providing a modern user experience).
+...and add an entry point with our configuration:
 
-app/index.html:
+```js
+// index.js
+const reflectjs = require('reflectjs-core');
+const path = require('path');
+
+new reflectjs.Server({
+  port: 3002,
+  rootPath: path.join(__dirname, 'docroot'),
+});
+```
+
+In TypeScript we can use imports instead:
+
+```ts
+// index.ts
+import { Server } from 'reflectjs-core';
+import path from 'path';
+
+new Server({
+  port: 3002,
+  rootPath: path.join(__dirname, 'docroot'),
+});
+```
+
+We can now create a page in `docroot/`...
 
 ```html
-<html :URLPATH="/">
-  <body>
-    <div>
-      <a href="index">[home]</a> | <a href="products">[products]</a>
-    </div>
-
-    <:on-off :on="[[head.router.name === 'index']]">
-      <div>Home</div>
-    </:on-off>
-
-    <:on-off :on="[[head.router.name === 'products']]">
-      <div>Products</div>
-    </:on-off>
-  </body>
-</html>
-```
-
-This page is delivered for all paths inside its own directory, thanks to the `:URLPATH` directive. It can know what name it was requested with using the built-in `head.router` component.
-
-Based on that, it can decide what actual content is displayed using the `<:on-off>` built-in component.
-
-[http://localhost:3001/app](http://localhost:3001/app):
-
-```
-[home] | [products]
-Home
-```
-
-The same logic runs in both the server and the client. This means when users click a link, navigation is handled in browser and page content is switched with no need for additional requests to the server.
-
-At the same time, both links can be requested directly to the server to get the page with the relevant content, just as if they were two physical pages.
-
-[http://localhost:3001/app/products](http://localhost:3001/app/products):
-
-```
-[home] | [products]
-Products
-```
-
-The `<:on-off>` built-in component is implemented using a [`<template>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/template) tag, meaning its content is effectively removed from the DOM when `:on` is false.
-
-The `head.router` built-in component is implemented using the [Navigation API](https://developer.mozilla.org/en-US/docs/Web/API/Navigation_API) in browsers which support it. Those that don't (including web search engines) will simply navigate the app making actual HTTP requests.
-
-👉 In a real app you'll want to keep different page contents in different `.htm` page fragment files and include them in the main file using the `<:include>` directive
-
-
-## Reusability
-
-In HTML pages there's always a number of blocks replicated with minimal changes:
-
-```html
-<div class="products">
-  <div class="product">
-    <span>Gadget<span>
-    <span class="price">€1</span>
-  </div>
-  <div class="product">
-    <span>Widget<span>
-    <span class="price">€2</span>
-  </div>
-</div>
-```
-
-Using the `<:define>` directive you can declare your own custom tags:
-
-```html
-<:define tag="app-product" class="product">
-  <span>[[name]]<span>
-  <span class="price">€[[price]]</span>
-</:define>
-
-<div class="products">
-  <app-product :name="Gadget" :price="1"/>
-  <app-product :name="Widget" :price="2"/>
-</div>
-```
-
-We now have a much simpler markup that clearly specifies what it represent (an application product) and what's specific to each instance (name and price), greatly improving readability and maintainability.
-
-Custom tag definitions are usually collected in page fragment files, with a `.htm` extensions so the server won't deliver them, and page fragments are `<:import>`-ed in pages when needed:
-
-```html
+<!-- index.html -->
 <html>
-  <head>
-    <:import src="lib.htm"/>
-  </head>
   <body>
-    <app-product :name="Gadget" :price="1"/>
-    <app-product :name="Widget" :price="2"/>
+    Good [[
+      new Date().getHours() <= 12
+          ? 'morning'
+          : 'evening'
+    ]]!
   <body>
 </html>
 ```
 
-Because it's imported inside the `<head>` tag, `lib.htm` can further declutter page code by referencing any needed CSS file and declaring the usual meta tags itself:
+...and run the project:
 
-```html
-<lib>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="index.css" rel="stylesheet">
-
-  <:define tag="app-product" class="product">
-    <span>[[name]]<span>
-    <span class="price">€[[price]]</span>
-  </:define>
-</lib>
+```sh
+node index.js
+# ... START http://localhost:3002
 ```
 
-👉 Page fragments must have an arbitrary root tag, `<lib>` here.
+> <i class="bi-info-square-fill"></i> By using Reflect.js in a project we can customize it and add our own services and middleware to the server. All options are documented in the [Server Reference](https://reflectjs.org/doc/reference/server).
+
+## Next steps
+
+* [Introduction](https://reflectjs.org/doc/introduction) &mdash; get the gist of Reflect.js
+* [Examples](https://reflectjs.org/doc/examples/reacivity) &mdash; see all the features in bite-sized examples
+* [Tutorial](https://reflectjs.org/doc/tutorial) &mdash; get a taste of Reflect.js development
+* [Reference](https://reflectjs.org/doc/reference/cli) &mdash; find all the details
