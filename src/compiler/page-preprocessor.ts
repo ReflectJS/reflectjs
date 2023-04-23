@@ -126,6 +126,8 @@ function loadValue(
   key: string, attr: HtmlAttribute, ret: Map<string, ValueProps>, errors: PageError[]
 ) {
   let domKey = null;
+  let attrQuote = attr.quote;
+  let attrValue = attr.value;
   if (key.startsWith(page.EVENT_ATTR_PREFIX)) {
     domKey = key.substring(page.EVENT_ATTR_PREFIX.length);
     key = page.EVENT_VALUE_PREFIX + hyphenToCamel(domKey);
@@ -133,6 +135,10 @@ function loadValue(
     key = page.HANDLER_VALUE_PREFIX + hyphenToCamel(key.substring(page.HANDLER_ATTR_PREFIX.length));
   } else if (key.startsWith(page.CLASS_ATTR_PREFIX)) {
     key = page.CLASS_VALUE_PREFIX + hyphenToCamel(key.substring(page.CLASS_ATTR_PREFIX.length));
+    if (attrValue === '') {
+      attrQuote = '[';
+      attrValue = 'true';
+    }
   } else if (key.startsWith(page.STYLE_ATTR_PREFIX)) {
     key = page.STYLE_VALUE_PREFIX + hyphenToCamel(key.substring(page.STYLE_ATTR_PREFIX.length));
   } else if (key.startsWith(page.WILL_HANDLER_ATTR_PREFIX)) {
@@ -143,7 +149,7 @@ function loadValue(
     key = hyphenToCamel(key);
   }
   const props: ValueProps = {
-    val: attr.quote === '[' ? `[[${attr.value}]]` : attr.value
+    val: attrQuote === '[' ? `[[${attrValue}]]` : attrValue
   };
   domKey && (props.domKey = domKey);
   ret.set(key, props);

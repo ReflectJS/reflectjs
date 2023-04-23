@@ -347,6 +347,32 @@ describe("compiler: page-preprocessor", () => {
     assert.deepEqual(props, expected);
   });
 
+  it(`default value for empty :class- attribute`, async () => {
+    const doc = await getDoc(pre, `<html :class-test></html>`);
+    const { props, errors } = loadPage(doc);
+    assert.equal(errors.length, 0);
+    assert.equal(
+      doc.toString(),
+      `<html ${DOM_ID_ATTR}="0">` +
+      `<head ${DOM_ID_ATTR}="1"></head>` +
+      `<body ${DOM_ID_ATTR}="2"></body>` +
+      `</html>`
+    );
+    const expected: PageProps = {
+      root: {
+        id: '0', name: 'page',
+        values: {
+          class_test: { val: '[[true]]' }
+        },
+        children: [
+          { id: '1', name: 'head' },
+          { id: '2', name: 'body' }
+        ]
+      }
+    }
+    assert.deepEqual(props, expected);
+  });
+
   it(`hyphenToCamel()`, () => {
     assert.equal(hyphenToCamel('data-dummy'), 'dataDummy');
     assert.equal(hyphenToCamel('attr_data-dummy'), 'attr_dataDummy');
