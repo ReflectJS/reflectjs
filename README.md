@@ -8,7 +8,7 @@
 
 ---
 
-Using a reactive framework in modern web projects can be pretty involved &mdash;&nbsp;but&nbsp;it&nbsp;doesn't&nbsp;have&nbsp;to&nbsp;be.
+Using a reactive framework in modern web development can be pretty involved &mdash;&nbsp;but&nbsp;it&nbsp;doesn't&nbsp;have&nbsp;to&nbsp;be.
 
 Reflect.js is a groundbreaking alternative which strives for simplicity:
 

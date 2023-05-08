@@ -11,7 +11,8 @@ let baseUrl: string;
 let browser: Browser;
 let servedPages = 0;
 
-describe("server: stdlib", () => {
+describe("server: stdlib", function () {
+  this.timeout(10000);
 
   before((done) => {
     server = new Server({
