@@ -32,7 +32,8 @@ export class Routing {
           const text = await that.read(abspath, 1000);
           const r = re.exec(text);
           if (r && r.length > 1) {
-            rules.push({ prefix: path + r[1], pathname: relpath });
+            let s = (path + r[1]).replace(/\/{2,}/g, '/');
+            rules.push({ prefix: s, pathname: relpath });
           }
         }
       }
