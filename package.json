@@ -1,6 +1,6 @@
 {
   "name": "reflectjs-core",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "The simplest reactive web framework, built for Node.js and the browser.",
   "keywords": [
     "reactive",
