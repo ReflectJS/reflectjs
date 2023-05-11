@@ -151,6 +151,13 @@ describe("server: routing", () => {
       +-index.html
   */
 
+  it('should support PAGEPATH (root.html)', async () => {
+    const doc = await loadPage(`http://localhost:${port}/root.html?__noclient`);
+    const span = doc.getElementById('pagepath');
+    const pagepath = span?.textContent;
+    assert.equal(pagepath, '/');
+  });
+
   it('should support EXTURLS (index.html)', async () => {
     const doc = await loadPage(`http://localhost:${port}/index.html?__noclient`);
     const exturls = doc.getElementById('exturls')?.textContent;

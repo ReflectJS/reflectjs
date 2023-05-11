@@ -275,7 +275,8 @@ export class Server {
       return;
     }
     const urlPath = rootElement.getAttribute(URLPATH_ATTR) as string;
-    const pagePath = path.dirname(fname) + '/';
+    const dirName = path.dirname(fname);
+    const pagePath = dirName.endsWith('/') ? dirName : dirName + '/';
     const pageName = path.basename(fname);
     rootElement.setAttribute(PAGEPATH_ATTR, pagePath);
     rootElement.setAttribute(PAGENAME_ATTR, pageName);
