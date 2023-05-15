@@ -16,10 +16,16 @@ export function mixColors(col1:string, col2:string, ratio:number): string {
 	var g2 = rgba2 ? rgba2.g / 255.0 : 0;
 	var b1 = rgba1 ? rgba1.b / 255.0 : 0;
 	var b2 = rgba2 ? rgba2.b / 255.0 : 0;
+  var a1 = rgba1 && rgba1.a != null ? rgba1.a : 1;
+  var a2 = rgba2 && rgba2.a != null ? rgba2.a : 1;
 	var ret = components2Color({
 		r: Math.round((r2 * ratio + r1 * (1.0 - ratio)) * 255),
 		g: Math.round((g2 * ratio + g1 * (1.0 - ratio)) * 255),
 		b: Math.round((b2 * ratio + b1 * (1.0 - ratio)) * 255),
+    a: (rgba1 && rgba1.a != null || rgba2 && rgba2.a != null) ?
+       a2 * ratio + a1 * (1.0 - ratio) :
+       undefined
+
 	});
 	return ret;
 }
@@ -96,4 +102,10 @@ export function fullRgb(s:string): string {
 		ret = `#${r}${r}${g}${g}${b}${b}`;
 	}
 	return ret;
+}
+
+export function opacity(s: string, a: number): string {
+  var rgba = color2Components(s) as Rgba;
+  rgba.a = a;
+  return components2Color(rgba);
 }

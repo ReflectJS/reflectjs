@@ -1,5 +1,5 @@
 import { regexMap } from "../preprocessor/util";
-import { mixColors } from "./color";
+import { color2Components, components2Color, fullRgb, mixColors, opacity } from "./color";
 import { Scope, ScopeCloning, ScopeProps } from "./scope";
 import { Value } from "./value";
 
@@ -55,8 +55,9 @@ export const DOM_VALUE = RESERVED_PREFIX + 'dom';
 export const SCOPE_VALUE = RESERVED_PREFIX + 'scope';
 export const ELEMENTINDEX_VALUE = RESERVED_PREFIX + 'elementIndex';
 export const ISLASTELEMENT_VALUE = RESERVED_PREFIX + 'isLastElement';
-export const MIXCOLORS_VALUE = RESERVED_PREFIX + 'mixColors';
-export const REGEXMAP_VALUE = RESERVED_PREFIX + 'regexMap';
+// export const MIXCOLORS_VALUE = RESERVED_PREFIX + 'mixColors';
+// export const REGEXMAP_VALUE = RESERVED_PREFIX + 'regexMap';
+export const COLOR_VALUE = RESERVED_PREFIX + 'color'
 export const HIDDEN_VALUE = 'hidden';
 export const DATA_VALUE = 'data';
 export const DATA_OFFSET_VALUE = 'dataOffset';
@@ -101,8 +102,15 @@ export interface PageProps {
     this.setGlobal('window', win);
     this.setGlobal('document', this.doc);
     this.setGlobal('isServer', Reflect.has(win, 'happyDOM'));
-    this.setGlobal(MIXCOLORS_VALUE, mixColors);
-    this.setGlobal(REGEXMAP_VALUE, regexMap);
+    // this.setGlobal(MIXCOLORS_VALUE, mixColors);
+    // this.setGlobal(REGEXMAP_VALUE, regexMap);
+    this.setGlobal(COLOR_VALUE, {
+      mix: mixColors,
+      components2Color: components2Color,
+      color2Components: color2Components,
+      fullRgb: fullRgb,
+      opacity: opacity
+    });
     this.initEvents();
     this.scopes = new Map();
     this.root = this.load(null, props.root);
