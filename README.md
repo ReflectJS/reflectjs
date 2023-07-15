@@ -16,7 +16,7 @@ Reflect.js is a groundbreaking alternative which strives for simplicity:
 2. it generates fully [indexable pages](https://reflectjs.org/docs/introduction#indexability) out of the box
 3. it makes it easy to create your own [reusable components](https://reflectjs.org/docs/introduction#reusability).
 
-It's implemented as a customizable [Express](https://expressjs.com/) server for [Node.js](https://nodejs.org/). It augments HTML with `:`-prefixed [attributes](https://reflectjs.org/docs/reference/language#values), `[[...]]` [expressions](https://reflectjs.org/docs/reference/language#expressions), and `<:...>` [directives](https://reflectjs.org/docs/reference/language#directives), so it's pretty easy to pick up.
+It's implemented as a customizable [Express](https://expressjs.com/) server for [Node.js](https://nodejs.org/). It augments HTML with `:`-prefixed [attributes](https://reflectjs.org/docs/reference/language#values), `[[...]]` [expressions](https://reflectjs.org/docs/reference/language#expressions), and `<:...>` [directives](https://reflectjs.org/docs/reference/language#directives), and it's easy to pick up.
 
 Page-specific JavaScript code for both the client and the server is  compiled on the fly as needed &mdash; you only have to focus on page logic and the server takes care of the rest.
 
