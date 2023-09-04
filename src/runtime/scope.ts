@@ -340,8 +340,8 @@ export class Scope {
   linkValues() {
     for (const [key, value] of Object.entries(this.values)) {
       value.scope = this;
-      value.props.refs?.forEach(id => {
-        const other = this.lookupRef(id, key);
+      value.props.refs?.forEach(ref => {
+        const other = this.lookupRef(ref, key);
         if (other && !other.props.passive) {
           (value.src ?? (value.src = new Set())).add(other);
           (other.dst ?? (other.dst = new Set())).add(value);
