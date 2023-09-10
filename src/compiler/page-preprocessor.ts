@@ -9,7 +9,7 @@ import { EXPR_MARKER1, EXPR_MARKER2, isDynamic } from "./expr-preprocessor";
 import { PageError } from "./page-compiler";
 
 const WHOLE_TEXT_TAGS: any = { STYLE: true, TITLE: true };
-const STATIC_TEXT_TAGS: any = { SCRIPT: true };
+const STATIC_TEXT_TAGS: any = { SCRIPT: true, CODE: true };
 
 export function loadPage(doc: HtmlDocument) {
   const root = doc.firstElementChild as HtmlElement;
