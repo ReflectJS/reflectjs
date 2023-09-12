@@ -11,11 +11,11 @@
     "runtime",
     "HTML"
   ],
-  "homepage": "https://github.com/trillo/trillo#readme",
-  "bugs": "https://github.com/trillo/trillo/issues",
+  "homepage": "https://github.com/trillojs/trillo#readme",
+  "bugs": "https://github.com/trillojs/trillo/issues",
   "repository": {
     "type": "git",
-    "url": "https://github.com/trillo/trillo.git"
+    "url": "https://github.com/trillojs/trillo.git"
   },
   "author": "Fabrizio Capolini",
   "license": "MIT",

@@ -1,8 +1,8 @@
 # Trillo
 
-[![CodeQL](https://github.com/trillo/trillo/actions/workflows/codeql.yml/badge.svg)](https://github.com/trillo/trillo/actions/workflows/codeql.yml)
-[![Node.js CI](https://github.com/trillo/trillo/actions/workflows/node.js.yml/badge.svg)](https://github.com/trillo/trillo/actions/workflows/node.js.yml)
-![Coverage](https://github.com/trillo/trillo/raw/main/res/coverage-badge-230912.svg)
+[![CodeQL](https://github.com/trillojs/trillo/actions/workflows/codeql.yml/badge.svg)](https://github.com/trillojs/trillo/actions/workflows/codeql.yml)
+[![Node.js CI](https://github.com/trillojs/trillo/actions/workflows/node.js.yml/badge.svg)](https://github.com/trillojs/trillo/actions/workflows/node.js.yml)
+![Coverage](https://github.com/trillojs/trillo/raw/main/res/coverage-badge-230912.svg)
 
 **The HTML-oriented reactive framework**
 
