@@ -324,7 +324,7 @@ describe(`compiler: page-samples`, () => {
           <div>Price: [[price]]</div>
           <p/>
         </:define>
-    
+
         <app-product :name="Thingy" :price="1$"/>
         <app-product :name="Widget" :price="2$"/>
         <app-product :name="Gadget" :price="3$"/>
@@ -640,6 +640,6 @@ export function cleanTestPage(s?: string) {
     return undefined;
   }
   s = s.replace('<!DOCTYPE html>', '');
-  s = s.replace(/(\s+data-reflectjs=".*?")/g, '');
+  s = s.replace(/(\s+data-trillo=".*?")/g, '');
   return normalizeText(s);
 }

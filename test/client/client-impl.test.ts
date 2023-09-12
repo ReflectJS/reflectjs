@@ -24,16 +24,16 @@ describe('client: client-impl', async () => {
     win.document.getElementById(PROPS_SCRIPT_ID).remove();
     assert.equal(
       page.getMarkup(),
-      `<!DOCTYPE html><html data-reflectjs="0" lang="en">` +
-      `<head data-reflectjs="1"></head>` +
-      `<body data-reflectjs="2"></body></html>`
+      `<!DOCTYPE html><html data-trillo="0" lang="en">` +
+      `<head data-trillo="1"></head>` +
+      `<body data-trillo="2"></body></html>`
     );
     page.root.proxy['attr_lang'] = 'it';
     assert.equal(
       page.getMarkup(),
-      `<!DOCTYPE html><html data-reflectjs="0" lang="it">` +
-      `<head data-reflectjs="1"></head>` +
-      `<body data-reflectjs="2"></body></html>`
+      `<!DOCTYPE html><html data-trillo="0" lang="it">` +
+      `<head data-trillo="1"></head>` +
+      `<body data-trillo="2"></body></html>`
     );
   });
 
@@ -55,15 +55,15 @@ describe('client: client-impl', async () => {
     const page = loadClientPage(win) as Page;
     assert.equal(
       page.doc.getElementById('content')?.innerHTML?.trim(),
-      `<li data-reflectjs="4|0"><!---t0-->1<!---/--></li>` +
-      `<li data-reflectjs="4|1"><!---t0-->2<!---/--></li>` +
-      `<li data-reflectjs="4"><!---t0-->3<!---/--></li>`
+      `<li data-trillo="4|0"><!---t0-->1<!---/--></li>` +
+      `<li data-trillo="4|1"><!---t0-->2<!---/--></li>` +
+      `<li data-trillo="4"><!---t0-->3<!---/--></li>`
     );
     page.root.proxy['body']['content']['item']['data'] = ['a', 'b'];
     assert.equal(
       page.doc.getElementById('content')?.innerHTML?.trim(),
-      `<li data-reflectjs="4|0"><!---t0-->a<!---/--></li>` +
-      `<li data-reflectjs="4"><!---t0-->b<!---/--></li>`
+      `<li data-trillo="4|0"><!---t0-->a<!---/--></li>` +
+      `<li data-trillo="4"><!---t0-->b<!---/--></li>`
     );
   });
 
@@ -74,15 +74,15 @@ describe('client: client-impl', async () => {
     const page = await loadPage(html);
     assert.equal(
       page.doc.getElementById('content')?.innerHTML?.trim(),
-      `<li data-reflectjs="4|0"><!---t0-->1<!---/--></li>` +
-      `<li data-reflectjs="4|1"><!---t0-->2<!---/--></li>` +
-      `<li data-reflectjs="4"><!---t0-->3<!---/--></li>`
+      `<li data-trillo="4|0"><!---t0-->1<!---/--></li>` +
+      `<li data-trillo="4|1"><!---t0-->2<!---/--></li>` +
+      `<li data-trillo="4"><!---t0-->3<!---/--></li>`
     );
     page.root.proxy['body']['content']['item']['data'] = ['a', 'b'];
     assert.equal(
       page.doc.getElementById('content')?.innerHTML?.trim(),
-      `<li data-reflectjs="4|0"><!---t0-->a<!---/--></li>` +
-      `<li data-reflectjs="4"><!---t0-->b<!---/--></li>`
+      `<li data-trillo="4|0"><!---t0-->a<!---/--></li>` +
+      `<li data-trillo="4"><!---t0-->b<!---/--></li>`
     );
   });
 
@@ -104,9 +104,9 @@ describe('client: client-impl', async () => {
     const page = await loadPage(html);
     assert.equal(
       page.doc.getElementById('content')?.innerHTML.replace(/\s+/g, ' '),
-      ` <li data-reflectjs="4|0"> <!---t0-->a<!---/--> (<!---t1-->1<!---/-->) </li>` +
-      `<li data-reflectjs="4|1"> <!---t0-->b<!---/--> (<!---t1-->3<!---/-->) </li>` +
-      `<li data-reflectjs="4"> <!---t0-->c<!---/--> (<!---t1-->0<!---/-->) </li> `
+      ` <li data-trillo="4|0"> <!---t0-->a<!---/--> (<!---t1-->1<!---/-->) </li>` +
+      `<li data-trillo="4|1"> <!---t0-->b<!---/--> (<!---t1-->3<!---/-->) </li>` +
+      `<li data-trillo="4"> <!---t0-->c<!---/--> (<!---t1-->0<!---/-->) </li> `
     );
     page.root.proxy['body']['content']['item']['data'] = [
       { name: 'a', count: 1 },
@@ -114,8 +114,8 @@ describe('client: client-impl', async () => {
     ];
     assert.equal(
       page.doc.getElementById('content')?.innerHTML.replace(/\s+/g, ' '),
-      ` <li data-reflectjs="4|0"> <!---t0-->a<!---/--> (<!---t1-->1<!---/-->) </li>` +
-      `<li data-reflectjs="4"> <!---t0-->b<!---/--> (<!---t1-->3<!---/-->) </li> `
+      ` <li data-trillo="4|0"> <!---t0-->a<!---/--> (<!---t1-->1<!---/-->) </li>` +
+      `<li data-trillo="4"> <!---t0-->b<!---/--> (<!---t1-->3<!---/-->) </li> `
     );
   });
 

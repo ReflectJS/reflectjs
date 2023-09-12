@@ -143,7 +143,7 @@ describe("compiler: page-compiler", () => {
     assert.equal(
       doc.toString(),
       `<html ${DOM_ID_ATTR}="0">\n` +
-      `<head ${DOM_ID_ATTR}="1">\n<style data-reflectjs-text="0"></style>\n</head>\n` +
+      `<head ${DOM_ID_ATTR}="1">\n<style data-trillo-text="0"></style>\n</head>\n` +
       `<body ${DOM_ID_ATTR}="2"></body>\n` +
       `</html>`
     );

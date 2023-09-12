@@ -64,7 +64,7 @@ export const STDLIB = `<lib>
 
     :will-init=[[
       if (!isServer) {
-        _instanceDom = __dom.parentElement.querySelector('[data-reflectjs-from="' + __id + '"]');
+        _instanceDom = __dom.parentElement.querySelector('[data-trillo-from="' + __id + '"]');
       }
     ]]
 
@@ -83,7 +83,7 @@ export const STDLIB = `<lib>
           let e = div.firstElementChild;
           if (e) {
             e.remove();
-            e.setAttribute('data-reflectjs-from', __id);
+            e.setAttribute('data-trillo-from', __id);
             __dom.parentElement.insertBefore(e, __dom);
             __dom.innerHTML = '';
             if (__scope.props.children) {
@@ -98,7 +98,7 @@ export const STDLIB = `<lib>
           if (e) {
             _instanceDom = e;
             e.remove();
-            e.setAttribute('data-reflectjs-from', __id);
+            e.setAttribute('data-trillo-from', __id);
             __dom.parentElement.insertBefore(e, __dom);
             if (__scope.props.children) {
               const s = __scope.page.load(__scope, __scope.props.children[0]);

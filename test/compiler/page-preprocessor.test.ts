@@ -284,7 +284,7 @@ describe("compiler: page-preprocessor", () => {
       normalizeText(doc.toString()),
       normalizeText(`<html ${DOM_ID_ATTR}="0">
         <head ${DOM_ID_ATTR}="1">
-          <style data-reflectjs-text="0"></style>
+          <style data-trillo-text="0"></style>
         </head>
         <body ${DOM_ID_ATTR}="2"></body>
       </html>`)

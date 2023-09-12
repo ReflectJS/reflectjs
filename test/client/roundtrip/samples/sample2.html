@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html :test=[[() => {
   const s1 = document.getElementById('content').innerHTML.replace(/\s+/g, ' ');
-  const s2 = ` <div data-reflectjs=\"4\"> <b>Product: <!---t0-->Thingy<!---/--></b> <div>Price: <!---t1-->1$<!---/--></div> <p></p> </div>`
-  + ` <div data-reflectjs=\"5\"> <b>Product: <!---t0-->Widget<!---/--></b> <div>Price: <!---t1-->2$<!---/--></div> <p></p> </div>`
-  + ` <div data-reflectjs=\"6\"> <b>Product: <!---t0-->Gadget<!---/--></b> <div>Price: <!---t1-->3$<!---/--></div> <p></p> </div> `;
+  const s2 = ` <div data-trillo=\"4\"> <b>Product: <!---t0-->Thingy<!---/--></b> <div>Price: <!---t1-->1$<!---/--></div> <p></p> </div>`
+  + ` <div data-trillo=\"5\"> <b>Product: <!---t0-->Widget<!---/--></b> <div>Price: <!---t1-->2$<!---/--></div> <p></p> </div>`
+  + ` <div data-trillo=\"6\"> <b>Product: <!---t0-->Gadget<!---/--></b> <div>Price: <!---t1-->3$<!---/--></div> <p></p> </div> `;
   return (s1 === s2 ? 'OK' : s1);
 }]]>
   <body>

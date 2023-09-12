@@ -58,8 +58,8 @@ describe("server: stdlib", function () {
     it(`off, noclient`, async () => {
       const win = await loadPage(`${baseUrl}/on-off/on-off-passive-1.html?__noclient`);
       assert.equal(normalizeText(win.document.body.outerHTML), normalizeText(
-        `<body data-reflectjs="3">
-        <template id="theTemplate" data-reflectjs="4">
+        `<body data-trillo="3">
+        <template id="theTemplate" data-trillo="4">
         <div id="theDiv">hi there</div>
         </template>
         </body>`
@@ -70,8 +70,8 @@ describe("server: stdlib", function () {
       const win = await loadPage(`${baseUrl}/on-off/on-off-passive-1.html`);
       Array.from(win.document.getElementsByTagName('script')).forEach(e => e.remove());
       assert.equal(normalizeText(win.document.body.outerHTML), normalizeText(
-        `<body data-reflectjs="3">
-        <template id="theTemplate" data-reflectjs="4">
+        `<body data-trillo="3">
+        <template id="theTemplate" data-trillo="4">
         <div id="theDiv">hi there</div>
         </template>
         </body>`
@@ -81,9 +81,9 @@ describe("server: stdlib", function () {
     it(`on, noclient`, async () => {
       const win = await loadPage(`${baseUrl}/on-off/on-off-passive-1.html?__noclient&on=true`);
       assert.equal(normalizeText(win.document.body.outerHTML), normalizeText(
-        `<body data-reflectjs="3">
-        <div id="theDiv" data-reflectjs-from="4">hi there</div>` +
-        `<template id="theTemplate" data-reflectjs="4"></template>
+        `<body data-trillo="3">
+        <div id="theDiv" data-trillo-from="4">hi there</div>` +
+        `<template id="theTemplate" data-trillo="4"></template>
         </body>`
       ));
     })
@@ -92,9 +92,9 @@ describe("server: stdlib", function () {
       const win = await loadPage(`${baseUrl}/on-off/on-off-passive-1.html?on=true`);
       Array.from(win.document.getElementsByTagName('script')).forEach(e => e.remove());
       assert.equal(normalizeText(win.document.body.outerHTML), normalizeText(
-        `<body data-reflectjs="3">
-        <div id="theDiv" data-reflectjs-from="4">hi there</div>` +
-        `<template id="theTemplate" data-reflectjs="4"></template>
+        `<body data-trillo="3">
+        <div id="theDiv" data-trillo-from="4">hi there</div>` +
+        `<template id="theTemplate" data-trillo="4"></template>
         </body>`
       ));
     })
@@ -106,9 +106,9 @@ describe("server: stdlib", function () {
     it(`off, noclient`, async () => {
       const win = await loadPage(`${baseUrl}/on-off/on-off-active-1.html?__noclient`);
       assert.equal(normalizeText(win.document.body.outerHTML), normalizeText(
-        `<body data-reflectjs="3">
-        <template id="theTemplate" data-reflectjs="4">
-        <div id="theDiv" data-reflectjs="5">hello <span><!---t0--><!---/--></span></div>
+        `<body data-trillo="3">
+        <template id="theTemplate" data-trillo="4">
+        <div id="theDiv" data-trillo="5">hello <span><!---t0--><!---/--></span></div>
         </template>
         </body>`
       ));
@@ -118,9 +118,9 @@ describe("server: stdlib", function () {
       const win = await loadPage(`${baseUrl}/on-off/on-off-active-1.html`);
       Array.from(win.document.getElementsByTagName('script')).forEach(e => e.remove());
       assert.equal(normalizeText(win.document.body.outerHTML), normalizeText(
-        `<body data-reflectjs="3">
-        <template id="theTemplate" data-reflectjs="4">
-        <div id="theDiv" data-reflectjs="5">hello <span><!---t0--><!---/--></span></div>
+        `<body data-trillo="3">
+        <template id="theTemplate" data-trillo="4">
+        <div id="theDiv" data-trillo="5">hello <span><!---t0--><!---/--></span></div>
         </template>
         </body>`
       ));
@@ -129,10 +129,10 @@ describe("server: stdlib", function () {
     it(`on, noclient`, async () => {
       const win = await loadPage(`${baseUrl}/on-off/on-off-active-1.html?__noclient&on=true`);
       assert.equal(normalizeText(win.document.body.outerHTML), normalizeText(
-        `<body data-reflectjs="3">
-        <div id="theDiv" data-reflectjs="5" data-reflectjs-from="4">hello ` +
+        `<body data-trillo="3">
+        <div id="theDiv" data-trillo="5" data-trillo-from="4">hello ` +
         `<span><!---t0-->there<!---/--></span>` +
-        `</div><template id="theTemplate" data-reflectjs="4"></template>
+        `</div><template id="theTemplate" data-trillo="4"></template>
         </body>`
       ));
     })
@@ -141,10 +141,10 @@ describe("server: stdlib", function () {
       const win = await loadPage(`${baseUrl}/on-off/on-off-active-1.html?on=true`);
       Array.from(win.document.getElementsByTagName('script')).forEach(e => e.remove());
       assert.equal(normalizeText(win.document.body.outerHTML), normalizeText(
-        `<body data-reflectjs="3">
-        <div id="theDiv" data-reflectjs="5" data-reflectjs-from="4">hello ` +
+        `<body data-trillo="3">
+        <div id="theDiv" data-trillo="5" data-trillo-from="4">hello ` +
         `<span><!---t0-->there<!---/--></span>` +
-        `</div><template id="theTemplate" data-reflectjs="4"></template>
+        `</div><template id="theTemplate" data-trillo="4"></template>
         </body>`
       ));
     })
@@ -153,36 +153,36 @@ describe("server: stdlib", function () {
       const win = await loadPage(`${baseUrl}/on-off/on-off-active-2.html?on=true`);
       Array.from(win.document.getElementsByTagName('script')).forEach(e => e.remove());
       assert.equal(normalizeText(win.document.body.outerHTML), normalizeText(
-        `<body data-reflectjs="3">
-        <div id="theDiv" data-reflectjs="5" data-reflectjs-from="4">hello ` +
-        `<span data-reflectjs="6"><!---t0-->there<!---/--></span>` +
-        `</div><template id="theTemplate" data-reflectjs="4"></template>
+        `<body data-trillo="3">
+        <div id="theDiv" data-trillo="5" data-trillo-from="4">hello ` +
+        `<span data-trillo="6"><!---t0-->there<!---/--></span>` +
+        `</div><template id="theTemplate" data-trillo="4"></template>
         </body>`
       ));
-      const option = win.reflectjs_page.root.proxy.body.option;
+      const option = win.trillo_page.root.proxy.body.option;
       option.on = false;
       assert.equal(normalizeText(win.document.body.outerHTML), normalizeText(
-        `<body data-reflectjs="3">
-        <template id="theTemplate" data-reflectjs="4">` +
-        `<div id="theDiv" data-reflectjs="5" data-reflectjs-from="4">hello ` +
-        `<span data-reflectjs="6"><!---t0-->there<!---/--></span>` +
+        `<body data-trillo="3">
+        <template id="theTemplate" data-trillo="4">` +
+        `<div id="theDiv" data-trillo="5" data-trillo-from="4">hello ` +
+        `<span data-trillo="6"><!---t0-->there<!---/--></span>` +
         `</div></template>
         </body>`
       ));
       option.on = true;
       assert.equal(normalizeText(win.document.body.outerHTML), normalizeText(
-        `<body data-reflectjs="3">
-        <div id="theDiv" data-reflectjs="5" data-reflectjs-from="4">hello ` +
-        `<span data-reflectjs="6"><!---t0-->there<!---/--></span>` +
-        `</div><template id="theTemplate" data-reflectjs="4"></template>
+        `<body data-trillo="3">
+        <div id="theDiv" data-trillo="5" data-trillo-from="4">hello ` +
+        `<span data-trillo="6"><!---t0-->there<!---/--></span>` +
+        `</div><template id="theTemplate" data-trillo="4"></template>
         </body>`
       ));
       option.on = false;
       assert.equal(normalizeText(win.document.body.outerHTML), normalizeText(
-        `<body data-reflectjs="3">
-        <template id="theTemplate" data-reflectjs="4">` +
-        `<div id="theDiv" data-reflectjs="5" data-reflectjs-from="4">hello ` +
-        `<span data-reflectjs="6"><!---t0-->there<!---/--></span>` +
+        `<body data-trillo="3">
+        <template id="theTemplate" data-trillo="4">` +
+        `<div id="theDiv" data-trillo="5" data-trillo-from="4">hello ` +
+        `<span data-trillo="6"><!---t0-->there<!---/--></span>` +
         `</div></template>
         </body>`
       ));

@@ -1,8 +1,8 @@
-# Reflect.js
+# Trillo
 
-[![CodeQL](https://github.com/reflectjs/reflectjs-core/actions/workflows/codeql.yml/badge.svg)](https://github.com/reflectjs/reflectjs-core/actions/workflows/codeql.yml)
-[![Node.js CI](https://github.com/reflectjs/reflectjs-core/actions/workflows/node.js.yml/badge.svg)](https://github.com/reflectjs/reflectjs-core/actions/workflows/node.js.yml)
-![Coverage](https://github.com/reflectjs/reflectjs-core/raw/main/res/coverage-badge-230423.svg)
+[![CodeQL](https://github.com/trillo/trillo/actions/workflows/codeql.yml/badge.svg)](https://github.com/trillo/trillo/actions/workflows/codeql.yml)
+[![Node.js CI](https://github.com/trillo/trillo/actions/workflows/node.js.yml/badge.svg)](https://github.com/trillo/trillo/actions/workflows/node.js.yml)
+![Coverage](https://github.com/trillo/trillo/raw/main/res/coverage-badge-230912.svg)
 
 **The HTML-oriented reactive framework**
 
@@ -10,19 +10,19 @@
 
 Using a reactive framework in modern web development can be pretty involved &mdash;&nbsp;but&nbsp;it&nbsp;doesn't&nbsp;have&nbsp;to&nbsp;be.
 
-Reflect.js is a groundbreaking alternative which strives for simplicity:
+Trillo is a groundbreaking alternative which strives for simplicity:
 
-1. it turns HTML itself into a [reactive language](https://reflectjs.org/docs/introduction#reactivity)
-2. it generates fully [indexable pages](https://reflectjs.org/docs/introduction#indexability) out of the box
-3. it makes it easy to create your own [reusable components](https://reflectjs.org/docs/introduction#reusability).
+1. it turns HTML itself into a [reactive language](https://trillojs.gitbook.io/docs/topics/reactivity)
+2. it generates fully [indexable pages](https://trillojs.gitbook.io/docs/topics/indexability) out of the box
+3. it makes it easy to create your own [reusable components](https://trillojs.gitbook.io/docs/topics/reusability).
 
-It's implemented as a customizable [Express](https://expressjs.com/) server for [Node.js](https://nodejs.org/). It augments HTML with `:`-prefixed [attributes](https://reflectjs.org/docs/reference/language#values), `[[...]]` [expressions](https://reflectjs.org/docs/reference/language#expressions), and `<:...>` [directives](https://reflectjs.org/docs/reference/language#directives), and it's easy to pick up.
+It's implemented as a customizable [Express](https://expressjs.com/) server for [Node.js](https://nodejs.org/). It augments HTML with `:`-prefixed [attributes](https://trillojs.gitbook.io/docs/reference/language#values), `[[...]]` [expressions](https://trillojs.gitbook.io/docs/reference/language#expressions), and `<:...>` [directives](https://trillojs.gitbook.io/docs/reference/preprocessor), and it's easy to pick up.
 
 Page-specific JavaScript code for both the client and the server is  compiled on the fly as needed &mdash; you only have to focus on page logic and the server takes care of the rest.
 
-Reflect.js removes all the boilerplate code associated with JS-oriented reactive web frameworks like [React](https://react.dev/) and [Vue.js](https://vuejs.org/), while still encouraging good practices and code reuse &mdash; you'll be surprised at how effective it can be.
+Trillo removes all the boilerplate code associated with JS-oriented reactive web frameworks like [React](https://react.dev/) and [Vue.js](https://vuejs.org/), while still encouraging good practices and code reuse &mdash; you'll be surprised at how effective it can be.
 
-> Reflect.js is still under development. We plan to reach v.1.0 later in 2023.
+> Trillo is still under development. We plan to reach v.1.0 later in 2023.
 
 ## Hello World
 
@@ -30,8 +30,8 @@ Reflect.js removes all the boilerplate code associated with JS-oriented reactive
 
 ```sh
 mkdir myapp && cd myapp
-npm install reflectjs-core
-npx reflectjs
+npm install trillo
+npx trillo
 # ... START http://localhost:3001
 ```
 
@@ -50,7 +50,7 @@ npx reflectjs
 
 3. navigate to http://localhost:3001 to see the seconds counter live.
 
-> If you install globally with `npm install -g reflectjs-core` you can just launch the server from any directory with the `reflectjs` command.
+> If you install globally with `npm install -g trillo` you can just launch the server from any directory with the `trillo` command.
 
 ## Use in a project
 
@@ -59,7 +59,7 @@ npx reflectjs
 ```sh
 mkdir myproject cd myproject
 npm init -y
-npm install reflectjs-core
+npm install trillo
 mkdir docroot
 ```
 
@@ -67,10 +67,10 @@ mkdir docroot
 
 ```js
 // index.js
-const reflectjs = require('reflectjs-core');
+const trillo = require('trillo');
 const path = require('path');
 
-new reflectjs.Server({
+new trillo.Server({
   port: 3002,
   rootPath: path.join(__dirname, 'docroot'),
 });
@@ -80,7 +80,7 @@ in TypeScript we can use imports instead
 
 ```ts
 // index.ts
-import { Server } from 'reflectjs-core';
+import { Server } from 'trillo';
 import path from 'path';
 
 new Server({
@@ -111,10 +111,10 @@ node index.js
 
 5. navigate to http://localhost:3002 to see the seconds counter live.
 
-> When using Reflect.js in a project you can configure it and add your own services and middleware. All options are documented in the [Server Reference](https://reflectjs.org/docs/reference/server).
+> When using Trillo in a project you can configure it and add your own services and middleware. All options are documented in the [Server Reference](https://trillo.org/docs/reference/server).
 
 ## Next steps
 
-* [Introduction](https://reflectjs.org/docs/introduction) &mdash; get the gist of Reflect.js
-* [Tutorial](https://reflectjs.org/docs/tutorial) &mdash; get a taste of Reflect.js development
-* [Reference](https://reflectjs.org/docs/reference/language#values) &mdash; find all the details
+* [Overview](https://trillojs.gitbook.io/docs/overview) &mdash; get the gist of Trillo
+* [Tutorials](https://trillojs.gitbook.io/docs/tutorials) &mdash; get a taste of Trillo development
+* [Reference](https://trillojs.gitbook.io/docs/reference) &mdash; find all the details

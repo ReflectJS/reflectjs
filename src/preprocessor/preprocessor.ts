@@ -19,7 +19,7 @@ const SLOT_ARG = 'name';
 const SLOT_ATTR = ':slot';
 
 export const MARKDOWN_TAG = ':MARKDOWN';
-const MARKDOWN_DEFAULT_CLASS = 'reflectjs-markdown';
+const MARKDOWN_DEFAULT_CLASS = 'trillo-markdown';
 
 const MAX_RECURSIONS = 100;
 
