@@ -1,6 +1,6 @@
 {
   "name": "trillo",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "The HTML-oriented reactive web framework, built for Node.js and the browser.",
   "keywords": [
     "reactive",
