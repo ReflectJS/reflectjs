@@ -23,7 +23,8 @@
     "build": "rm -rf dist/* && tsc && browserify dist/client/client-main.js -o dist/client.js && cp package.json dist && cp README.md dist && cp LICENSE dist && chmod a+x dist/command.js",
     "test": "npm run build && mocha --exit -r ts-node/register test/**/*.test.ts",
     "test-only": "mocha --exit -r ts-node/register test/**/*.test.ts",
-    "coverage": "nyc npm run test && coverage-badges --output res/coverage-badge.svg",
+    "coverage": "npm run build-client && nyc --reporter=cobertura npm run coverage-test",
+    "coverage-test": "mocha --reporter mocha-junit-reporter --exit -r ts-node/register test/**/*.test.ts",
     "release-minor": "npm version $(semver $npm_package_version -i minor) && cp package.json dist && npm publish ./dist --tag latest",
     "release-patch": "npm version $(semver $npm_package_version -i patch) && cp package.json dist && npm publish ./dist --tag latest"
   },
