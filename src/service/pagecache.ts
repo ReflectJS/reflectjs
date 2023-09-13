@@ -6,30 +6,59 @@ import { DomElement } from "../preprocessor/dom";
 import { HtmlDocument } from "../preprocessor/htmldom";
 import Preprocessor, { EMBEDDED_INCLUDE_FNAME } from "../preprocessor/preprocessor";
 import { EXTURLS_ATTR, PAGENAME_ATTR, PAGEPATH_ATTR, PROPS_SCRIPT_ID, RUNTIME_SCRIPT_ID, URLPATH_ATTR } from "../runtime/page";
-import { CLIENT_JS_FILE, SERVER_NOCLIENT_PARAM, SERVER_PAGE_TIMEOUT, ServerProps } from "../server";
+import { CLIENT_JS_FILE, SERVER_NOCLIENT_PARAM, SERVER_PAGE_TIMEOUT, ServerLogger, ServerProps } from "../server";
 import { Routing } from "./routing";
 import { STDLIB } from "./stdlib";
 
-export class PageSet {
+const SUFFIXES = new Set(['.html', '.htm']);
+
+export class PageCache {
   props: ServerProps;
+  logger: ServerLogger;
   normalizeText: boolean;
   compiledPages: Map<string, CompiledPage>;
   serverPageTimeout: number;
   clientJs: string;
   routing?: Routing;
 
-  constructor(props: ServerProps) {
+  constructor(props: ServerProps, logger: ServerLogger) {
     this.props = props;
+    this.logger = logger;
     this.normalizeText = props.normalizeText !== undefined ? props.normalizeText : true;
     this.compiledPages = new Map();
     this.serverPageTimeout = props.serverPageTimeout ?? SERVER_PAGE_TIMEOUT;
     // load client runtime
-    const p = props.__clientJsFilePath ?? path.resolve(__dirname, CLIENT_JS_FILE);
+    const p = props.__clientJsFilePath ?? path.resolve(__dirname, '..', CLIENT_JS_FILE);
     this.clientJs = '\n' + fs.readFileSync(p, { encoding: 'utf8'});
+    // page monitor
+    fs.watch(props.rootPath, {
+      recursive: true,
+    }, (event, filename) => {
+      if (SUFFIXES.has(path.extname(filename))) {
+        this.invalidate(filename);
+      }
+    });
   }
 
   setRouting(routing: Routing) {
     this.routing = routing;
+  }
+
+  invalidate(relname: string | null) {
+    if (!relname) {
+      this.compiledPages.clear();
+      return;
+    }
+    const absname = path.join(this.props.rootPath, relname);
+    for (const p of Array.from(this.compiledPages)) {
+      const pageName = p[0];
+      const compiledPage: CompiledPage = p[1];
+      if (compiledPage.files.includes(absname)) {
+        // page is affected by change: remove from cache
+        this.logger('DEBUG', `PageCache.invalidate() "${pageName}"`);
+        this.compiledPages.delete(pageName);
+      }
+    }
   }
 
   async getPage(url: URL, originalUrl: string, filePath: string): Promise<ExecutedPage> {
@@ -46,7 +75,7 @@ export class PageSet {
 
   protected async getCompiledPage(url: URL, filePath: string): Promise<CompiledPage> {
     const cachedPage = this.compiledPages.get(filePath);
-    if (cachedPage && await this.isCompiledPageFresh(cachedPage)) {
+    if (cachedPage) {
       return cachedPage;
     }
     const ret = await this.compilePage(url, filePath);
@@ -91,6 +120,7 @@ export class PageSet {
         ret.errors = [{ type: 'error', msg: `${err}` }];
       }
     }
+    this.logger('DEBUG', `PageCache.compilePage(): "${filePath}"`);
     return ret;
   }
 
@@ -114,23 +144,6 @@ export class PageSet {
       p.startsWith(prefix) && extUrls.push(encodeURI(p));
     }
     extUrls.length && rootElement.setAttribute(EXTURLS_ATTR, extUrls.join(' '));
-  }
-
-  protected async isCompiledPageFresh(compiledPage: CompiledPage): Promise<boolean> {
-    for (const file of compiledPage.files) {
-      if (file === EMBEDDED_INCLUDE_FNAME) {
-        continue;
-      }
-      try {
-        const stat = await fs.promises.stat(file);
-        if (stat.mtime.valueOf() > compiledPage.tstamp) {
-          return false;
-        }
-      } catch (err: any) {
-        return false;
-      }
-    }
-    return true;
   }
 
   protected async executePage(url: URL, originalUrl: string, compiledPage: CompiledPage): Promise<ExecutedPage> {
@@ -195,7 +208,7 @@ export class PageSet {
   }
 }
 
-export type CompiledPage = {
+type CompiledPage = {
   tstamp: number,
   files: string[],
   output: string,

@@ -4,12 +4,14 @@ import fs from "fs";
 import * as http from 'http';
 import path from "path";
 import exitHook from "./service/exit-hook";
-import { PageSet } from "./service/pageset";
+import { PageCache } from "./service/pagecache";
 import { Routing } from "./service/routing";
 
 export const SERVER_PAGE_TIMEOUT = 2000;
 export const CLIENT_JS_FILE = 'client.js';
 export const SERVER_NOCLIENT_PARAM = '__noclient';
+
+export type ServerLogger = (type: 'ERROR' | 'WARN' | 'INFO' | 'DEBUG', msg: any) => void;
 
 export interface ServerProps {
   port?: number,
@@ -22,6 +24,7 @@ export interface ServerProps {
   mute?: boolean,
   serverPageTimeout?: number,
   normalizeText?: boolean,
+  liveUpdate?: boolean,
   // reserved, used for testing
   __clientJsFilePath?: string,
   __willServePage?: (url: URL) => void;
@@ -35,12 +38,12 @@ export interface TrafficLimit {
 // https://expressjs.com/en/advanced/best-practice-performance.html
 export class Server {
   props: ServerProps;
-  pageSet: PageSet;
+  pageSet: PageCache;
   server: http.Server;
 
   constructor(props: ServerProps, cb?: (port: number) => void) {
     this.props = props;
-    this.pageSet = new PageSet(props);
+    this.pageSet = new PageCache(props, (type, msg) => this.log(type, msg));
     const app = express();
 
     app.use(express.json());
@@ -63,8 +66,7 @@ export class Server {
         if (cb) {
           cb(port);
         } else {
-          this.log('info', `${this.getTimestamp()}: START `
-            + `http://localhost:${port} [${props.rootPath}]`);
+          this.log('INFO', `START http://localhost:${port} [${props.rootPath}]`);
         }
       })
     }
@@ -74,11 +76,11 @@ export class Server {
       : app.listen(listenCB);
 
     exitHook(() => {
-      this.log('info', 'WILL EXIT');
+      this.log('INFO', 'WILL EXIT');
     });
 
     process.on('uncaughtException', (err) => {
-      this.log('error', err.stack ? err.stack : `${err}`);
+      this.log('ERROR', err.stack ? err.stack : `${err}`);
     });
   }
 
@@ -86,17 +88,18 @@ export class Server {
     this.server.close();
   }
 
-  log(type: 'error' | 'warn' | 'info' | 'debug', msg: any) {
+  log(type: 'ERROR' | 'WARN' | 'INFO' | 'DEBUG', msg: any) {
     if (!this.props.mute) {
       if (this.props.logger) {
         this.props.logger(type, msg);
       } else {
+        const ts = this.getTimestamp();
         switch (type) {
-          case 'error': console.error(msg); break;
-          case 'warn': console.warn(msg); break;
-          case 'info': console.info(msg); break;
-          case 'debug': console.debug(msg); break;
-          default: console.log(msg);
+          case 'ERROR': console.error(ts, type, msg); break;
+          case 'WARN': console.warn(ts, type, msg); break;
+          case 'INFO': console.info(ts, type, msg); break;
+          case 'DEBUG': console.debug(ts, type, msg); break;
+          default: console.log(ts, type, msg);
         }
       }
     }
@@ -185,8 +188,7 @@ export class Server {
       } catch (err: any) {
         res.header("Content-Type",'text/plain');
         res.send(`${err}`);
-        that.log('error', `${that.getTimestamp()}: `
-          + `ERROR ${url.toString()}: ${err}`);
+        that.log('ERROR', `Server "${url.toString()}": ${err}`);
       }
     });
   }
