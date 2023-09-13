@@ -50,6 +50,7 @@
     "coverage-badges-cli": "^1.0.11",
     "jsdom": "^20.0.3",
     "mocha": "^10.1.0",
+    "mocha-junit-reporter": "^2.2.1",
     "nyc": "^15.1.0",
     "puppeteer": "^19.8.0",
     "regenerator-runtime": "^0.13.11",
