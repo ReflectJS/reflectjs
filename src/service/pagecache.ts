@@ -14,6 +14,7 @@ const SUFFIXES = new Set(['.html', '.htm']);
 
 export class PageCache {
   props: ServerProps;
+  invalidateCB: () => void;
   logger: ServerLogger;
   normalizeText: boolean;
   compiledPages: Map<string, CompiledPage>;
@@ -21,8 +22,9 @@ export class PageCache {
   clientJs: string;
   routing?: Routing;
 
-  constructor(props: ServerProps, logger: ServerLogger) {
+  constructor(props: ServerProps, invalidateCB: () => void, logger: ServerLogger) {
     this.props = props;
+    this.invalidateCB = invalidateCB;
     this.logger = logger;
     this.normalizeText = props.normalizeText !== undefined ? props.normalizeText : true;
     this.compiledPages = new Map();
@@ -45,19 +47,22 @@ export class PageCache {
   }
 
   invalidate(relname: string | null) {
+    const size = this.compiledPages.size;
     if (!relname) {
       this.compiledPages.clear();
-      return;
-    }
-    const absname = path.join(this.props.rootPath, relname);
-    for (const p of Array.from(this.compiledPages)) {
-      const pageName = p[0];
-      const compiledPage: CompiledPage = p[1];
-      if (compiledPage.files.includes(absname)) {
-        // page is affected by change: remove from cache
-        this.logger('DEBUG', `PageCache.invalidate() "${pageName}"`);
-        this.compiledPages.delete(pageName);
+    } else {
+      const absname = path.join(this.props.rootPath, relname);
+      for (const p of Array.from(this.compiledPages)) {
+        const pageName = p[0];
+        const compiledPage: CompiledPage = p[1];
+        if (compiledPage.files.includes(absname)) {
+          this.logger('DEBUG', `PageCache.invalidate() "${pageName}"`);
+          this.compiledPages.delete(pageName);
+        }
       }
+    }
+    if (this.compiledPages.size !== size) {
+      this.invalidateCB();
     }
   }
 

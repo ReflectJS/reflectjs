@@ -6,6 +6,7 @@ import path from "path";
 import exitHook from "./service/exit-hook";
 import { PageCache } from "./service/pagecache";
 import { Routing } from "./service/routing";
+import WebSocket from 'ws';
 
 export const SERVER_PAGE_TIMEOUT = 2000;
 export const CLIENT_JS_FILE = 'client.js';
@@ -39,11 +40,17 @@ export interface TrafficLimit {
 export class Server {
   props: ServerProps;
   pageSet: PageCache;
+  liveSockets: LiveSockets;
   server: http.Server;
 
-  constructor(props: ServerProps, cb?: (port: number) => void) {
+  constructor(props: ServerProps, cb?: (port: number, liveUpdatePort?: number) => void) {
     this.props = props;
-    this.pageSet = new PageCache(props, (type, msg) => this.log(type, msg));
+    this.liveSockets = new LiveSockets((type, msg) => this.log(type, msg));
+    this.pageSet = new PageCache(props, () => {
+      this.liveSockets.notify();
+    }, (type, msg) => {
+      this.log(type, msg);
+    });
     const app = express();
 
     app.use(express.json());
@@ -63,12 +70,22 @@ export class Server {
       new Routing(props.rootPath, (instance) => {
         this.pageSet.setRouting(instance);
         const port = (this.server.address() as any).port;
-        if (cb) {
-          cb(port);
-        } else {
-          this.log('INFO', `START http://localhost:${port} [${props.rootPath}]`);
+        let liveUpdatePort: number | undefined;
+        if (this.props.liveUpdate) {
+          liveUpdatePort = port + 1000;
+          const wss = new WebSocket.Server({ port: liveUpdatePort });
+          wss.on('connection', ws => this.liveSockets.add(ws));
         }
-      })
+        if (cb) {
+          cb(port, liveUpdatePort);
+        } else {
+          let msg = `START http://localhost:${port} [${props.rootPath}]`;
+          if (liveUpdatePort) {
+            msg += ` liveUpdatePort: ${liveUpdatePort}`;
+          }
+          this.log('INFO', msg);
+        }
+      });
     }
 
     this.server = props.port
@@ -191,5 +208,38 @@ export class Server {
         that.log('ERROR', `Server "${url.toString()}": ${err}`);
       }
     });
+  }
+}
+
+class LiveSockets {
+  logger: ServerLogger;
+  sockets: Set<{ ws: WebSocket, ts: number}>;
+
+  constructor(logger: ServerLogger) {
+    this.logger = logger;
+    this.sockets = new Set();
+    setInterval(() => {
+      const ts = Date.now() - 30000;
+      for (const s of Array.from(this.sockets)) {
+        if (s.ts < ts) {
+          this.sockets.delete(s);
+          s.ws.close();
+        }
+      }
+    }, 5000);
+  }
+
+  add(ws: WebSocket) {
+    const item = { ws, ts: Date.now() };
+    this.sockets.add(item);
+    ws.on('message', () => {
+      item.ts = Date.now();
+    });
+  }
+
+  notify() {
+    for (const socket of this.sockets) {
+      socket.ws.send('reload');
+    }
   }
 }
