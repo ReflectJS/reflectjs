@@ -45,17 +45,19 @@ export class PageCache {
     this.routing = routing;
   }
 
-  invalidate(relname?: string) {
+  invalidate(absname?: string) {
     const size = this.compiledPages.size;
-    if (!relname) {
+    if (!absname) {
       this.compiledPages.clear();
     } else {
-      const absname = path.join(this.props.rootPath, relname);
       for (const p of Array.from(this.compiledPages)) {
         const pageName = p[0];
         const compiledPage: CompiledPage = p[1];
-        if (compiledPage.files.includes(absname)) {
-          // this.logger('DEBUG', `PageCache.invalidate() "${pageName}"`);
+        if (
+          (compiledPage.errors && compiledPage.errors.length > 0) ||
+          compiledPage.files.includes(absname)
+        ) {
+          this.logger('DEBUG', `PageCache.invalidate() "${pageName}"`);
           this.compiledPages.delete(pageName);
         }
       }
