@@ -56,7 +56,7 @@ export class PageCache {
         const pageName = p[0];
         const compiledPage: CompiledPage = p[1];
         if (compiledPage.files.includes(absname)) {
-          this.logger('DEBUG', `PageCache.invalidate() "${pageName}"`);
+          // this.logger('DEBUG', `PageCache.invalidate() "${pageName}"`);
           this.compiledPages.delete(pageName);
         }
       }
@@ -66,7 +66,7 @@ export class PageCache {
     }
   }
 
-  async getPage(url: URL, originalUrl: string, filePath: string): Promise<ExecutedPage> {
+  async getPage(url: URL, originalUrl: string, filePath: string, liveSocketsPort?: number): Promise<ExecutedPage> {
     const compiledPage = await this.getCompiledPage(url, filePath);
     if (compiledPage.errors && compiledPage.errors.length > 0) {
       return {
@@ -75,7 +75,7 @@ export class PageCache {
         errors: compiledPage.errors.slice()
       }
     }
-    return this.executePage(url, originalUrl, compiledPage);
+    return this.executePage(url, originalUrl, compiledPage, liveSocketsPort);
   }
 
   protected async getCompiledPage(url: URL, filePath: string): Promise<CompiledPage> {
@@ -125,7 +125,7 @@ export class PageCache {
         ret.errors = [{ type: 'error', msg: `${err}` }];
       }
     }
-    this.logger('DEBUG', `PageCache.compilePage(): "${filePath}"`);
+    // this.logger('DEBUG', `PageCache.compilePage(): "${filePath}"`);
     return ret;
   }
 
@@ -151,7 +151,7 @@ export class PageCache {
     extUrls.length && rootElement.setAttribute(EXTURLS_ATTR, extUrls.join(' '));
   }
 
-  protected async executePage(url: URL, originalUrl: string, compiledPage: CompiledPage): Promise<ExecutedPage> {
+  protected async executePage(url: URL, originalUrl: string, compiledPage: CompiledPage, liveSocketsPort?: number): Promise<ExecutedPage> {
     const ret: ExecutedPage = { compiledPage: compiledPage };
     try {
       const win = new Window({
@@ -201,6 +201,25 @@ export class PageCache {
         runtimeScript.remove();
         outdoc.getElementById(PROPS_SCRIPT_ID).remove();
       }
+
+      if (liveSocketsPort) {
+        const reloadScript = outdoc.createElement('script');
+        reloadScript.id = RUNTIME_SCRIPT_ID;
+        reloadScript.appendChild(outdoc.createTextNode(`
+          if (window.WebSocket) {
+            const ws = new WebSocket('ws://${url.hostname}:${liveSocketsPort}');
+            ws.onmessage = (event) => {
+              if (event.data === 'reload') {
+                location.reload();
+              }
+            }
+            setInterval(() => ws.send('keepalive'), 5000);
+          }
+        `));
+        outdoc.body.appendChild(reloadScript);
+        outdoc.body.appendChild(outdoc.createTextNode('\n'));
+      }
+
       ret.output = `<!DOCTYPE html>\n` + outdoc.documentElement.outerHTML;
     } catch (err: any) {
       if (Array.isArray(err)) {

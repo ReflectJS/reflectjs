@@ -41,9 +41,10 @@ export class Server {
   props: ServerProps;
   pageSet: PageCache;
   liveSockets: LiveSockets;
+  liveSocketsPort: number | undefined;
   server: http.Server;
 
-  constructor(props: ServerProps, cb?: (port: number, liveUpdatePort?: number) => void) {
+  constructor(props: ServerProps, cb?: (port: number, liveSocketsPort?: number) => void) {
     this.props = props;
     this.liveSockets = new LiveSockets((type, msg) => this.log(type, msg));
     this.pageSet = new PageCache(props, () => {
@@ -70,18 +71,17 @@ export class Server {
       new Routing(props.rootPath, (instance) => {
         this.pageSet.setRouting(instance);
         const port = (this.server.address() as any).port;
-        let liveUpdatePort: number | undefined;
         if (this.props.liveUpdate) {
-          liveUpdatePort = port + 1000;
-          const wss = new WebSocket.Server({ port: liveUpdatePort });
+          this.liveSocketsPort = port + 1000;
+          const wss = new WebSocket.Server({ port: this.liveSocketsPort });
           wss.on('connection', ws => this.liveSockets.add(ws));
         }
         if (cb) {
-          cb(port, liveUpdatePort);
+          cb(port, this.liveSocketsPort);
         } else {
           let msg = `START http://localhost:${port} [${props.rootPath}]`;
-          if (liveUpdatePort) {
-            msg += ` liveUpdatePort: ${liveUpdatePort}`;
+          if (this.liveSocketsPort) {
+            msg += ` liveUpdatePort: ${this.liveSocketsPort}`;
           }
           this.log('INFO', msg);
         }
@@ -196,7 +196,7 @@ export class Server {
       try {
         this.props.__willServePage && this.props.__willServePage(url);
         const filePath = this.pageSet.routing?.getFilePath(url.pathname) ?? url.pathname;
-        const page = await that.pageSet.getPage(url, req.originalUrl, filePath);
+        const page = await that.pageSet.getPage(url, req.originalUrl, filePath, this.liveSocketsPort);
         if (page.errors) {
           throw page.errors.map(pe => `${pe.type}: ${pe.msg}`).join('\n');
         }
