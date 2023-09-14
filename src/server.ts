@@ -7,6 +7,7 @@ import exitHook from "./service/exit-hook";
 import { PageCache } from "./service/pagecache";
 import { Routing } from "./service/routing";
 import WebSocket from 'ws';
+const fp = require("find-free-port");
 
 export const SERVER_PAGE_TIMEOUT = 2000;
 export const CLIENT_JS_FILE = 'client.js';
@@ -71,19 +72,30 @@ export class Server {
       new Routing(props.rootPath, (instance) => {
         this.pageSet.setRouting(instance);
         const port = (this.server.address() as any).port;
-        if (this.props.liveUpdate) {
-          this.liveSocketsPort = port + 1000;
-          const wss = new WebSocket.Server({ port: this.liveSocketsPort });
-          wss.on('connection', ws => this.liveSockets.add(ws));
-        }
-        if (cb) {
-          cb(port, this.liveSocketsPort);
-        } else {
-          let msg = `START http://localhost:${port} [${props.rootPath}]`;
-          if (this.liveSocketsPort) {
-            msg += ` liveUpdatePort: ${this.liveSocketsPort}`;
+
+        const done = (port: number, liveSocketsPort?: number) => {
+          if (cb) {
+            cb(port, this.liveSocketsPort);
+          } else {
+            let msg = `START http://localhost:${port} [${props.rootPath}]`;
+            if (this.liveSocketsPort) {
+              msg += ` liveUpdatePort: ${this.liveSocketsPort}`;
+            }
+            this.log('INFO', msg);
           }
-          this.log('INFO', msg);
+        }
+
+        if (this.props.liveUpdate) {
+          fp(3000, (err: any, freePort?: number) => {
+            if (freePort) {
+              this.liveSocketsPort = freePort;
+              const wss = new WebSocket.Server({ port: freePort });
+              wss.on('connection', ws => this.liveSockets.add(ws));
+              done(port, freePort);
+            }
+          });
+        } else {
+          done(port);
         }
       });
     }

@@ -5,10 +5,11 @@ import { compileDoc, PageError } from "../compiler/page-compiler";
 import { DomElement } from "../preprocessor/dom";
 import { HtmlDocument } from "../preprocessor/htmldom";
 import Preprocessor, { EMBEDDED_INCLUDE_FNAME } from "../preprocessor/preprocessor";
-import { EXTURLS_ATTR, PAGENAME_ATTR, PAGEPATH_ATTR, PROPS_SCRIPT_ID, RUNTIME_SCRIPT_ID, URLPATH_ATTR } from "../runtime/page";
+import { EXTURLS_ATTR, LIVERELOAD_SCRIPT_ID, PAGENAME_ATTR, PAGEPATH_ATTR, PROPS_SCRIPT_ID, RUNTIME_SCRIPT_ID, URLPATH_ATTR } from "../runtime/page";
 import { CLIENT_JS_FILE, SERVER_NOCLIENT_PARAM, SERVER_PAGE_TIMEOUT, ServerLogger, ServerProps } from "../server";
 import { Routing } from "./routing";
 import { STDLIB } from "./stdlib";
+import { normalizeText } from "../preprocessor/util";
 
 const SUFFIXES = new Set(['.html', '.htm']);
 
@@ -204,18 +205,17 @@ export class PageCache {
 
       if (liveSocketsPort) {
         const reloadScript = outdoc.createElement('script');
-        reloadScript.id = RUNTIME_SCRIPT_ID;
-        reloadScript.appendChild(outdoc.createTextNode(`
-          if (window.WebSocket) {
-            const ws = new WebSocket('ws://${url.hostname}:${liveSocketsPort}');
-            ws.onmessage = (event) => {
-              if (event.data === 'reload') {
-                location.reload();
-              }
-            }
-            setInterval(() => ws.send('keepalive'), 5000);
-          }
-        `));
+        reloadScript.id = LIVERELOAD_SCRIPT_ID;
+        reloadScript.appendChild(outdoc.createTextNode(`\n` +
+        `  if (window.WebSocket) {\n` +
+        `    const ws = new WebSocket('ws://${url.hostname}:${liveSocketsPort}');\n` +
+        `    ws.onmessage = (event) => {\n` +
+        `      if (event.data === 'reload') {\n` +
+        `        location.reload();\n` +
+        `      }\n` +
+        `    }\n` +
+        `    setInterval(() => ws.send('keepalive'), 5000);\n` +
+        `  }\n`));
         outdoc.body.appendChild(reloadScript);
         outdoc.body.appendChild(outdoc.createTextNode('\n'));
       }
