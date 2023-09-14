@@ -769,7 +769,7 @@ class ScopeProxyHandler implements ProxyHandler<any> {
       //TODO: filter errors due to `data` being null/undefined
       //TODO: should we assume null / empty string as result?
       //TODO: (+ use v.ValueProps.pos if available)
-      console.log(ex);
+      // console.log(ex);
     }
   }
 
