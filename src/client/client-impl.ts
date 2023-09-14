@@ -5,9 +5,11 @@ export function loadClientPage(win: any): Page | undefined {
   if (!e) {
     return undefined;
   }
-  const json = e.textContent;
-  const props = win.eval(`(${json})`) as PageProps;
-  const page = new Page(win as any, win.document.documentElement as any, props);
-  page.refresh();
-  return page;
+  try {
+    const json = e.textContent;
+    const props = win.eval(`(${json})`) as PageProps;
+    const page = new Page(win as any, win.document.documentElement as any, props);
+    page.refresh();
+    return page;
+  } catch (ignored) {}
 }
