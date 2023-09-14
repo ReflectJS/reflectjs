@@ -28,7 +28,8 @@ program.command('serve')
       pageLimit: {
         windowMs: 5000,
         maxRequests: 50
-      }
+      },
+      liveUpdate: true,
     });
   });
 

@@ -7,38 +7,37 @@
 ![tests](https://img.shields.io/endpoint?style=flat-square&url=https://gist.githubusercontent.com/fcapolini/ee36283cfd3eb89ecdd1e5d23910682f/raw/trillo-junit-tests.json)
 ![coverage](https://img.shields.io/endpoint?style=flat-square&url=https%3A%2F%2Fgist.githubusercontent.com%2Ffcapolini%2Fee36283cfd3eb89ecdd1e5d23910682f%2Fraw%2Ftrillo-cobertura-coverage.json)
 
-**The HTML-oriented reactive framework**
+## The HTML-oriented reactive web framework
 
----
-
-Using a reactive framework in modern web development can be pretty involved &mdash;&nbsp;but&nbsp;it&nbsp;doesn't&nbsp;have&nbsp;to&nbsp;be.
+Using a traditional reactive framework can be pretty involved.
 
 Trillo is a groundbreaking alternative which strives for simplicity:
 
-1. it turns HTML itself into a [reactive language](https://trillojs.gitbook.io/docs/topics/reactivity)
-2. it generates fully [indexable pages](https://trillojs.gitbook.io/docs/topics/indexability) out of the box
-3. it makes it easy to create your own [reusable components](https://trillojs.gitbook.io/docs/topics/reusability).
+1. it turns HTML itself into a [reactive language](https://docs.trillojs.dev/en/topics/reactivity)
+2. it generates fully [indexable pages](https://docs.trillojs.dev/en/topics/indexability)
+3. it lets you create your own [custom tags](https://docs.trillojs.dev/en/topics/reusability).
+4. it makes it easy to create your own [component libraries](https://docs.trillojs.dev/en/topics/kits).
 
 It's implemented as a customizable [Express](https://expressjs.com/) server for [Node.js](https://nodejs.org/). It augments HTML with `:`-prefixed [attributes](https://trillojs.gitbook.io/docs/reference/language#values), `[[...]]` [expressions](https://trillojs.gitbook.io/docs/reference/language#expressions), and `<:...>` [directives](https://trillojs.gitbook.io/docs/reference/preprocessor), and it's easy to pick up.
 
-Page-specific JavaScript code for both the client and the server is  compiled on the fly as needed &mdash; you only have to focus on page logic and the server takes care of the rest.
+Page-specific JavaScript code for both the client and the server is  compiled on the fly as needed &mdash; you only have to focus on page logic and the server takes care of the rest, no matter what IDE or code editor you're using.
 
-Trillo removes all the boilerplate code associated with JS-oriented reactive web frameworks like [React](https://react.dev/) and [Vue.js](https://vuejs.org/), while still encouraging good practices and code reuse &mdash; you'll be surprised at how effective it can be.
+Trillo removes all the boilerplate associated with JS-oriented reactive web frameworks like [Angular](https://angular.io/), [React](https://react.dev/) and [Vue.js](https://vuejs.org/), while still encouraging good practices and code reuse. You'll be surprised at how effective it can be.
 
-> Trillo is still under development. We plan to reach v.1.0 later in 2023.
+> Trillo is under active development. We plan to reach v.1.0 later in 2023.
 
 ## Hello World
 
-1. create a dir and install the package:
+1. install the package and create a dir for the example:
 
 ```sh
-mkdir myapp && cd myapp
-npm install trillo
-npx trillo
-# ... START http://localhost:3001
+npm i -g trillo
+mkdir myapp
+trillo serve myapp
+# ... START http://localhost:3000
 ```
 
-2. add `index.html`
+2. add `myapp/index.html`
 
 ```html
 <html>
@@ -51,73 +50,13 @@ npx trillo
 </html>
 ```
 
-3. navigate to http://localhost:3001 to see the seconds counter live.
+3. navigate to http://localhost:3000 to see the seconds counter live.
 
-> If you install globally with `npm install -g trillo` you can just launch the server from any directory with the `trillo` command.
+> If you look at the page source received by the browser you'll notice it contains the text "Seconds: 0". This shows that page logic is executed once in the server in order to deliver content-ready pages, and then transferred to the client to support local updates and user interaction: Trillo supports [isomorphism](https://en.wikipedia.org/wiki/Isomorphic_JavaScript) out of the box.
 
-## Use in a project
+## More Info
 
-1. create the project
-
-```sh
-mkdir myproject cd myproject
-npm init -y
-npm install trillo
-mkdir docroot
-```
-
-2. add an entry point
-
-```js
-// index.js
-const trillo = require('trillo');
-const path = require('path');
-
-new trillo.Server({
-  port: 3002,
-  rootPath: path.join(__dirname, 'docroot'),
-});
-```
-
-in TypeScript we can use imports instead
-
-```ts
-// index.ts
-import { Server } from 'trillo';
-import path from 'path';
-
-new Server({
-  port: 3002,
-  rootPath: path.join(__dirname, 'docroot'),
-});
-```
-
-3. add `docroot/index.html`
-
-```html
-<html>
-  <body :count="[[0]]"
-        :did-init="[[
-          setInterval(() => count++, 1000);
-        ]]">
-    Seconds: [[count]]
-  </body>
-</html>
-```
-
-4. run the project:
-
-```sh
-node index.js
-# ... START http://localhost:3002
-```
-
-5. navigate to http://localhost:3002 to see the seconds counter live.
-
-> When using Trillo in a project you can configure it and add your own services and middleware. All options are documented in the [Server Reference](https://trillo.org/docs/reference/server).
-
-## Next steps
-
-* [Overview](https://trillojs.gitbook.io/docs/overview) &mdash; get the gist of Trillo
-* [Tutorials](https://trillojs.gitbook.io/docs/tutorials) &mdash; get a taste of Trillo development
-* [Reference](https://trillojs.gitbook.io/docs/reference) &mdash; find all the details
+* [Homepage](https://trillojs.dev/)
+* [Quick Start](https://docs.trillojs.dev/en/quick-start) &mdash; quickly check it out
+* [Tutorials](https://docs.trillojs.dev/en/tutorials) &mdash; get a taste of Trillo development
+* [Reference](https://docs.trillojs.dev/en/reference) &mdash; find all the details

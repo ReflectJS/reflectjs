@@ -23,6 +23,7 @@ export const PROPS_JS_ID = 'trillo_props';
 export const PAGE_JS_ID = 'trillo_page';
 export const PAGE_READY_CB = 'onTrilloReady';
 export const RUNTIME_SCRIPT_ID = 'trillo-runtime';
+export const LIVERELOAD_SCRIPT_ID = 'trillo-reload';
 
 export const ROOT_SCOPE_NAME = 'page';
 export const HEAD_SCOPE_NAME = 'head';
