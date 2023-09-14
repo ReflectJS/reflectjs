@@ -9,7 +9,7 @@ import { EXTURLS_ATTR, LIVERELOAD_SCRIPT_ID, PAGENAME_ATTR, PAGEPATH_ATTR, PROPS
 import { CLIENT_JS_FILE, SERVER_NOCLIENT_PARAM, SERVER_PAGE_TIMEOUT, ServerLogger, ServerProps } from "../server";
 import { Routing } from "./routing";
 import { STDLIB } from "./stdlib";
-import { normalizeText } from "../preprocessor/util";
+const chokidar = require('chokidar');
 
 const SUFFIXES = new Set(['.html', '.htm']);
 
@@ -34,10 +34,8 @@ export class PageCache {
     const p = props.__clientJsFilePath ?? path.resolve(__dirname, '..', CLIENT_JS_FILE);
     this.clientJs = '\n' + fs.readFileSync(p, { encoding: 'utf8'});
     // page monitor
-    fs.watch(props.rootPath, {
-      recursive: true,
-    }, (event, filename) => {
-      if (SUFFIXES.has(path.extname(filename))) {
+    chokidar.watch(props.rootPath).on('all', (event: string, filename?: string) => {
+      if (!filename || SUFFIXES.has(path.extname(filename))) {
         this.invalidate(filename);
       }
     });
@@ -47,7 +45,7 @@ export class PageCache {
     this.routing = routing;
   }
 
-  invalidate(relname: string | null) {
+  invalidate(relname?: string) {
     const size = this.compiledPages.size;
     if (!relname) {
       this.compiledPages.clear();

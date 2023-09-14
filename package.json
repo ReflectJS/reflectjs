@@ -61,6 +61,7 @@
     "typescript": "^4.9.3"
   },
   "dependencies": {
+    "chokidar": "^3.5.3",
     "commander": "^11.0.0",
     "escodegen": "^2.0.0",
     "esprima": "^4.0.1",
