@@ -4,7 +4,8 @@ import path from "path";
 import { compileDoc, PageError } from "../compiler/page-compiler";
 import { DomElement } from "../preprocessor/dom";
 import { HtmlDocument } from "../preprocessor/htmldom";
-import Preprocessor, { EMBEDDED_INCLUDE_FNAME } from "../preprocessor/preprocessor";
+import Preprocessor from "../preprocessor/preprocessor";
+import { normalizeText } from "../preprocessor/util";
 import { EXTURLS_ATTR, LIVERELOAD_SCRIPT_ID, PAGENAME_ATTR, PAGEPATH_ATTR, PROPS_SCRIPT_ID, RUNTIME_SCRIPT_ID, URLPATH_ATTR } from "../runtime/page";
 import { CLIENT_JS_FILE, SERVER_NOCLIENT_PARAM, SERVER_PAGE_TIMEOUT, ServerLogger, ServerProps } from "../server";
 import { Routing } from "./routing";
@@ -34,7 +35,11 @@ export class PageCache {
     const p = props.__clientJsFilePath ?? path.resolve(__dirname, '..', CLIENT_JS_FILE);
     this.clientJs = '\n' + fs.readFileSync(p, { encoding: 'utf8'});
     // page monitor
-    chokidar.watch(props.rootPath).on('all', (event: string, filename?: string) => {
+    chokidar.watch(props.rootPath, {
+      ignored: /([\/\\]\.)/,
+      ignorePermissionErrors: true,
+      depth: 15,
+    }).on('all', (event: string, filename?: string) => {
       if (!filename || SUFFIXES.has(path.extname(filename))) {
         this.invalidate(filename);
       }
@@ -68,24 +73,24 @@ export class PageCache {
   }
 
   async getPage(url: URL, originalUrl: string, filePath: string, liveSocketsPort?: number): Promise<ExecutedPage> {
-    const compiledPage = await this.getCompiledPage(url, filePath);
+    const compiledPage = await this.getCompiledPage(url, filePath, liveSocketsPort);
     if (compiledPage.errors && compiledPage.errors.length > 0) {
-      return {
-        compiledPage: compiledPage,
-        output: '',
-        errors: compiledPage.errors.slice()
-      }
+      return this.errorPage(url, originalUrl, compiledPage, liveSocketsPort);
     }
     return this.executePage(url, originalUrl, compiledPage, liveSocketsPort);
   }
 
-  protected async getCompiledPage(url: URL, filePath: string): Promise<CompiledPage> {
+  protected async getCompiledPage(url: URL, filePath: string, liveSocketsPort?: number): Promise<CompiledPage> {
     const cachedPage = this.compiledPages.get(filePath);
     if (cachedPage) {
       return cachedPage;
     }
     const ret = await this.compilePage(url, filePath);
-    if (!ret.errors || !ret.errors.length) {
+    if (!ret.errors || !ret.errors.length || liveSocketsPort) {
+      /*
+      if liveSocketsPort is valid, we're in development mode,
+      so we keep monitored even pages with errors
+      */
       this.compiledPages.set(filePath, ret);
     }
     return ret;
@@ -152,7 +157,9 @@ export class PageCache {
     extUrls.length && rootElement.setAttribute(EXTURLS_ATTR, extUrls.join(' '));
   }
 
-  protected async executePage(url: URL, originalUrl: string, compiledPage: CompiledPage, liveSocketsPort?: number): Promise<ExecutedPage> {
+  protected async executePage(
+    url: URL, originalUrl: string, compiledPage: CompiledPage, liveSocketsPort?: number
+  ): Promise<ExecutedPage> {
     const ret: ExecutedPage = { compiledPage: compiledPage };
     try {
       const win = new Window({
@@ -206,16 +213,11 @@ export class PageCache {
       if (liveSocketsPort) {
         const reloadScript = outdoc.createElement('script');
         reloadScript.id = LIVERELOAD_SCRIPT_ID;
-        reloadScript.appendChild(outdoc.createTextNode(`\n` +
-        `  if (window.WebSocket) {\n` +
-        `    const ws = new WebSocket('ws://${url.hostname}:${liveSocketsPort}');\n` +
-        `    ws.onmessage = (event) => {\n` +
-        `      if (event.data === 'reload') {\n` +
-        `        location.reload();\n` +
-        `      }\n` +
-        `    }\n` +
-        `    setInterval(() => ws.send('keepalive'), 5000);\n` +
-        `  }\n`));
+        reloadScript.appendChild(
+          outdoc.createTextNode(
+            this.reloadScript(url, liveSocketsPort)
+          )
+        );
         outdoc.body.appendChild(reloadScript);
         outdoc.body.appendChild(outdoc.createTextNode('\n'));
       }
@@ -229,6 +231,50 @@ export class PageCache {
       }
     }
     return ret;
+  }
+
+  protected async errorPage(
+    url: URL, originalUrl: string, compiledPage: CompiledPage, liveSocketsPort?: number
+  ): Promise<ExecutedPage> {
+    return {
+      compiledPage,
+      errors: compiledPage.errors,
+      output: normalizeText(`<!DOCTYPE html>
+      <html lang="en">
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <title>Page Errors</title>
+          <meta name="color-scheme" content="light dark">
+          <style>
+            body {
+              font-family: sans-serif;
+            }
+          </style>
+        </head>
+        <body>
+          <h1>Page errors:</h1>
+          <ul>
+          <li>${compiledPage.errors?.map(e => e.msg).join('</li><br/><li>')}</li>
+          </ul>
+          <script>${liveSocketsPort ? this.reloadScript(url, liveSocketsPort) : ''}</script>
+        </body>
+      </html>
+      `)
+    }
+  }
+
+  protected reloadScript(url: URL, liveSocketsPort: number): string {
+    return `\n` +
+    `  if (window.WebSocket) {\n` +
+    `    const ws = new WebSocket('ws://${url.hostname}:${liveSocketsPort}');\n` +
+    `    ws.onmessage = (event) => {\n` +
+    `      if (event.data === 'reload') {\n` +
+    `        location.reload();\n` +
+    `      }\n` +
+    `    }\n` +
+    `    setInterval(() => ws.send('keepalive'), 5000);\n` +
+    `  }\n`
   }
 }
 

@@ -210,7 +210,9 @@ export class Server {
         const filePath = this.pageSet.routing?.getFilePath(url.pathname) ?? url.pathname;
         const page = await that.pageSet.getPage(url, req.originalUrl, filePath, this.liveSocketsPort);
         if (page.errors) {
-          throw page.errors.map(pe => `${pe.type}: ${pe.msg}`).join('\n');
+          that.log('ERROR', `Server "${url.toString()}": ${
+            page.errors.map(e => e.type + ': ' + e.msg).join(', ')
+          }`);
         }
         res.header("Content-Type",'text/html');
         res.send(page.output ?? '');
