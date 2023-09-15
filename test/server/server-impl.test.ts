@@ -3,6 +3,7 @@ import * as happy from 'happy-dom';
 import { JSDOM } from 'jsdom';
 import { PROPS_SCRIPT_ID, RUNTIME_SCRIPT_ID } from "../../src/runtime/page";
 import { Server } from "../../src/server";
+import { normalizeSpace } from "../../src/preprocessor/util";
 
 let server: Server;
 let port: number;
@@ -46,7 +47,9 @@ describe("server: server-impl", () => {
 
   it(`shouldn't get inexistent page`, async () => {
     const doc = await loadPage(`http://localhost:${port}/inexistent.html`);
-    assert.equal(doc.body.textContent, 'error: Could not read file "/inexistent.html"');
+    assert.equal(
+      normalizeSpace(doc.body.textContent ?? '')?.trim(),
+      'Page errors: Could not read file "/inexistent.html"');
   })
 
   it(`should get dynamic page`, async () => {
